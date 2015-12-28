@@ -10,6 +10,7 @@
 #include "../Utils/Console.h"
 #include "../Utils/Logging.h"
 #include "../Utils/SystemInfo.h"
+#include <thread>
 
 namespace Engine
 {
@@ -17,9 +18,19 @@ namespace Engine
 	{
 	public:
 		static bool Update();
-		static bool Render();
+		static void Render();
+
+		static std::string GetApplicationDirectory();
+		static bool Running();
 		static void Exit();
 		static void Destroy();
-		static bool Running;
+		static void BeginRendering();
+
+	private:
+		static std::thread _renderThread;
+		static bool _renderThreadAssigned;
+		static bool _running;
+		static std::string _appDirectory;
+		static IRenderer* _renderer;
 	};
 }

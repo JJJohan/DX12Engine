@@ -1,5 +1,6 @@
 #include "IRenderer.h"
 #include "../Utils/Logging.h"
+#include "../Input/Input.h"
 
 namespace Engine
 {
@@ -13,14 +14,20 @@ namespace Engine
 		, _windowHandle(nullptr)
 		, _windowInstance(HINSTANCE(GetModuleHandle(nullptr)))
 		, _vsync(true)
+		, _renderFinished(true)
 	{
 		_windowClosed = nullptr;
-	    SetClearColour(Colour::Blue);
+		IRenderer::SetClearColour(Colour::Blue);
 	}
 
 	IRenderer::~IRenderer()
 	{
 		
+	}
+
+	bool IRenderer::RenderFinished() const
+	{
+		return _renderFinished;
 	}
 
 	void IRenderer::SetClearColour(Colour colour)
@@ -31,7 +38,7 @@ namespace Engine
 		_clearColour[3] = colour.GetAlpha();
 	}
 
-	bool IRenderer::Render()
+	bool IRenderer::WindowRender() const
 	{
 		// Main message loop:
 		MSG msg;
@@ -74,6 +81,15 @@ namespace Engine
 			DestroyWindow(hwnd);
 			_windowClosed = hwnd;
 			break;
+
+		case WM_KEYDOWN:
+			Input::KeyDownEvent(wParam);
+			break;
+
+		case WM_KEYUP:
+			Input::KeyUpEvent(wParam);
+			break;
+
 		default:
 			return DefWindowProc(hwnd, msg, wParam, lParam);
 		}
@@ -86,7 +102,27 @@ namespace Engine
 		_vsync = enabled;
 	}
 
-	void IRenderer::SetWindowTitle(std::string title)
+	std::string IRenderer::GetDeviceName() const
+	{
+		return _deviceName;
+	}
+
+	size_t IRenderer::GetDeviceMemoryTotal() const
+	{
+		return _deviceMemoryTotal;
+	}
+
+	size_t IRenderer::GetDeviceMemoryFree() const
+	{
+		return _deviceMemoryFree;
+	}
+
+	std::string IRenderer::GetMaxFeatureLevel() const
+	{
+		return _featureLevel;
+	}
+
+	void IRenderer::SetWindowTitle(std::string title) const
 	{
 		if (_windowHandle != nullptr)
 		{
@@ -94,7 +130,12 @@ namespace Engine
 		}
 	}
 
-	bool IRenderer::RegisterInstance()
+	HWND IRenderer::GetWindowHandle() const
+	{
+		return _windowHandle;
+	}
+
+	bool IRenderer::RegisterInstance() const
 	{
 		WNDCLASSEX wcx;
 		wcx.cbSize = sizeof(wcx); // size of structure 

@@ -1,10 +1,12 @@
 #pragma once
 
 #include "../IRenderer.h"
-#include "d3dx12.h"
+#include "FeatureSupport.h"
 #include <dxgi1_5.h>
 #include <wrl/client.h>
 #include <DirectXMath.h>
+#include "Camera.h"
+#include "RenderObject.h"
 
 using namespace Microsoft::WRL;
 using namespace DirectX;
@@ -22,18 +24,13 @@ namespace Engine
 		bool Render() override;
 
 	private:
-		void GetHardwareAdapter(IDXGIFactory4* pFactory, IDXGIAdapter1** ppAdapter);
+		static void GetHardwareAdapter(IDXGIFactory4* pFactory, IDXGIAdapter3** ppAdapter);
 
 		const static int _frameCount = 2;
-
-		struct Vertex
-		{
-			XMFLOAT3 position;
-			XMFLOAT4 color;
-		};
+		FeatureInfo _featureInfo;
 
 		// Pipeline objects
-		D3D12_VIEWPORT _viewport;
+		Camera* _pCamera;
 		D3D12_RECT _scissorRect;
 		ComPtr<IDXGISwapChain3> _swapChain;
 		ComPtr<ID3D12Device> _device;
@@ -56,6 +53,7 @@ namespace Engine
 		HANDLE _fenceEvent;
 		ComPtr<ID3D12Fence> _fence;
 		UINT64 _fenceValue;
+		RenderObject* _pTriangle;
 		
 		bool LoadPipeline();
 		bool LoadAssets();

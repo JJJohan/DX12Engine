@@ -4,7 +4,9 @@ namespace Engine
 {
 	float Time::_deltaTime = 0.0f;
 	float Time::_runningTime = 0.0f;
+	float Time::_gpuTime = 0.0f;
 	std::chrono::steady_clock::time_point Time::_previousTime = std::chrono::steady_clock::now();
+	std::chrono::steady_clock::time_point Time::_previousTimeGPU = std::chrono::steady_clock::now();
 
 	float const Time::DeltaTime()
 	{
@@ -16,9 +18,9 @@ namespace Engine
 		return _runningTime;
 	}
 
-	float const Time::FrameRate()
+	float const Time::GPUTime()
 	{
-		return 1.0f / _deltaTime;
+		return _gpuTime;
 	}
 
 	void Time::Update()
@@ -30,5 +32,15 @@ namespace Engine
 
 		_deltaTime = diff.count();
 		_runningTime += _deltaTime;
+	}
+
+	void Time::UpdateGPU()
+	{
+		// Calculate frame time
+		std::chrono::steady_clock::time_point currentTime = std::chrono::high_resolution_clock::now();
+		std::chrono::duration<float> diff = currentTime - _previousTimeGPU;
+		_previousTimeGPU = currentTime;
+
+		_gpuTime = diff.count();
 	}
 }

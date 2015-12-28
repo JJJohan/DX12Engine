@@ -209,4 +209,18 @@ namespace Engine
 	{
 		return _frequency;
 	}
+
+	double Processor::GetClockSpeed()
+	{
+		LARGE_INTEGER qwWait, qwStart, qwCurrent;
+		QueryPerformanceCounter(&qwStart);
+		QueryPerformanceFrequency(&qwWait);
+		qwWait.QuadPart >>= 5;
+		unsigned __int64 Start = __rdtsc();
+		do
+		{
+			QueryPerformanceCounter(&qwCurrent);
+		} while (qwCurrent.QuadPart - qwStart.QuadPart < qwWait.QuadPart);
+		return ((__rdtsc() - Start) << 5) / 1000000.0;
+	}
 }

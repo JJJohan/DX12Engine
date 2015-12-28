@@ -19,6 +19,8 @@ namespace Engine
 		static void DestroyRenderer();
 		static bool Render();
 		static bool Update();
+		static HWND GetWindowHandle();
+		static IRenderer* GetRenderer();
 
 	private:
 		Renderer();

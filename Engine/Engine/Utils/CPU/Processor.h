@@ -15,6 +15,7 @@ namespace Engine
 		int GetL2CacheSize();
 		int GetLogicalCores();
 		int GetFrequency();
+		double GetClockSpeed();
 
 	private:
 		std::string _features;

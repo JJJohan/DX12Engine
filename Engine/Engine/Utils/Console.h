@@ -2,6 +2,7 @@
 
 namespace Engine
 {
+	class Vector2;
 	class Colour;
 
 	class Console
@@ -32,6 +33,8 @@ namespace Engine
 		static void SetColour(ConsoleColour textColour, ConsoleColour backgroundColour = ConsoleColour::Current);
 		static ConsoleColour GetTextColour();
 		static ConsoleColour GetBackgroundColour();
+		static Vector2 GetCursorPos();
+		static void SetCursorPos(int x, int y);
 
 	private:
 		static bool HandlerRoutine(DWORD ctrlType);

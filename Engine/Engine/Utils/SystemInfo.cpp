@@ -5,6 +5,7 @@
 #include "Logging.h"
 #include "StringUtils.h"
 #include "..\Data\Vector2.h"
+#include "../Rendering/Renderer.h"
 #ifdef _DEBUG
 #include "Console.h"
 #endif
@@ -15,9 +16,19 @@ namespace Engine
 
 	void SystemInfo::PrintSystemInfo()
 	{
+		// Ignore logging this to file if GPU info is not available (yet?).
+		bool ignored = false;
+		if (Renderer::GetRenderer() == nullptr)
+		{
+			Logging::EnableFileLogging(false);
+			ignored = true;
+		}
+
 #ifdef _DEBUG
 		Console::ConsoleColour textColour = Console::GetTextColour();
 		Console::SetColour(Console::ConsoleColour::Cyan);
+		Vector2 cursorPos = Console::GetCursorPos();
+		Console::SetCursorPos(0, 2);
 #endif
 
 		Logging::Log("----------------------");
@@ -42,7 +53,18 @@ namespace Engine
 
 #ifdef _DEBUG
 		Console::SetColour(textColour);
+
+		if (cursorPos.Y != 2)
+		{
+			Console::SetCursorPos(int(cursorPos.X), int(cursorPos.Y));
+		}
 #endif
+
+		// Make sure logging is re-enabled if it was hidden.
+		if (ignored)
+		{
+			Logging::EnableFileLogging(true);
+		} 
 	}
 
 	Vector2 SystemInfo::GetNativeResolution()
@@ -93,8 +115,7 @@ namespace Engine
 			windowsName = "OS: Unknown";
 		}
 
-		// Windows 32 or 64-bit architecture check
-		
+		// Windows 32 or 64-bit architecture check		
 		SYSTEM_INFO sysInfo;
 		GetSystemInfo(&sysInfo);
 		std::string architecture;
@@ -121,25 +142,48 @@ namespace Engine
 		
 		std::stringstream ss;
 		ss << "CPU: " << _processor.GetName() << "\n";
+		ss << "  Estimated Clock Speed: " << _processor.GetClockSpeed() << "Mhz\n";
 		ss << "  Features: " << _processor.GetFeatures() << "\n";
-		ss << "  Threads: " << _processor.GetLogicalCores();
+		ss << "  Logical Cores: " << _processor.GetLogicalCores();
 		return ss.str();
 	}
 
 	std::string SystemInfo::GetGPUInfo()
 	{
-		return "GPU: Information pending";
+		std::stringstream ss;
+		ss.precision(3);
+		IRenderer* renderer = Renderer::GetRenderer();
+		if (renderer != nullptr)
+		{
+			float memTotal = float(renderer->GetDeviceMemoryTotal());
+			float memFree = float(renderer->GetDeviceMemoryFree());
+			ss << "GPU: " << renderer->GetDeviceName() << "\n";
+			ss << "  Dedicated Memory: " << memTotal / 1024 << " GB (" << size_t(memTotal) << " MB)\n";
+			ss << "  Free Memory: " << memFree / 1024 << " GB (" << size_t(memFree) << " MB)\n";
+			ss << "  Feature Level: " << renderer->GetMaxFeatureLevel();
+		}
+		else
+		{
+			ss << "GPU: Unavailable" << "\n";
+			ss << "  Dedicated Memory: Unavailable\n";
+			ss << "  Free Memory: Unavailable\n";
+			ss << "  Feature Level: Unavailable";
+		}
+
+		return ss.str();
 	}
 
 	std::string SystemInfo::GetMemInfo()
 	{
 		MEMORYSTATUSEX memInfo;
+		memInfo.dwLength = sizeof memInfo;
 		GlobalMemoryStatusEx(&memInfo);
 
-		DWORDLONG megabytes = memInfo.ullAvailPhys / 1024 / 1024 / 1024 / 1024 / 1024;
-		DWORDLONG gigabytes = megabytes / 1024;
+		DWORDLONG megabytes = memInfo.ullTotalPhys / 1024 / 1024;
+		double gigabytes = double(megabytes) / 1024.0f;
 
 		std::stringstream ss;
+		ss.precision(3);
 		ss << "MEM: " << gigabytes << " GB (" << megabytes << " MB)";
 		return ss.str();
 	}

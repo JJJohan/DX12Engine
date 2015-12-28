@@ -1,12 +1,14 @@
 #include <D3Dcompiler.h>
 #include "DX12Renderer.h"
 #include "../../Utils/Helpers.h"
-#include <sstream>
+#include "d3dx12.h"
+#include "CommandQueue.h"
 
 namespace Engine
 {
 	DX12Renderer::DX12Renderer()
-		: _swapChain(nullptr)
+		: _pCamera(nullptr)
+		, _swapChain(nullptr)
 		, _device(nullptr)
 		, _commandAllocator(nullptr)
 		, _commandQueue(nullptr)
@@ -20,6 +22,7 @@ namespace Engine
 		, _frameIndex(0)
 		, _fenceEvent(nullptr)
 		, _fence(nullptr)
+		, _pTriangle(nullptr)
 		, _fenceValue(0)
 	{
 	}
@@ -31,6 +34,8 @@ namespace Engine
 
 		CloseHandle(_fenceEvent);
 
+		delete _pCamera;
+		delete _pTriangle;
 		_swapChain.Reset();
 		_device.Reset();
 		_commandAllocator.Reset();
@@ -47,11 +52,6 @@ namespace Engine
 	{
 		IRenderer::InitWindow(width, height, windowed);
 
-		// Set up the viewports
-		_viewport.Width = float(_screenWidth);
-		_viewport.Height = float(_screenHeight);
-		_viewport.MaxDepth = 1.0f;
-
 		_scissorRect.right = _screenWidth;
 		_scissorRect.bottom = _screenHeight;
 
@@ -65,6 +65,9 @@ namespace Engine
 			return EXIT_FAILURE;
 		}
 
+		// Create a camera
+		_pCamera = Camera::CreateCamera(_device.Get(), XMFLOAT4(0.0f, 0.0f, float(width), float(height)), 90.0f, 0.0f, 1.0f);
+
 		return EXIT_SUCCESS;
 	}
 
@@ -75,10 +78,7 @@ namespace Engine
 
 	bool DX12Renderer::Render()
 	{
-		if (IRenderer::Render() == EXIT_FAILURE)
-		{
-			return EXIT_FAILURE;
-		}
+		_renderFinished = false;
 
 		// Record all the commands we need to render the scene into the command list.
 		PopulateCommandList();
@@ -87,24 +87,29 @@ namespace Engine
 		ID3D12CommandList* ppCommandLists[] = { _commandList.Get() };
 		_commandQueue->ExecuteCommandLists(_countof(ppCommandLists), ppCommandLists);
 
-		// Present the frame.
-		if (Failed(_swapChain->Present(_vsync, 0)))
+		// Check if the camera has moved.
+		if (_pCamera->Update())
 		{
-			return EXIT_FAILURE;
+			
 		}
+		
+		// Present the frame.
+		LOGFAILEDCOMRETURN(
+			_swapChain->Present(_vsync, 0),
+			EXIT_FAILURE);
 
 		WaitForPreviousFrame();
 
 		return EXIT_SUCCESS;
 	}
 
-	void DX12Renderer::GetHardwareAdapter(IDXGIFactory4* pFactory, IDXGIAdapter1** ppAdapter)
+	void DX12Renderer::GetHardwareAdapter(IDXGIFactory4* pFactory, IDXGIAdapter3** ppAdapter)
 	{
 		*ppAdapter = nullptr;
 		for (UINT adapterIndex = 0; ; ++adapterIndex)
 		{
-			IDXGIAdapter1* pAdapter = nullptr;
-			if (DXGI_ERROR_NOT_FOUND == pFactory->EnumAdapters1(adapterIndex, &pAdapter))
+			IDXGIAdapter* pAdapter = nullptr;
+			if (DXGI_ERROR_NOT_FOUND == pFactory->EnumAdapters(adapterIndex, &pAdapter))
 			{
 				// No more adapters to enumerate.
 				break;
@@ -112,9 +117,9 @@ namespace Engine
 
 			// Check to see if the adapter supports Direct3D 12, but don't create the
 			// actual device yet.
-			if (SUCCEEDED(D3D12CreateDevice(pAdapter, D3D_FEATURE_LEVEL_11_0, _uuidof(ID3D12Device), nullptr)))
+			if (SUCCEEDED(D3D12CreateDevice(pAdapter, D3D_FEATURE_LEVEL_12_0, _uuidof(ID3D12Device), nullptr)))
 			{
-				*ppAdapter = pAdapter;
+				*ppAdapter = static_cast<IDXGIAdapter3*>(pAdapter);
 				return;
 			}
 			pAdapter->Release();
@@ -132,27 +137,25 @@ namespace Engine
 #endif
 
 		ComPtr<IDXGIFactory4> factory;
-		if (Failed(CreateDXGIFactory1(IID_PPV_ARGS(&factory))))
-		{
-			return EXIT_FAILURE;
-		}
+		LOGFAILEDRETURN(
+			CreateDXGIFactory1(IID_PPV_ARGS(&factory)),
+			std::string(Logging::GetWin32ErrorString()),
+			EXIT_FAILURE);
 
 		if (_useWarpDevice)
 		{
 			ComPtr<IDXGIAdapter> warpAdapter;
-			if (Failed(factory->EnumWarpAdapter(IID_PPV_ARGS(&warpAdapter))))
-			{
-				return EXIT_FAILURE;
-			}
+			LOGFAILEDCOMRETURN(
+				factory->EnumWarpAdapter(IID_PPV_ARGS(&warpAdapter)),
+				EXIT_FAILURE);
 
-			if (Failed(D3D12CreateDevice(warpAdapter.Get(), D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(&_device))))
-			{
-				return EXIT_FAILURE;
-			}
+			LOGFAILEDCOMRETURN(
+				D3D12CreateDevice(warpAdapter.Get(), D3D_FEATURE_LEVEL_12_0, IID_PPV_ARGS(&_device)),
+				EXIT_FAILURE);
 		}
 		else
 		{
-			ComPtr<IDXGIAdapter1> hardwareAdapter;
+			ComPtr<IDXGIAdapter3> hardwareAdapter;
 			GetHardwareAdapter(factory.Get(), &hardwareAdapter);
 			if (hardwareAdapter.Get() == nullptr)
 			{
@@ -160,28 +163,33 @@ namespace Engine
 				return EXIT_FAILURE;
 			}
 
-			DXGI_ADAPTER_DESC1 desc;
-			hardwareAdapter->GetDesc1(&desc);
-			std::wstring wideDesc = std::wstring(desc.Description);
-			std::stringstream mem;
-			mem << "Available graphics memory: " << desc.DedicatedVideoMemory << " MB";
-			Logging::Log("Creating Direct3D12 device using adapter '" + std::string(wideDesc.begin(), wideDesc.end()) + "'.");
-			Logging::Log(mem.str());
+			AdapterInfo adapterInfo = FeatureSupport::QueryAdapterInfo(hardwareAdapter.Get());
+			_deviceName = adapterInfo.Name;
+			
+			DXGI_QUERY_VIDEO_MEMORY_INFO videoMemInfo = {};
+			LOGFAILEDCOMRETURN(
+				hardwareAdapter->QueryVideoMemoryInfo(0, DXGI_MEMORY_SEGMENT_GROUP_LOCAL, &videoMemInfo),
+				EXIT_FAILURE);
+			_deviceMemoryTotal = adapterInfo.DedicatedMemory;
+			_deviceMemoryFree = (videoMemInfo.Budget - videoMemInfo.CurrentUsage) / 1024 / 1024;
 
-			if (Failed(D3D12CreateDevice(hardwareAdapter.Get(), D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(&_device))))
-			{
-				return EXIT_FAILURE;
-			}
+			Logging::Log("Creating Direct3D12 device using adapter '" + adapterInfo.Name + "'.");
+			LOGFAILEDCOMRETURN(
+				D3D12CreateDevice(hardwareAdapter.Get(), D3D_FEATURE_LEVEL_12_0, IID_PPV_ARGS(&_device)),
+				EXIT_FAILURE);
 		}
+
+		// Populate feature level info.
+		_featureInfo = FeatureSupport::QueryDeviceFeatures(_device.Get(), DXGI_FORMAT_R8G8B8A8_UNORM);
+		_featureLevel = FeatureSupport::GetFeatureLevelString(_featureInfo.MaxFeatureLevelSupported);
 
 		// Describe and create the command queue.
 		D3D12_COMMAND_QUEUE_DESC queueDesc = {};
 		queueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
 		queueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
-		if (Failed(_device->CreateCommandQueue(&queueDesc, IID_PPV_ARGS(&_commandQueue))))
-		{
-			return EXIT_FAILURE;
-		}
+		LOGFAILEDCOMRETURN(
+			_device->CreateCommandQueue(&queueDesc, IID_PPV_ARGS(&_commandQueue)),
+			EXIT_FAILURE);
 
 		// Describe and create the swap chain.
 		DXGI_SWAP_CHAIN_DESC swapChainDesc = {};
@@ -197,15 +205,13 @@ namespace Engine
 
 		// Swap chain needs the queue so that it can force a flush on it.
 		ComPtr<IDXGISwapChain> swapChain;
-		if (Failed(factory->CreateSwapChain(_commandQueue.Get(), &swapChainDesc, &swapChain)))
-		{
-			return EXIT_FAILURE;
-		}
+		LOGFAILEDCOMRETURN(
+			factory->CreateSwapChain(_commandQueue.Get(), &swapChainDesc, &swapChain),
+			EXIT_FAILURE);
 
-		if (Failed(swapChain.As(&_swapChain)))
-		{
-			return EXIT_FAILURE;
-		}
+		LOGFAILEDCOMRETURN(
+			swapChain.As(&_swapChain),
+			EXIT_FAILURE);
 
 		_frameIndex = _swapChain->GetCurrentBackBufferIndex();
 
@@ -215,10 +221,9 @@ namespace Engine
 		rtvHeapDesc.NumDescriptors = _frameCount;
 		rtvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
 		rtvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
-		if (Failed(_device->CreateDescriptorHeap(&rtvHeapDesc, IID_PPV_ARGS(&_rtvHeap))))
-		{
-			return EXIT_FAILURE;
-		}
+		LOGFAILEDCOMRETURN(
+			_device->CreateDescriptorHeap(&rtvHeapDesc, IID_PPV_ARGS(&_rtvHeap)),
+			EXIT_FAILURE);
 
 		_rtvDescriptorSize = _device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 
@@ -228,19 +233,17 @@ namespace Engine
 		// Create a RTV for each frame.
 		for (UINT n = 0; n < _frameCount; n++)
 		{
-			if (Failed(_swapChain->GetBuffer(n, IID_PPV_ARGS(&_renderTargets[n]))))
-			{
-				return EXIT_FAILURE;
-			}
+			LOGFAILEDCOMRETURN(
+				_swapChain->GetBuffer(n, IID_PPV_ARGS(&_renderTargets[n])),
+				EXIT_FAILURE);
 
 			_device->CreateRenderTargetView(_renderTargets[n].Get(), nullptr, rtvHandle);
 			rtvHandle.Offset(1, _rtvDescriptorSize);
 		}	
 
-		if (Failed(_device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&_commandAllocator))))
-		{
-			return EXIT_FAILURE;
-		}
+		LOGFAILEDCOMRETURN(
+			_device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&_commandAllocator)),
+			EXIT_FAILURE);
 
 		return EXIT_SUCCESS;
 	}
@@ -249,46 +252,42 @@ namespace Engine
 	{
 		// Create an empty root signature.
 		{
+			// define descriptor tables for a CBV for shaders
+			CD3DX12_DESCRIPTOR_RANGE DescRange[1];
+			DescRange[0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0);
+
+			CD3DX12_ROOT_PARAMETER rootParameters[1];
+			rootParameters[0].InitAsConstantBufferView(0);
+
 			CD3DX12_ROOT_SIGNATURE_DESC rootSignatureDesc;
-			rootSignatureDesc.Init(0, nullptr, 0, nullptr, D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
+			rootSignatureDesc.Init(1, rootParameters, 0, nullptr, D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
 
 			ComPtr<ID3DBlob> signature;
 			ComPtr<ID3DBlob> error;
-			if (Failed(D3D12SerializeRootSignature(&rootSignatureDesc, D3D_ROOT_SIGNATURE_VERSION_1, &signature, &error)))
-			{
-				return EXIT_FAILURE;
-			}
+			LOGFAILEDCOMRETURN(
+				D3D12SerializeRootSignature(&rootSignatureDesc, D3D_ROOT_SIGNATURE_VERSION_1, &signature, &error),
+				EXIT_FAILURE);
 
-			if (Failed(_device->CreateRootSignature(0, signature->GetBufferPointer(), signature->GetBufferSize(), IID_PPV_ARGS(&_rootSignature))))
-			{
-				return EXIT_FAILURE;
-			}
+			LOGFAILEDCOMRETURN(
+				_device->CreateRootSignature(0, signature->GetBufferPointer(), signature->GetBufferSize(), IID_PPV_ARGS(&_rootSignature)),
+				EXIT_FAILURE);
 		}
+
+		// Create an example triangle object.
+		std::vector<Vertex> triangleVertices =
+		{
+			{ { 0.0f, 0.25f * _aspectRatio, 0.0f },{ 1.0f, 0.0f, 0.0f, 1.0f },{ 0.0f, 0.0f } },
+			{ { 0.25f, -0.25f * _aspectRatio, 0.0f },{ 0.0f, 1.0f, 0.0f, 1.0f },{ 0.0f, 0.0f } },
+			{ { -0.25f, -0.25f * _aspectRatio, 0.0f },{ 0.0f, 0.0f, 1.0f, 1.0f },{ 0.0f, 0.0f } }
+		};
+
+		_pTriangle = new RenderObject();
+		_pTriangle->SetVertices(_device.Get(), triangleVertices);
+		_pTriangle->LoadVertexShader(GetRelativeFilePath("Shaders\\Diffuse.hlsl"), "VSMain", "vs_5_1");
+		_pTriangle->LoadPixelShader(GetRelativeFilePath("Shaders\\Diffuse.hlsl"), "PSMain", "ps_5_1");
 
 		// Create the pipeline state, which includes compiling and loading shaders.
 		{
-			ComPtr<ID3DBlob> vertexShader;
-			ComPtr<ID3DBlob> pixelShader;
-
-#ifdef _DEBUG
-			// Enable better shader debugging with the graphics debugging tools.
-			UINT compileFlags = D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION;
-#else
-			UINT compileFlags = 0;
-#endif
-
-			if (Failed(D3DCompileFromFile(L"C:\\Users\\Johan\\Documents\\Repositories\\Engine\\Engine\\Engine\\Shaders\\Diffuse.hlsl", 
-				nullptr, nullptr, "VSMain", "vs_5_0", compileFlags, 0, &vertexShader, nullptr)))
-			{
-				return EXIT_FAILURE;
-			}
-
-			if (Failed(D3DCompileFromFile(L"C:\\Users\\Johan\\Documents\\Repositories\\Engine\\Engine\\Engine\\Shaders\\Diffuse.hlsl", 
-				nullptr, nullptr, "PSMain", "ps_5_0", compileFlags, 0, &pixelShader, nullptr)))
-			{
-				return EXIT_FAILURE;
-			}
-
 			// Define the vertex input layout.
 			D3D12_INPUT_ELEMENT_DESC inputElementDescs[] =
 			{
@@ -300,8 +299,8 @@ namespace Engine
 			D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc = {};
 			psoDesc.InputLayout = { inputElementDescs, _countof(inputElementDescs) };
 			psoDesc.pRootSignature = _rootSignature.Get();
-			psoDesc.VS = { reinterpret_cast<UINT8*>(vertexShader->GetBufferPointer()), vertexShader->GetBufferSize() };
-			psoDesc.PS = { reinterpret_cast<UINT8*>(pixelShader->GetBufferPointer()), pixelShader->GetBufferSize() };
+			psoDesc.VS = { reinterpret_cast<UINT8*>(_pTriangle->GetVertexShader()->GetBufferPointer()), _pTriangle->GetVertexShader()->GetBufferSize() };
+			psoDesc.PS = { reinterpret_cast<UINT8*>(_pTriangle->GetPixelShader()->GetBufferPointer()), _pTriangle->GetPixelShader()->GetBufferSize() };
 			psoDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
 			psoDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
 			psoDesc.DepthStencilState.DepthEnable = FALSE;
@@ -311,73 +310,28 @@ namespace Engine
 			psoDesc.NumRenderTargets = 1;
 			psoDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
 			psoDesc.SampleDesc.Count = 1;
-			if (Failed(_device->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&_pipelineState))))
-			{
-				return EXIT_FAILURE;
-			}
+
+			LOGFAILEDCOMRETURN(
+				_device->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&_pipelineState)),
+				EXIT_FAILURE);
 		}
 
 		// Create the command list.
-		if (Failed(_device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, _commandAllocator.Get(), _pipelineState.Get(), IID_PPV_ARGS(&_commandList))))
-		{
-			return EXIT_FAILURE;
-		}
+		LOGFAILEDCOMRETURN(
+			_device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, _commandAllocator.Get(), _pipelineState.Get(), IID_PPV_ARGS(&_commandList)),
+			EXIT_FAILURE);
 
 		// Command lists are created in the recording state, but there is nothing
 		// to record yet. The main loop expects it to be closed, so close it now.
-		if (Failed(_commandList->Close()))
-		{
-			return EXIT_FAILURE;
-		}
-
-		// Create the vertex buffer.
-		{
-			// Define the geometry for a triangle.
-			Vertex triangleVertices[] =
-			{
-				{ { 0.0f, 0.25f * _aspectRatio, 0.0f },{ 1.0f, 0.0f, 0.0f, 1.0f } },
-				{ { 0.25f, -0.25f * _aspectRatio, 0.0f },{ 0.0f, 1.0f, 0.0f, 1.0f } },
-				{ { -0.25f, -0.25f * _aspectRatio, 0.0f },{ 0.0f, 0.0f, 1.0f, 1.0f } }
-			};
-
-			const UINT vertexBufferSize = sizeof(triangleVertices);
-
-			// Note: using upload heaps to transfer static data like vert buffers is not 
-			// recommended. Every time the GPU needs it, the upload heap will be marshalled 
-			// over. Please read up on Default Heap usage. An upload heap is used here for 
-			// code simplicity and because there are very few verts to actually transfer.
-			if (Failed(_device->CreateCommittedResource(
-				&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
-				D3D12_HEAP_FLAG_NONE,
-				&CD3DX12_RESOURCE_DESC::Buffer(vertexBufferSize),
-				D3D12_RESOURCE_STATE_GENERIC_READ,
-				nullptr,
-				IID_PPV_ARGS(&_vertexBuffer))))
-			{
-				return EXIT_FAILURE;
-			}
-
-			// Copy the triangle data to the vertex buffer.
-			UINT8* pVertexDataBegin;
-			if (Failed(_vertexBuffer->Map(0, nullptr, reinterpret_cast<void**>(&pVertexDataBegin))))
-			{
-				return EXIT_FAILURE;
-			}
-			memcpy(pVertexDataBegin, triangleVertices, sizeof(triangleVertices));
-			_vertexBuffer->Unmap(0, nullptr);
-			
-			// Initialize the vertex buffer view.
-			_vertexBufferView.BufferLocation = _vertexBuffer->GetGPUVirtualAddress();
-			_vertexBufferView.StrideInBytes = sizeof(Vertex);
-			_vertexBufferView.SizeInBytes = vertexBufferSize;
-		}
+		LOGFAILEDCOMRETURN(
+			_commandList->Close(),
+			EXIT_FAILURE);
 
 		// Create synchronization objects and wait until assets have been uploaded to the GPU.
 		{
-			if (Failed(_device->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&_fence))))
-			{
-				return EXIT_FAILURE;
-			}
+			LOGFAILEDCOMRETURN(
+				_device->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&_fence)),
+				EXIT_FAILURE);
 			_fenceValue = 1;
 
 			// Create an event handle to use for frame synchronization.
@@ -404,43 +358,43 @@ namespace Engine
 		// Command list allocators can only be reset when the associated 
 		// command lists have finished execution on the GPU; apps should use 
 		// fences to determine GPU execution progress.
-		if (Failed(_commandAllocator->Reset()))
-		{
-			return EXIT_FAILURE;
-		}
+		LOGFAILEDCOMRETURN(
+			_commandAllocator->Reset(),
+			EXIT_FAILURE);
 
 		// However, when ExecuteCommandList() is called on a particular command 
 		// list, that command list can then be reset at any time and must be before 
 		// re-recording.
-		if (Failed(_commandList->Reset(_commandAllocator.Get(), _pipelineState.Get())))
-		{
-			return EXIT_FAILURE;
-		}
+		LOGFAILEDCOMRETURN(
+			_commandList->Reset(_commandAllocator.Get(), _pipelineState.Get()),
+			EXIT_FAILURE);
 
 		// Set necessary state.
 		_commandList->SetGraphicsRootSignature(_rootSignature.Get());
-		_commandList->RSSetViewports(1, &_viewport);
+		_commandList->RSSetViewports(1, &_pCamera->GetViewPort());
 		_commandList->RSSetScissorRects(1, &_scissorRect);
 
+		// Point to the camera's constant buffer for camera transformation data.
+		_commandList->SetGraphicsRootConstantBufferView(0, _pCamera->GetCBuffer()->GetGPUVirtualAddress());
+
 		// Indicate that the back buffer will be used as a render target.
-		_commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(_renderTargets[_frameIndex].Get(), D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET));
+		_commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(_renderTargets[_frameIndex].Get(), 
+			D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET));
 
 		CD3DX12_CPU_DESCRIPTOR_HANDLE rtvHandle(_rtvHeap->GetCPUDescriptorHandleForHeapStart(), _frameIndex, _rtvDescriptorSize);
 		_commandList->OMSetRenderTargets(1, &rtvHandle, FALSE, nullptr);
 
 		// Record commands.
 		_commandList->ClearRenderTargetView(rtvHandle, _clearColour, 0, nullptr);
-		_commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		_commandList->IASetVertexBuffers(0, 1, &_vertexBufferView);
-		_commandList->DrawInstanced(3, 1, 0, 0);
+		_pTriangle->Draw(_commandList.Get());
 
 		// Indicate that the back buffer will now be used to present.
-		_commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(_renderTargets[_frameIndex].Get(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT));
+		_commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(_renderTargets[_frameIndex].Get(), 
+			D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT));
 
-		if (Failed(_commandList->Close()))
-		{
-			return EXIT_FAILURE;
-		}
+		LOGFAILEDCOMRETURN(
+			_commandList->Close(),
+			EXIT_FAILURE);
 
 		return EXIT_SUCCESS;
 	}
@@ -458,23 +412,24 @@ namespace Engine
 
 		// Signal and increment the fence value.
 		const UINT64 fence = _fenceValue;
-		if (Failed(_commandQueue->Signal(_fence.Get(), fence)))
-		{
-			return EXIT_FAILURE;
-		}
+		LOGFAILEDCOMRETURN(
+			_commandQueue->Signal(_fence.Get(), fence),
+			EXIT_FAILURE);
 		_fenceValue++;
 
 		// Wait until the previous frame is finished.
 		if (_fence->GetCompletedValue() < fence)
 		{
-			if (Failed(_fence->SetEventOnCompletion(fence, _fenceEvent)))
-			{
-				return EXIT_FAILURE;
-			}
+			LOGFAILEDCOMRETURN(
+				_fence->SetEventOnCompletion(fence, _fenceEvent),
+				EXIT_FAILURE);
 			WaitForSingleObject(_fenceEvent, INFINITE);
 		}
 
+		CommandQueue::Process();
+
 		_frameIndex = _swapChain->GetCurrentBackBufferIndex();
+		_renderFinished = true;
 
 		return EXIT_SUCCESS;
 	}

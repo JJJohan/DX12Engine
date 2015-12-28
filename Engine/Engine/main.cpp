@@ -1,5 +1,4 @@
 #include <iostream>
-#include <thread>
 #include <sstream>
 #include "Core/Core.h"
 
@@ -12,8 +11,9 @@ int WINAPI WinMain(HINSTANCE hInstance,
 	Engine::Console::InitConsole();
 #endif
 
-	Engine::SystemInfo::PrintSystemInfo();
 	Engine::Logging::Log("Starting engine...\n");
+
+	Engine::SystemInfo::PrintSystemInfo();
 
 	Engine::IRenderer* renderer = Engine::Renderer::CreateRenderer(Engine::RenderAPI::Direct3D12);
 	bool windowInit = false;
@@ -23,11 +23,20 @@ int WINAPI WinMain(HINSTANCE hInstance,
 		renderer->SetVsync(false);
 		windowInit = true;
 	}
-	
+
+	Engine::SystemInfo::PrintSystemInfo();
+
+	Engine::Event test;
+	test += [] { Engine::Logging::LogError("Whoah!"); };
+
+	Engine::Input::RegisterKey(VK_F1, Engine::KeyDown, [] { Engine::Logging::LogError("Whoah!"); });
+	Engine::Input::RegisterKey(VK_F2, Engine::KeyUp, [] { Engine::Logging::LogError("Whoah!"); });
+
 	float timer = 0.0f;
 	if (windowInit)
 	{
-		while (Engine::Core::Running)
+		Engine::Core::BeginRendering();
+		while (Engine::Core::Running())
 		{
 			if (Engine::Core::Update() != EXIT_SUCCESS)
 			{
@@ -35,17 +44,11 @@ int WINAPI WinMain(HINSTANCE hInstance,
 				break;
 			}
 
-			if (Engine::Core::Render() != EXIT_SUCCESS)
-			{
-				// Rendering failed, exit.
-				break;
-			}
-
 			timer += Engine::Time::DeltaTime();
 			if (timer > 1.0f)
 			{
 				std::stringstream fps;
-				fps << "Engine - " << Engine::Time::FrameRate() << " FPS";
+				fps << "Engine - CPU: " << int(1 / Engine::Time::DeltaTime()) << " FPS | GPU: " << int(1 / Engine::Time::GPUTime()) << " FPS";
 				renderer->SetWindowTitle(fps.str());
 				timer -= 1.0f;
 			}

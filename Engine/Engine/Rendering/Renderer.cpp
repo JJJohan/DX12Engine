@@ -1,5 +1,6 @@
 #include "Renderer.h"
 #include "DX12\DX12Renderer.h"
+#include "../Core/Core.h"
 
 namespace Engine
 {
@@ -32,6 +33,11 @@ namespace Engine
 		return _renderer.get()->Update();
 	}
 
+	HWND Renderer::GetWindowHandle()
+	{
+		return _renderer.get()->GetWindowHandle();
+	}
+
 	Renderer::Renderer()
 	{
 	}
@@ -39,5 +45,10 @@ namespace Engine
 	Renderer::~Renderer()
 	{
 		_renderer.reset();
+	}
+
+	IRenderer* Renderer::GetRenderer()
+	{
+		return _renderer.get();
 	}
 }

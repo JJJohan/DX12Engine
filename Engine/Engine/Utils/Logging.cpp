@@ -1,6 +1,8 @@
 #include <iostream>
 #include <windows.h>
 #include "Logging.h"
+#include "Win32Utils.h"
+#include "Helpers.h"
 #ifdef _DEBUG
 #include "Console.h"
 #endif
@@ -8,9 +10,13 @@
 namespace Engine
 {
 	Logging::LogPriority Logging::LogLevel = Logging::LogPriority::Info;
+	bool Logging::_logToFile = true;
+	std::string Logging::_logFilePath = GetRelativeFilePath("");
 
 	void Logging::LogError(std::string message)
 	{
+		Win32Utils::ShowMessageBox(message, "Error");
+
 		LogLevel = LogPriority::Error;
 		Log(message);
 	}
@@ -56,16 +62,22 @@ namespace Engine
 	void Logging::LogWin32Error()
 	{
 		DWORD errorCode = GetLastError();
-		if (errorCode != 0)
+		std::string errorString = GetWin32ErrorString();
+		if (!errorString.empty())
 		{
-			std::string errorString = GetWin32ErrorString(errorCode);
 			std::cout << "Error " << errorCode << ": " << errorString << std::endl;
 		}
 	}
 
 	//Returns the last Win32 error, in string format. Returns an empty string if there is no error.
-	std::string Logging::GetWin32ErrorString(DWORD errorCode)
+	std::string Logging::GetWin32ErrorString()
 	{
+		DWORD errorCode = GetLastError();
+		if (errorCode == 0)
+		{
+			return std::string();
+		}
+
 		LPSTR messageBuffer = nullptr;
 		size_t size = FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
 			nullptr, errorCode, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), LPSTR(&messageBuffer), 0, nullptr);
@@ -76,5 +88,15 @@ namespace Engine
 		LocalFree(messageBuffer);
 
 		return message;
+	}
+
+	void Logging::EnableFileLogging(bool enabled)
+	{
+		_logToFile = enabled;
+	}
+
+	void Logging::SetLogPath(std::string filePath)
+	{
+		_logFilePath = filePath;
 	}
 }
