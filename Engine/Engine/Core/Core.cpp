@@ -1,12 +1,16 @@
 #include "Core.h"
+#include "../Rendering/DX12/DX12Renderer.h"
+#include "../Factory/Factory.h"
 
 namespace Engine
-{	
+{
 	std::string Core::_appDirectory = std::string();
 	bool Core::_running = true;
 	std::thread Core::_renderThread = std::thread();
 	bool Core::_renderThreadAssigned = false;
 	IRenderer* Core::_renderer = nullptr;
+	std::function<void()> Core::_updateLoop;
+	std::function<void()> Core::_destroyMethod;
 
 	bool Core::Update()
 	{
@@ -22,6 +26,13 @@ namespace Engine
 		{
 			return EXIT_FAILURE;
 		}
+
+		Input::Update();
+
+		// Call the main update loop.
+		_updateLoop();
+
+		std::this_thread::sleep_for(std::chrono::milliseconds(1));
 
 		return EXIT_SUCCESS;
 	}
@@ -42,13 +53,34 @@ namespace Engine
 		}
 	}
 
-	void Core::BeginRendering()
+	void Core::Initialise(int width, int height, bool windowed, ENGINE_LINK_DESC engineLink)
 	{
+		_updateLoop = engineLink.UpdateLoop;
+		_destroyMethod = engineLink.DestroyMethod;
+
+		Input::RegisterKey(VK_ESCAPE, KeyDown, []
+		                            {
+			                            Exit();
+		                            });
+
 		_renderer = Renderer::GetRenderer();
 		if (_renderer == nullptr)
 		{
 			Logging::LogError("Tried to begin rendering without a renderer!");
 			return;
+		}
+
+		Factory::_pRenderer = static_cast<DX12Renderer*>(_renderer);
+
+		_renderer->AssignCreateMethod(engineLink.CreateMethod);
+		_renderer->AssignDrawLoop(engineLink.DrawLoop);
+
+		bool windowInit = false;
+		if (_renderer->InitWindow(width, height, windowed) != EXIT_FAILURE)
+		{
+			_renderer->SetClearColour(Engine::Colour::Blue);
+			_renderer->SetVsync(false);
+			windowInit = true;
 		}
 
 		if (!_renderThreadAssigned)
@@ -81,6 +113,8 @@ namespace Engine
 			}
 		}
 
+		_destroyMethod();
+
 		Renderer::DestroyRenderer();
 	}
 
@@ -89,7 +123,7 @@ namespace Engine
 		if (_appDirectory.empty())
 		{
 			char dir[512];
-			GetModuleFileName(nullptr, dir, sizeof(dir));
+			GetModuleFileNameA(nullptr, dir, sizeof(dir));
 			_appDirectory = std::string(dir);
 
 			size_t seperatorIndex = _appDirectory.find_last_of('\\');
@@ -102,3 +136,4 @@ namespace Engine
 		return _appDirectory;
 	}
 }
+
