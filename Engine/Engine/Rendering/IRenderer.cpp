@@ -1,6 +1,17 @@
 #include "IRenderer.h"
 #include "../Utils/Logging.h"
 #include "../Input/Input.h"
+#include <memory>
+
+#ifndef HID_USAGE_PAGE_GENERIC
+#define HID_USAGE_PAGE_GENERIC         ((USHORT) 0x01)
+#endif
+#ifndef HID_USAGE_GENERIC_MOUSE
+#define HID_USAGE_GENERIC_MOUSE        ((USHORT) 0x02)
+#endif
+#ifndef HID_USAGE_GENERIC_KEYBOARD
+#define HID_USAGE_GENERIC_KEYBOARD        ((USHORT) 0x06)
+#endif
 
 namespace Engine
 {
@@ -8,13 +19,15 @@ namespace Engine
 
 	IRenderer::IRenderer()
 		: _screenWidth(0)
-		, _screenHeight(0)
-		, _aspectRatio(1.0f)
-		, _windowed(false)
-		, _windowHandle(nullptr)
-		, _windowInstance(HINSTANCE(GetModuleHandle(nullptr)))
-		, _vsync(true)
-		, _renderFinished(true)
+		  , _screenHeight(0)
+		  , _aspectRatio(1.0f)
+		  , _windowed(false)
+		  , _windowHandle(nullptr)
+		  , _windowInstance(HINSTANCE(GetModuleHandle(nullptr)))
+		  , _deviceMemoryTotal(0)
+		  , _deviceMemoryFree(0)
+		  , _vsync(true)
+		  , _renderFinished(true)
 	{
 		_windowClosed = nullptr;
 		IRenderer::SetClearColour(Colour::Blue);
@@ -22,7 +35,6 @@ namespace Engine
 
 	IRenderer::~IRenderer()
 	{
-		
 	}
 
 	bool IRenderer::RenderFinished() const
@@ -30,7 +42,7 @@ namespace Engine
 		return _renderFinished;
 	}
 
-	void IRenderer::SetClearColour(Colour colour)
+	void IRenderer::SetClearColour(const Colour& colour)
 	{
 		_clearColour[0] = colour.GetRed();
 		_clearColour[1] = colour.GetGreen();
@@ -82,19 +94,82 @@ namespace Engine
 			_windowClosed = hwnd;
 			break;
 
-		case WM_KEYDOWN:
-			Input::KeyDownEvent(wParam);
-			break;
+		case WM_INPUT:
+			{
+				UINT dwSize;
 
-		case WM_KEYUP:
-			Input::KeyUpEvent(wParam);
-			break;
+				GetRawInputData(HRAWINPUT(lParam), RID_INPUT, nullptr, &dwSize,
+				                sizeof(RAWINPUTHEADER));
+				std::unique_ptr<BYTE[]> lpb(new BYTE[size_t(dwSize)], std::default_delete<BYTE[]>());
+
+				if (GetRawInputData(HRAWINPUT(lParam), RID_INPUT, lpb.get(), &dwSize, sizeof(RAWINPUTHEADER)) != dwSize)
+				{
+					OutputDebugString(TEXT("GetRawInputData does not return correct size !\n"));
+				}
+
+				RAWINPUT* raw = reinterpret_cast<RAWINPUT*>(lpb.get());
+
+				if (raw->header.dwType == RIM_TYPEKEYBOARD)
+				{
+					if (raw->data.keyboard.Flags == RI_KEY_BREAK)
+					{
+						Input::KeyUpEvent(raw->data.keyboard.VKey);
+					}
+					else if (raw->data.keyboard.Flags == RI_KEY_MAKE)
+					{
+						Input::KeyDownEvent(raw->data.keyboard.VKey);
+					}
+				}
+				else if (raw->header.dwType == RIM_TYPEMOUSE)
+				{
+					// Check if mouse has moved.
+					if (raw->data.mouse.usFlags == MOUSE_MOVE_RELATIVE)
+					{
+						Input::MouseMoveEvent(raw->data.mouse.lLastX, raw->data.mouse.lLastY);
+					}
+
+					// Check if mouse buttons were clicked.
+					switch (raw->data.mouse.usButtonFlags)
+					{
+					case RI_MOUSE_LEFT_BUTTON_DOWN:
+						Input::MouseButtonDownEvent(0);
+						break;
+					case RI_MOUSE_LEFT_BUTTON_UP:
+						Input::MouseButtonUpEvent(0);
+						break;
+					case RI_MOUSE_MIDDLE_BUTTON_DOWN:
+						Input::MouseButtonDownEvent(1);
+						break;
+					case RI_MOUSE_MIDDLE_BUTTON_UP:
+						Input::MouseButtonUpEvent(2);
+						break;
+					case RI_MOUSE_RIGHT_BUTTON_DOWN:
+						Input::MouseButtonDownEvent(2);
+						break;
+					case RI_MOUSE_RIGHT_BUTTON_UP:
+						Input::MouseButtonUpEvent(2);
+						break;
+					}
+				}
+
+				break;
+			}
 
 		default:
 			return DefWindowProc(hwnd, msg, wParam, lParam);
 		}
 
 		return EXIT_SUCCESS;
+	}
+
+	void IRenderer::AssignCreateMethod(const std::function<void()>& createMethod)
+	{
+		_createMethod = createMethod;
+	}
+
+	void IRenderer::AssignDrawLoop(const std::function<void()>& drawLoop)
+	{
+		_drawLoop = drawLoop;
 	}
 
 	void IRenderer::SetVsync(bool enabled)
@@ -122,11 +197,12 @@ namespace Engine
 		return _featureLevel;
 	}
 
-	void IRenderer::SetWindowTitle(std::string title) const
+	void IRenderer::SetWindowTitle(const std::string& title) const
 	{
 		if (_windowHandle != nullptr)
 		{
-			SetWindowText(_windowHandle, title.c_str());
+			std::wstring wide = std::wstring(title.begin(), title.end());
+			SetWindowText(_windowHandle, wide.c_str());
 		}
 	}
 
@@ -148,13 +224,13 @@ namespace Engine
 		wcx.hCursor = LoadCursor(nullptr, IDC_ARROW); // predefined arrow 
 		wcx.hbrBackground = HBRUSH(GetStockObject(BLACK_BRUSH)); // white background brush 
 		wcx.lpszMenuName = nullptr; // name of menu resource 
-		wcx.lpszClassName = "EngineProcess"; // name of window class 
+		wcx.lpszClassName = L"EngineProcess"; // name of window class 
 		wcx.hIconSm = HICON(LoadImage(_windowInstance, // small class icon 
-			MAKEINTRESOURCE(5),
-			IMAGE_ICON,
-			GetSystemMetrics(SM_CXSMICON),
-			GetSystemMetrics(SM_CYSMICON),
-			LR_DEFAULTCOLOR));
+		                              MAKEINTRESOURCE(5),
+		                              IMAGE_ICON,
+		                              GetSystemMetrics(SM_CXSMICON),
+		                              GetSystemMetrics(SM_CYSMICON),
+		                              LR_DEFAULTCOLOR));
 
 		return RegisterClassEx(&wcx) != 0;
 	}
@@ -162,8 +238,24 @@ namespace Engine
 	bool IRenderer::RegisterWindow()
 	{
 		// Create the main window. 
-		_windowHandle = CreateWindow("EngineProcess", "Engine Window", WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, 
-			_screenWidth, _screenHeight, nullptr, nullptr, _windowInstance,	nullptr);
+		_windowHandle = CreateWindow(L"EngineProcess", L"Engine Window", WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT,
+			_screenWidth, _screenHeight, nullptr, nullptr, _windowInstance, nullptr);
+
+		RAWINPUTDEVICE rid[2];
+		rid[0].usUsagePage = HID_USAGE_PAGE_GENERIC; // 0x01
+		rid[0].usUsage = HID_USAGE_GENERIC_MOUSE; // 0x02
+		rid[0].dwFlags = RIDEV_INPUTSINK;
+		rid[0].hwndTarget = _windowHandle;
+
+		rid[1].usUsagePage = HID_USAGE_PAGE_GENERIC; // 0x01
+		rid[1].usUsage = HID_USAGE_GENERIC_KEYBOARD; // 0x06
+		rid[1].dwFlags = RIDEV_INPUTSINK;
+		rid[1].hwndTarget = _windowHandle;
+
+		if (!RegisterRawInputDevices(rid, 2, sizeof(RAWINPUTDEVICE)))
+		{
+			return EXIT_FAILURE;
+		}
 
 		if (!_windowHandle)
 		{
@@ -175,3 +267,4 @@ namespace Engine
 		return EXIT_SUCCESS;
 	}
 }
+
