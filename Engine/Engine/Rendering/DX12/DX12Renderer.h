@@ -6,13 +6,15 @@
 #include <wrl/client.h>
 #include <DirectXMath.h>
 #include "Camera.h"
-#include "RenderObject.h"
+#include <mutex>
 
 using namespace Microsoft::WRL;
 using namespace DirectX;
 
 namespace Engine
 {
+	class RenderObject;
+
 	class DX12Renderer : public IRenderer
 	{
 	public:
@@ -23,9 +25,14 @@ namespace Engine
 		bool Update() override;
 		bool Render() override;
 
-	private:
-		static void GetHardwareAdapter(IDXGIFactory4* pFactory, IDXGIAdapter3** ppAdapter);
+		static DX12Renderer* Get();
 
+		void Sync();
+
+	private:
+		void GetHardwareAdapter(IDXGIFactory2* pFactory, IDXGIAdapter3** ppAdapter);
+
+		static DX12Renderer* _instance;
 		const static int _frameCount = 2;
 		FeatureInfo _featureInfo;
 
@@ -39,25 +46,31 @@ namespace Engine
 		ComPtr<ID3D12CommandQueue> _commandQueue;
 		ComPtr<ID3D12RootSignature> _rootSignature;
 		ComPtr<ID3D12DescriptorHeap> _rtvHeap;
-		ComPtr<ID3D12PipelineState> _pipelineState;
+		ComPtr<ID3D12DescriptorHeap> _srvHeap;
 		ComPtr<ID3D12GraphicsCommandList> _commandList;
+#if _DEBUG
+		ComPtr<ID3D12DebugDevice> _debugDevice;
+#endif
 		int _rtvDescriptorSize;
 		bool _useWarpDevice;
-
-		// App resources
-		ComPtr<ID3D12Resource> _vertexBuffer;
-		D3D12_VERTEX_BUFFER_VIEW _vertexBufferView;
 
 		// Synchronization objects
 		UINT _frameIndex;
 		HANDLE _fenceEvent;
 		ComPtr<ID3D12Fence> _fence;
 		UINT64 _fenceValue;
-		RenderObject* _pTriangle;
-		
+		std::mutex _syncMutex;
+
 		bool LoadPipeline();
 		bool LoadAssets();
-		bool PopulateCommandList() const;
+		void PopulateCommandList();
 		bool WaitForPreviousFrame();
+
+		friend class RenderObjectFactory;
+		friend class MaterialFactory;
+		friend class TextureFactory;
+		friend class VertexBufferFactory;
+		friend class IndexBufferFactory;
 	};
 }
+
