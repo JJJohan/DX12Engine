@@ -64,7 +64,7 @@ namespace Engine
 		if (ignored)
 		{
 			Logging::EnableFileLogging(true);
-		} 
+		}
 	}
 
 	Vector2 SystemInfo::GetNativeResolution()
@@ -139,7 +139,7 @@ namespace Engine
 	{
 		SYSTEM_INFO sysInfo;
 		GetSystemInfo(&sysInfo);
-		
+
 		std::stringstream ss;
 		ss << "CPU: " << _processor.GetName() << "\n";
 		ss << "  Estimated Clock Speed: " << _processor.GetClockSpeed() << "Mhz\n";
@@ -173,6 +173,11 @@ namespace Engine
 		return ss.str();
 	}
 
+	int SystemInfo::GetCPUCores()
+	{
+		return _processor.GetLogicalCores();
+	}
+
 	std::string SystemInfo::GetMemInfo()
 	{
 		MEMORYSTATUSEX memInfo;
@@ -196,25 +201,26 @@ namespace Engine
 		return ss.str();
 	}
 
-	std::string SystemInfo::GetFileVersion(std::string fileName)
+	std::string SystemInfo::GetFileVersion(const std::string& fileName)
 	{
-		DWORD  verHandle = NULL;
-		UINT   size = 0;
+		std::wstring wide = std::wstring(fileName.begin(), fileName.end());
+		DWORD verHandle = NULL;
+		UINT size = 0;
 		LPBYTE lpBuffer = NULL;
-		DWORD  verSize = GetFileVersionInfoSize(fileName.c_str(), &verHandle);
+		DWORD verSize = GetFileVersionInfoSize(wide.c_str(), &verHandle);
 		std::stringstream versionStream;
 
 		if (verSize != NULL)
 		{
 			LPSTR verData = new char[verSize];
 
-			if (GetFileVersionInfo(fileName.c_str(), verHandle, verSize, verData))
+			if (GetFileVersionInfo(wide.c_str(), verHandle, verSize, verData))
 			{
-				if (VerQueryValue(verData, "\\", (VOID FAR* FAR*)&lpBuffer, &size))
+				if (VerQueryValue(verData, L"\\", (VOID FAR* FAR*)&lpBuffer, &size))
 				{
 					if (size)
 					{
-						VS_FIXEDFILEINFO *verInfo = (VS_FIXEDFILEINFO *)lpBuffer;
+						VS_FIXEDFILEINFO* verInfo = (VS_FIXEDFILEINFO*)lpBuffer;
 						if (verInfo->dwSignature == 0xfeef04bd)
 						{
 							// Doesn't matter if you are on 32 bit or 64 bit,
@@ -234,3 +240,4 @@ namespace Engine
 		return versionStream.str();
 	}
 }
+

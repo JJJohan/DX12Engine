@@ -10,32 +10,32 @@ namespace Engine
 
 	Vector3::Vector3()
 		: X(0.0f)
-		, Y(0.0f)
-		, Z(0.0f)
+		  , Y(0.0f)
+		  , Z(0.0f)
 	{
 		_dxVector = XMVectorZero();
 	}
 
 	Vector3::Vector3(float x, float y, float z)
 		: X(x)
-		, Y(y)
-		, Z(z)
+		  , Y(y)
+		  , Z(z)
 	{
 		_dxVector = XMVectorSet(x, y, z, 0.0f);
 	}
 
 	Vector3::Vector3(int x, int y, int z)
 		: X(float(x))
-		, Y(float(y))
-		, Z(float(z))
+		  , Y(float(y))
+		  , Z(float(z))
 	{
 		_dxVector = XMVectorSetInt(x, y, z, 0);
 	}
 
 	Vector3::Vector3(const Vector2& rhs)
 		: X(rhs.X)
-		, Y(rhs.Y)
-		, Z(0.0f)
+		  , Y(rhs.Y)
+		  , Z(0.0f)
 	{
 		_dxVector = XMVectorSet(rhs.X, rhs.Y, 0.0f, 0.0f);
 	}
@@ -136,3 +136,4 @@ namespace Engine
 		Z = _dxVector.m128_f32[2];
 	}
 }
+

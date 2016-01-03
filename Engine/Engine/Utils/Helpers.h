@@ -10,7 +10,8 @@ static bool Failed(HRESULT task)
 	if (task < 0)
 	{
 		_com_error err(task);
-		std::string errorString(err.ErrorMessage());
+		std::wstring wide = std::wstring(err.ErrorMessage());
+		std::string errorString(wide.begin(), wide.end());
 		Engine::Logging::Log(errorString);
 
 		return true;
@@ -33,3 +34,4 @@ static std::wstring GetRelativeFilePath(const wchar_t* relativePath)
 	wide.append(relativePath);
 	return wide;
 }
+

@@ -26,3 +26,4 @@ namespace Engine
 		int _frequency;
 	};
 }
+

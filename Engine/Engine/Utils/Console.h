@@ -14,17 +14,23 @@ namespace Engine
 			Black = 0,
 			DarkBlue = 1,
 			DarkGreen = 2,
-			DarkAqua, DarkCyan = 3,
+			DarkAqua,
+			DarkCyan = 3,
 			DarkRed = 4,
-			DarkPurple = 5, DarkPink = 5, DarkMagenta = 5,
+			DarkPurple = 5,
+			DarkPink = 5,
+			DarkMagenta = 5,
 			DarkYellow = 6,
 			DarkWhite = 7,
 			Gray = 8,
 			Blue = 9,
 			Green = 10,
-			Aqua = 11, Cyan = 11,
+			Aqua = 11,
+			Cyan = 11,
 			Red = 12,
-			Purple = 13, Pink = 13, Magenta = 13,
+			Purple = 13,
+			Pink = 13,
+			Magenta = 13,
 			Yellow = 14,
 			White = 15
 		};
@@ -42,3 +48,4 @@ namespace Engine
 		static int _backgroundColour;
 	};
 }
+

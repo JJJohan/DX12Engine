@@ -22,17 +22,18 @@ namespace Engine
 		// Get the key name
 		std::stringstream ss;
 		ss << "HARDWARE\\DESCRIPTION\\System\\CentralProcessor\\" << dwCPU << "\\";
-		const char* szKey = ss.str().c_str();
+		std::string szKey = ss.str();
+		std::wstring szKeyW = std::wstring(szKey.begin(), szKey.end());
 
 		// Open the key
-		if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, szKey, 0, KEY_QUERY_VALUE, &hKey) != ERROR_SUCCESS)
+		if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, szKeyW.c_str(), 0, KEY_QUERY_VALUE, &hKey) != ERROR_SUCCESS)
 		{
 			return 0;
 		}
 
 		// Read the value
 		DWORD dwLen = 4;
-		if (RegQueryValueEx(hKey, "~MHz", NULL, NULL, (LPBYTE)&dwSpeed, &dwLen) != ERROR_SUCCESS)
+		if (RegQueryValueEx(hKey, L"~MHz", nullptr, nullptr, LPBYTE(&dwSpeed), &dwLen) != ERROR_SUCCESS)
 		{
 			RegCloseKey(hKey);
 			return 0;
@@ -220,7 +221,9 @@ namespace Engine
 		do
 		{
 			QueryPerformanceCounter(&qwCurrent);
-		} while (qwCurrent.QuadPart - qwStart.QuadPart < qwWait.QuadPart);
+		}
+		while (qwCurrent.QuadPart - qwStart.QuadPart < qwWait.QuadPart);
 		return ((__rdtsc() - Start) << 5) / 1000000.0;
 	}
 }
+

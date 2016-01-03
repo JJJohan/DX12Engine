@@ -19,6 +19,7 @@ namespace Engine
 	class Win32Utils
 	{
 	public:
-		static int ShowMessageBox(std::string message, std::string title = "Message", MessageBoxType messageType = OK);
+		static int ShowMessageBox(const std::string& message, const std::string& title = "Message", MessageBoxType messageType = OK);
 	};
 }
+

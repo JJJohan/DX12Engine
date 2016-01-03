@@ -10,21 +10,21 @@ namespace Engine
 
 	Vector2::Vector2()
 		: X(0.0f)
-		, Y(0.0f)
+		  , Y(0.0f)
 	{
 		_dxVector = XMVectorZero();
 	}
 
 	Vector2::Vector2(int x, int y)
 		: X(float(x))
-		, Y(float(y))
+		  , Y(float(y))
 	{
 		_dxVector = XMVectorSetInt(x, y, 0, 0);
 	}
 
 	Vector2::Vector2(float x, float y)
 		: X(x)
-		, Y(y)
+		  , Y(y)
 	{
 		_dxVector = XMVectorSet(x, y, 0.0f, 0.0f);
 	}
@@ -124,3 +124,4 @@ namespace Engine
 		Y = _dxVector.m128_f32[1];
 	}
 }
+

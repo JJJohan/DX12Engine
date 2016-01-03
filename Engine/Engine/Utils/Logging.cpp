@@ -13,7 +13,12 @@ namespace Engine
 	bool Logging::_logToFile = true;
 	std::string Logging::_logFilePath = GetRelativeFilePath("");
 
-	void Logging::LogError(std::string message)
+	void Logging::LogError(const std::wstring& message)
+	{
+		LogError(std::string(message.begin(), message.end()));
+	}
+
+	void Logging::LogError(const std::string& message)
 	{
 		Win32Utils::ShowMessageBox(message, "Error");
 
@@ -21,39 +26,41 @@ namespace Engine
 		Log(message);
 	}
 
-	void Logging::LogWarning(std::string message)
+	void Logging::LogWarning(const std::string& message)
 	{
 		LogLevel = LogPriority::Warning;
 		Log(message);
 	}
 
-	void Logging::Log(std::string message)
+	void Logging::Log(const std::string& message)
 	{
 #ifdef _DEBUG
 		Console::ConsoleColour currentColour = Console::GetTextColour();
 #endif
 
+		std::string outString = message;
 		if (LogLevel == LogPriority::Error)
 		{
-			message = "[ERROR] " + message;
+			outString = "[ERROR] " + outString;
 #ifdef _DEBUG
 			Console::SetColour(Console::ConsoleColour::Red);
 #endif
 		}
 		else if (LogLevel == LogPriority::Warning)
 		{
-			message = "[WARNING] " + message;
+			outString = "[WARNING] " + outString;
 
 #ifdef _DEBUG
 			Console::SetColour(Console::ConsoleColour::Yellow);
 #endif
 		}
 
-		std::cout << message << std::endl;
+		std::cout << outString << std::endl;
 
 #ifdef _DEBUG
-		std::string output = message + "\n";
-		OutputDebugString(output.c_str());
+		std::string output = outString + "\n";
+		std::wstring outputW = std::wstring(output.begin(), output.end());
+		OutputDebugString(outputW.c_str());
 		Console::SetColour(currentColour);
 #endif
 		LogLevel = LogPriority::Info;
@@ -80,7 +87,7 @@ namespace Engine
 
 		LPSTR messageBuffer = nullptr;
 		size_t size = FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-			nullptr, errorCode, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), LPSTR(&messageBuffer), 0, nullptr);
+		                                                          nullptr, errorCode, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), LPWSTR(&messageBuffer), 0, nullptr);
 
 		std::string message(messageBuffer, size);
 
@@ -95,8 +102,9 @@ namespace Engine
 		_logToFile = enabled;
 	}
 
-	void Logging::SetLogPath(std::string filePath)
+	void Logging::SetLogPath(const std::string& filePath)
 	{
 		_logFilePath = filePath;
 	}
 }
+

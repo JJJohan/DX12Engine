@@ -25,6 +25,5 @@ namespace Engine
 	private:
 		Renderer();
 	};
-
-	
 }
+

@@ -42,7 +42,8 @@ namespace Engine
 			++textVal;
 		}
 
-		textVal %= 16; backVal %= 16;
+		textVal %= 16;
+		backVal %= 16;
 		unsigned short wAttributes = (unsigned(backVal) << 4) | unsigned(textVal);
 		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), wAttributes);
 	}
@@ -85,7 +86,7 @@ namespace Engine
 		int hConHandle;
 		intptr_t lStdHandle;
 		CONSOLE_SCREEN_BUFFER_INFO coninfo;
-		FILE *fp;
+		FILE* fp;
 
 		// allocate a console for this app
 		AllocConsole();
@@ -130,3 +131,4 @@ namespace Engine
 		}
 	}
 }
+

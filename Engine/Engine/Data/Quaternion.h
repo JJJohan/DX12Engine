@@ -4,6 +4,6 @@ namespace Engine
 {
 	class Quaternion
 	{
-		
 	};
 }
+

@@ -25,3 +25,4 @@ namespace Engine
 		friend Core;
 	};
 }
+

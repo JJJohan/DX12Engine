@@ -4,9 +4,12 @@
 
 namespace Engine
 {
-	int Win32Utils::ShowMessageBox(std::string message, std::string title, MessageBoxType messageType)
+	int Win32Utils::ShowMessageBox(const std::string& message, const std::string& title, MessageBoxType messageType)
 	{
 		HWND handle = Renderer::GetWindowHandle();
-		return MessageBoxEx(handle, message.c_str(), title.c_str(), 0, 0);
+		std::wstring messageW = std::wstring(message.begin(), message.end());
+		std::wstring titleW = std::wstring(title.begin(), title.end());
+		return MessageBoxEx(handle, messageW.c_str(), titleW.c_str(), 0, 0);
 	}
 }
+

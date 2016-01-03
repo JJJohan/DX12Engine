@@ -28,27 +28,27 @@
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v140</PlatformToolset>
-    <CharacterSet>MultiByte</CharacterSet>
+    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v140</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>MultiByte</CharacterSet>
+    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v140</PlatformToolset>
-    <CharacterSet>MultiByte</CharacterSet>
+    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v140</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>MultiByte</CharacterSet>
+    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -70,43 +70,59 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <IncludePath>$(IncludePath)</IncludePath>
+    <OutDir>$(SolutionDir)Build\</OutDir>
+    <TargetName>$(ProjectName)_debug</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <IncludePath>$(IncludePath)</IncludePath>
+    <OutDir>$(SolutionDir)Build\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <IncludePath>$(IncludePath)</IncludePath>
+    <OutDir>$(SolutionDir)Build\</OutDir>
+    <IntDir>$(Configuration)\</IntDir>
+    <TargetName>$(ProjectName)_debug</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <IncludePath>$(IncludePath)</IncludePath>
+    <OutDir>$(SolutionDir)Build\</OutDir>
+    <IntDir>$(Configuration)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(WindowsSDK_IncludePath)\winrt;$(WindowsSDK_IncludePath)\shared;$(WindowsSDK_IncludePath)\um</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>d3d12.lib;dxgi.lib;D3DCompiler.lib;Version.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(WindowsSDK_LibraryPath)\..\ucrt\x86;$(WindowsSDK_LibraryPath)\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>
+      </AdditionalLibraryDirectories>
       <SubSystem>Windows</SubSystem>
     </Link>
+    <FxCompile>
+      <ShaderModel>5.1</ShaderModel>
+    </FxCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(WindowsSDK_IncludePath)\winrt;$(WindowsSDK_IncludePath)\shared;$(WindowsSDK_IncludePath)\um</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>d3d12.lib;dxgi.lib;D3DCompiler.lib;Version.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(WindowsSDK_LibraryPath)\..\ucrt\x64;$(WindowsSDK_LibraryPath)\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>
+      </AdditionalLibraryDirectories>
       <SubSystem>Windows</SubSystem>
     </Link>
+    <FxCompile>
+      <ShaderModel>5.1</ShaderModel>
+    </FxCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -115,16 +131,20 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(WindowsSDK_IncludePath)\winrt;$(WindowsSDK_IncludePath)\shared;$(WindowsSDK_IncludePath)\um</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalDependencies>d3d12.lib;dxgi.lib;D3DCompiler.lib;Version.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(WindowsSDK_LibraryPath)\..\ucrt\x86;$(WindowsSDK_LibraryPath)\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>
+      </AdditionalLibraryDirectories>
       <SubSystem>Windows</SubSystem>
     </Link>
+    <FxCompile>
+      <ShaderModel>5.1</ShaderModel>
+    </FxCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -133,16 +153,20 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(WindowsSDK_IncludePath)\winrt;$(WindowsSDK_IncludePath)\shared;$(WindowsSDK_IncludePath)\um</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalDependencies>d3d12.lib;dxgi.lib;D3DCompiler.lib;Version.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(WindowsSDK_LibraryPath)\..\ucrt\x64;$(WindowsSDK_LibraryPath)\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>
+      </AdditionalLibraryDirectories>
       <SubSystem>Windows</SubSystem>
     </Link>
+    <FxCompile>
+      <ShaderModel>5.1</ShaderModel>
+    </FxCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Core\Core.cpp" />
@@ -151,6 +175,11 @@
     <ClCompile Include="Data\Quaternion.cpp" />
     <ClCompile Include="Data\Vector2.cpp" />
     <ClCompile Include="Data\Vector3.cpp" />
+    <ClCompile Include="Factory\Factory.cpp" />
+    <ClCompile Include="Factory\IndexBufferFactory.cpp" />
+    <ClCompile Include="Factory\MaterialFactory.cpp" />
+    <ClCompile Include="Factory\RenderObjectFactory.cpp" />
+    <ClCompile Include="Factory\TextureFactory.cpp" />
     <ClCompile Include="Input\Event.cpp" />
     <ClCompile Include="Input\Input.cpp" />
     <ClCompile Include="main.cpp" />
@@ -158,7 +187,14 @@
     <ClCompile Include="Rendering\DX12\CommandQueue.cpp" />
     <ClCompile Include="Rendering\DX12\DX12Renderer.cpp" />
     <ClCompile Include="Rendering\DX12\FeatureSupport.cpp" />
+    <ClCompile Include="Rendering\DX12\Font.cpp" />
+    <ClCompile Include="Rendering\DX12\HeapManager.cpp" />
+    <ClCompile Include="Rendering\DX12\HeapResource.cpp" />
+    <ClCompile Include="Rendering\DX12\IndexBuffer.cpp" />
+    <ClCompile Include="Rendering\DX12\Material.cpp" />
     <ClCompile Include="Rendering\DX12\RenderObject.cpp" />
+    <ClCompile Include="Rendering\DX12\Texture.cpp" />
+    <ClCompile Include="Rendering\DX12\VertexBuffer.cpp" />
     <ClCompile Include="Rendering\IRenderer.cpp" />
     <ClCompile Include="Rendering\Renderer.cpp" />
     <ClCompile Include="Utils\Console.cpp" />
@@ -174,13 +210,26 @@
     <ClInclude Include="Data\Quaternion.h" />
     <ClInclude Include="Data\Vector2.h" />
     <ClInclude Include="Data\Vector3.h" />
+    <ClInclude Include="Factory\Factory.h" />
+    <ClInclude Include="Factory\IndexBufferFactory.h" />
+    <ClInclude Include="Factory\MaterialFactory.h" />
+    <ClInclude Include="Factory\RenderObjectFactory.h" />
+    <ClInclude Include="Factory\TextureFactory.h" />
+    <ClInclude Include="Factory\VertexBufferFactory.h" />
     <ClInclude Include="Input\Event.h" />
     <ClInclude Include="Input\Input.h" />
     <ClInclude Include="Rendering\DX12\Camera.h" />
     <ClInclude Include="Rendering\DX12\CommandQueue.h" />
     <ClInclude Include="Rendering\DX12\DX12Renderer.h" />
     <ClInclude Include="Rendering\DX12\FeatureSupport.h" />
+    <ClInclude Include="Rendering\DX12\Font.h" />
+    <ClInclude Include="Rendering\DX12\HeapManager.h" />
+    <ClInclude Include="Rendering\DX12\HeapResource.h" />
+    <ClInclude Include="Rendering\DX12\IndexBuffer.h" />
+    <ClInclude Include="Rendering\DX12\Material.h" />
     <ClInclude Include="Rendering\DX12\RenderObject.h" />
+    <ClInclude Include="Rendering\DX12\Texture.h" />
+    <ClInclude Include="Rendering\DX12\VertexBuffer.h" />
     <ClInclude Include="Rendering\IRenderer.h" />
     <ClInclude Include="Rendering\Renderer.h" />
     <ClInclude Include="Utils\Console.h" />
@@ -193,9 +242,32 @@
     <ClInclude Include="Utils\Win32Utils.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\x64\Debug\Shaders\Diffuse.hlsl">
-      <FileType>Document</FileType>
-    </None>
+    <FxCompile Include="..\Build\Shaders\Diffuse.hlsl">
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">VSMain</EntryPointName>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">VSMain</EntryPointName>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">VSMain</EntryPointName>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">VSMain</EntryPointName>
+    </FxCompile>
+    <FxCompile Include="..\Build\Shaders\DiffuseTexture.hlsl">
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">VSMain</EntryPointName>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">VSMain</EntryPointName>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">VSMain</EntryPointName>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">VSMain</EntryPointName>
+    </FxCompile>
+    <FxCompile Include="..\Build\Shaders\Font.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </ShaderType>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">VSMain</EntryPointName>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">VSMain</EntryPointName>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">VSMain</EntryPointName>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">VSMain</EntryPointName>
+    </FxCompile>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

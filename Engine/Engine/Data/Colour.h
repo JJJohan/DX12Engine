@@ -41,3 +41,4 @@ namespace Engine
 		float _alpha;
 	};
 }
+

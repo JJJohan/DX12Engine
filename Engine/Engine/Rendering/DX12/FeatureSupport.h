@@ -31,3 +31,4 @@ namespace Engine
 		static std::string GetFeatureLevelString(D3D_FEATURE_LEVEL featureLevel);
 	};
 }
+

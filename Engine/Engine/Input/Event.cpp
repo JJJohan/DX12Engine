@@ -2,7 +2,7 @@
 
 namespace Engine
 {
-	static unsigned long long eventId = 0;
+	static int eventId = 0;
 
 	Event::Event()
 		: _id(eventId++)
@@ -27,17 +27,17 @@ namespace Engine
 		Call();
 	}
 
-	Event& Event::operator += (Func f)
+	Event& Event::operator +=(const Func& f)
 	{
 		_handlers.push_back(f);
 		return *this;
 	}
 
-	Event& Event::operator -= (Func f)
+	Event& Event::operator -=(const Func& f)
 	{
 		for (auto i = _handlers.begin(); i != _handlers.end(); ++i)
 		{
-			if ((*i).target<void()>() == f.target<void()>())
+			if ((*i).target<void>() == f.target<void>())
 			{
 				_handlers.erase(i);
 				break;
@@ -47,3 +47,4 @@ namespace Engine
 		return *this;
 	}
 }
+

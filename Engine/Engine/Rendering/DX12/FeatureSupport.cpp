@@ -14,7 +14,7 @@ namespace Engine
 		std::wstring wideDesc = std::wstring(desc.Description);
 		adapterInfo.DedicatedMemory = desc.DedicatedVideoMemory / 1024 / 1024;
 		adapterInfo.Name = std::string(wideDesc.begin(), wideDesc.end());
-		
+
 		return adapterInfo;
 	}
 
@@ -48,7 +48,7 @@ namespace Engine
 	FeatureInfo FeatureSupport::QueryDeviceFeatures(ID3D12Device* device, DXGI_FORMAT format)
 	{
 		FeatureInfo featureInfo;
-		
+
 		// Query D3D12 Options
 		LOGFAILEDRETURN(device->CheckFeatureSupport(D3D12_FEATURE_D3D12_OPTIONS, &featureInfo.D3D12Options, sizeof(featureInfo.D3D12Options)),
 			"Failed querying for D3D12_FEATURE_D3D12_OPTIONS.", featureInfo);
@@ -65,9 +65,9 @@ namespace Engine
 		// Query Feature Levels
 		D3D12_FEATURE_DATA_FEATURE_LEVELS featureLevels;
 		featureLevels.NumFeatureLevels = 9;
-		D3D_FEATURE_LEVEL* levels = new D3D_FEATURE_LEVEL[featureLevels.NumFeatureLevels] 
-		{ D3D_FEATURE_LEVEL_12_1, D3D_FEATURE_LEVEL_12_0, D3D_FEATURE_LEVEL_11_1, D3D_FEATURE_LEVEL_11_0, D3D_FEATURE_LEVEL_10_1, 
-			D3D_FEATURE_LEVEL_10_0, D3D_FEATURE_LEVEL_9_3, D3D_FEATURE_LEVEL_9_2, D3D_FEATURE_LEVEL_9_1 };
+		D3D_FEATURE_LEVEL* levels = new D3D_FEATURE_LEVEL[featureLevels.NumFeatureLevels]
+			{D3D_FEATURE_LEVEL_12_1, D3D_FEATURE_LEVEL_12_0, D3D_FEATURE_LEVEL_11_1, D3D_FEATURE_LEVEL_11_0, D3D_FEATURE_LEVEL_10_1,
+				D3D_FEATURE_LEVEL_10_0, D3D_FEATURE_LEVEL_9_3, D3D_FEATURE_LEVEL_9_2, D3D_FEATURE_LEVEL_9_1};
 		featureLevels.pFeatureLevelsRequested = levels;
 		LOGFAILEDRETURN(device->CheckFeatureSupport(D3D12_FEATURE_FEATURE_LEVELS, &featureLevels, sizeof(featureLevels)),
 			"Failed querying for D3D12_FEATURE_FEATURE_LEVELS.", featureInfo);
@@ -112,3 +112,4 @@ namespace Engine
 		return featureInfo;
 	}
 }
+

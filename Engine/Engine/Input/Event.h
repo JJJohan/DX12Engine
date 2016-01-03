@@ -15,11 +15,12 @@ namespace Engine
 
 		void Call();
 		void operator ()();
-		Event& operator += (Func f);
-		Event& operator -= (Func f);
+		Event& operator +=(const Func& f);
+		Event& operator -=(const Func& f);
 		Event();
 	private:
 		std::vector<Func> _handlers;
 		int _id;
 	};
 }
+

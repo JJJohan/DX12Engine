@@ -12,6 +12,7 @@ namespace Engine
 	public:
 		static void PrintSystemInfo();
 		static Vector2 GetNativeResolution();
+		static int GetCPUCores();
 
 	private:
 		static std::string GetOSInfo();
@@ -19,7 +20,8 @@ namespace Engine
 		static std::string GetGPUInfo();
 		static std::string GetMemInfo();
 		static std::string GetDisplayInfo();
-		static std::string GetFileVersion(std::string fileName);
+		static std::string GetFileVersion(const std::string& fileName);
 		static Processor _processor;
 	};
 }
+

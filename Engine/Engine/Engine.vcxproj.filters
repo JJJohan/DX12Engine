@@ -29,6 +29,9 @@
     <Filter Include="Shaders">
       <UniqueIdentifier>{25957cd9-8d31-4800-9b64-757cdc97bcdb}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Factory">
+      <UniqueIdentifier>{73530c43-1115-4115-b8e8-e79960bc0152}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\Core.cpp">
@@ -92,6 +95,42 @@
       <Filter>Source Files\Rendering\DX12</Filter>
     </ClCompile>
     <ClCompile Include="Rendering\DX12\RenderObject.cpp">
+      <Filter>Source Files\Rendering\DX12</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\DX12\VertexBuffer.cpp">
+      <Filter>Source Files\Rendering\DX12</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\DX12\Font.cpp">
+      <Filter>Source Files\Rendering\DX12</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\DX12\IndexBuffer.cpp">
+      <Filter>Source Files\Rendering\DX12</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\DX12\Texture.cpp">
+      <Filter>Source Files\Rendering\DX12</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\DX12\Material.cpp">
+      <Filter>Source Files\Rendering\DX12</Filter>
+    </ClCompile>
+    <ClCompile Include="Factory\RenderObjectFactory.cpp">
+      <Filter>Source Files\Factory</Filter>
+    </ClCompile>
+    <ClCompile Include="Factory\MaterialFactory.cpp">
+      <Filter>Source Files\Factory</Filter>
+    </ClCompile>
+    <ClCompile Include="Factory\IndexBufferFactory.cpp">
+      <Filter>Source Files\Factory</Filter>
+    </ClCompile>
+    <ClCompile Include="Factory\TextureFactory.cpp">
+      <Filter>Source Files\Factory</Filter>
+    </ClCompile>
+    <ClCompile Include="Factory\Factory.cpp">
+      <Filter>Source Files\Factory</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\DX12\HeapManager.cpp">
+      <Filter>Source Files\Rendering\DX12</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\DX12\HeapResource.cpp">
       <Filter>Source Files\Rendering\DX12</Filter>
     </ClCompile>
   </ItemGroup>
@@ -165,10 +204,55 @@
     <ClInclude Include="Rendering\DX12\RenderObject.h">
       <Filter>Source Files\Rendering\DX12</Filter>
     </ClInclude>
+    <ClInclude Include="Rendering\DX12\VertexBuffer.h">
+      <Filter>Source Files\Rendering\DX12</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\DX12\Font.h">
+      <Filter>Source Files\Rendering\DX12</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\DX12\IndexBuffer.h">
+      <Filter>Source Files\Rendering\DX12</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\DX12\Texture.h">
+      <Filter>Source Files\Rendering\DX12</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\DX12\Material.h">
+      <Filter>Source Files\Rendering\DX12</Filter>
+    </ClInclude>
+    <ClInclude Include="Factory\Factory.h">
+      <Filter>Source Files\Factory</Filter>
+    </ClInclude>
+    <ClInclude Include="Factory\RenderObjectFactory.h">
+      <Filter>Source Files\Factory</Filter>
+    </ClInclude>
+    <ClInclude Include="Factory\MaterialFactory.h">
+      <Filter>Source Files\Factory</Filter>
+    </ClInclude>
+    <ClInclude Include="Factory\VertexBufferFactory.h">
+      <Filter>Source Files\Factory</Filter>
+    </ClInclude>
+    <ClInclude Include="Factory\IndexBufferFactory.h">
+      <Filter>Source Files\Factory</Filter>
+    </ClInclude>
+    <ClInclude Include="Factory\TextureFactory.h">
+      <Filter>Source Files\Factory</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\DX12\HeapManager.h">
+      <Filter>Source Files\Rendering\DX12</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\DX12\HeapResource.h">
+      <Filter>Source Files\Rendering\DX12</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\x64\Debug\Shaders\Diffuse.hlsl">
+    <FxCompile Include="..\Build\Shaders\Diffuse.hlsl">
       <Filter>Shaders</Filter>
-    </None>
+    </FxCompile>
+    <FxCompile Include="..\Build\Shaders\Font.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Build\Shaders\DiffuseTexture.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

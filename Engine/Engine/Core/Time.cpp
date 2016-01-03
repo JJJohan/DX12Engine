@@ -44,3 +44,4 @@ namespace Engine
 		_gpuTime = diff.count();
 	}
 }
+
