@@ -1,53 +1,53 @@
 #pragma once
 
-#include "d3d12.h"
+#include <d3d12.h>
 #include <wrl/client.h>
 #include <DirectXMath.h>
-#include <vector>
+#include "VertexBuffer.h"
 
 using namespace Microsoft::WRL;
 
 namespace Engine
 {
-	struct Vertex
-	{
-		DirectX::XMFLOAT3 Position;
-		DirectX::XMFLOAT4 Colour;
-		DirectX::XMFLOAT2 UV;
-	};
+	class Material;
+	class IndexBuffer;
 
 	class RenderObject
 	{
 	public:
-		RenderObject();
-		~RenderObject();
+		virtual ~RenderObject();
 
-		void SetVertices(ID3D12Device* device, std::vector<Vertex> vertices);
-		std::vector<Vertex> GetVertices() const;
+		template <typename T>
+		void RenderObject::SetVertexBuffer(VertexBuffer<T>* vertexBuffer)
+		{
+			_pVertexBuffer = static_cast<VertexBufferBase*>(vertexBuffer);
+		}
 
-		void SetIndices(ID3D12Device* device, std::vector<int> indices);
-		std::vector<int> GetIndices() const;
+		VertexBufferBase* RenderObject::GetVertexBuffer() const
+		{
+			return _pVertexBuffer;
+		}
 
-		void LoadVertexShader(std::string shaderPath, std::string entryPoint, std::string shaderVersion);
-		void LoadPixelShader(std::string shaderPath, std::string entryPoint, std::string shaderVersion);
-		ID3DBlob* GetVertexShader() const;
-		ID3DBlob* GetPixelShader() const;
+		void SetIndexBuffer(IndexBuffer* indexBuffer);
+		IndexBuffer* GetIndexBuffer() const;
 
-		void Draw(ID3D12GraphicsCommandList* commandList) const;
+		void SetMaterial(Material* material);
+		Material* GetMaterial() const;
+
+		void Draw() const;
 
 	private:
-		size_t _indexCount;
-		std::vector<int> _indices;
-		ComPtr<ID3D12Resource> _indexBuffer;
-		D3D12_INDEX_BUFFER_VIEW _indexBufferView;
+		RenderObject();
 
-		size_t _vertexCount;
-		std::vector<Vertex> _vertices;
-		ComPtr<ID3D12Resource> _vertexBuffer;
-		D3D12_VERTEX_BUFFER_VIEW _vertexBufferView;
+		VertexBufferBase* _pVertexBuffer;
+		IndexBuffer* _pIndexBuffer;
+		Material* _pMaterial;
 
-		ComPtr<ID3DBlob> _vertexShader;
-		ComPtr<ID3DBlob> _pixelShader;
-		DirectX::XMMATRIX _worldMatrix;
+		ComPtr<ID3D12Device> _device;
+
+		XMMATRIX _worldMatrix;
+
+		friend class RenderObjectFactory;
 	};
 }
+
