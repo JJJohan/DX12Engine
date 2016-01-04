@@ -2,6 +2,7 @@
 #include "../../Utils/Logging.h"
 #include <D3Dcompiler.h>
 #include "d3dx12.h"
+#include "Texture.h"
 
 #ifdef _DEBUG
 // Enable better shader debugging with the graphics debugging tools.
@@ -44,6 +45,7 @@ namespace Engine
 		: _pPipelineState(nullptr)
 		, _pVertexShader(nullptr)
 		, _pPixelShader(nullptr)
+		, _pTexture(nullptr)
 		, _pDevice(nullptr)
 		, _pRootSignature(nullptr)
 	{
@@ -97,7 +99,7 @@ namespace Engine
 			psoDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
 			psoDesc.DepthStencilState.DepthEnable = FALSE;
 			psoDesc.DepthStencilState.StencilEnable = FALSE;
-			psoDesc.SampleMask = UINT_MAX ;
+			psoDesc.SampleMask = UINT_MAX;
 			psoDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 			psoDesc.NumRenderTargets = 1;
 			psoDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
@@ -115,12 +117,27 @@ namespace Engine
 		}
 	}
 
-	void Material::VerifyPSO(ID3D12GraphicsCommandList* commandList) const
+	void Material::SetTexture(Texture* texture)
+	{
+		_pTexture = texture;
+	}
+
+	Texture* Material::GetTexture() const
+	{
+		return _pTexture;
+	}
+
+	void Material::Bind(ID3D12GraphicsCommandList* commandList) const
 	{
 		if (_pPipelineState != _pLastPipelineState)
 		{
 			commandList->SetPipelineState(_pPipelineState);
 			_pLastPipelineState = _pPipelineState;
+		}
+
+		if (_pTexture != nullptr)
+		{
+			_pTexture->Bind(commandList);
 		}
 	}
 

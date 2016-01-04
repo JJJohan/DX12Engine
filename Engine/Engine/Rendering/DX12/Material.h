@@ -17,6 +17,8 @@ namespace Engine
 		const void* PixelByteCode;
 	};
 
+	class Texture;
+
 	class Material
 	{
 	public:
@@ -29,9 +31,12 @@ namespace Engine
 		
 		void Finalise(std::vector<D3D12_INPUT_ELEMENT_DESC> inputLayout);
 
-		void VerifyPSO(ID3D12GraphicsCommandList* commandList) const;
+		void Bind(ID3D12GraphicsCommandList* commandList) const;
 		static void ClearPSOHistory();
 		static void ReleasePSOCache();
+
+		void SetTexture(Texture* texture);
+		Texture* GetTexture() const;
 
 	private:
 		Material();
@@ -44,6 +49,7 @@ namespace Engine
 		ID3D12PipelineState* _pPipelineState;
 		ID3DBlob* _pVertexShader;
 		ID3DBlob* _pPixelShader;
+		Texture* _pTexture;
 
 		ID3D12Device* _pDevice;
 		ID3D12RootSignature* _pRootSignature;

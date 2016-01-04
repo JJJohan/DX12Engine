@@ -6,6 +6,7 @@
 #include "Material.h"
 #include "../../Factory/Factory.h"
 #include "HeapManager.h"
+#include "Texture.h"
 
 namespace Engine
 {
@@ -254,7 +255,7 @@ namespace Engine
 
 		// Describe and create a shader resource view (SRV) heap for the texture.
 		D3D12_DESCRIPTOR_HEAP_DESC srvHeapDesc = {};
-		srvHeapDesc.NumDescriptors = 1;
+		srvHeapDesc.NumDescriptors = Texture::TextureLimit;
 		srvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
 		srvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
 		LOGFAILEDCOMRETURN(
@@ -294,10 +295,10 @@ namespace Engine
 		{
 			// define descriptor tables for a CBV for shaders
 			CD3DX12_DESCRIPTOR_RANGE DescRange[1];
-			DescRange[0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0);
+			DescRange[0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, Texture::TextureLimit, 0);
 
 			CD3DX12_ROOT_PARAMETER rootParameters[2];
-			rootParameters[0].InitAsConstantBufferView(0, 0, D3D12_SHADER_VISIBILITY_ALL);
+			rootParameters[0].InitAsConstantBufferView(0, 0, D3D12_SHADER_VISIBILITY_VERTEX);
 			rootParameters[1].InitAsDescriptorTable(1, &DescRange[0], D3D12_SHADER_VISIBILITY_PIXEL);
 
 			D3D12_STATIC_SAMPLER_DESC sampler = {};
