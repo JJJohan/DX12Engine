@@ -189,7 +189,7 @@ namespace Engine
 
 		std::stringstream ss;
 		ss.precision(3);
-		ss << "MEM: " << gigabytes << " GB (" << megabytes << " MB)";
+		ss << "MEM: " << megabytes << " GB (" << gigabytes << " MB)";
 		return ss.str();
 	}
 

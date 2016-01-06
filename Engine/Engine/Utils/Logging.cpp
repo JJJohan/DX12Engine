@@ -11,14 +11,9 @@ namespace Engine
 {
 	Logging::LogPriority Logging::LogLevel = Logging::LogPriority::Info;
 	bool Logging::_logToFile = true;
-	std::string Logging::_logFilePath = GetRelativeFilePath("");
+	String Logging::_logFilePath = GetRelativeFilePath("");
 
-	void Logging::LogError(const std::wstring& message)
-	{
-		LogError(std::string(message.begin(), message.end()));
-	}
-
-	void Logging::LogError(const std::string& message)
+	void Logging::LogError(const String& message)
 	{
 		Win32Utils::ShowMessageBox(message, "Error");
 
@@ -26,13 +21,23 @@ namespace Engine
 		Log(message);
 	}
 
-	void Logging::LogWarning(const std::string& message)
+	void Logging::LogError(fmt::CStringRef formatString, fmt::ArgList args)
+	{
+		LogError(format(formatString, args));
+	}
+
+	void Logging::LogWarning(const String& message)
 	{
 		LogLevel = LogPriority::Warning;
 		Log(message);
 	}
 
-	void Logging::Log(const std::string& message)
+	void Logging::LogWarning(fmt::CStringRef formatString, fmt::ArgList args)
+	{
+		LogWarning(format(formatString, args));
+	}
+
+	void Logging::Log(const String& message)
 	{
 #ifdef _DEBUG
 		Console::ConsoleColour currentColour = Console::GetTextColour();
@@ -66,6 +71,11 @@ namespace Engine
 		LogLevel = LogPriority::Info;
 	}
 
+	void Logging::Log(fmt::CStringRef formatString, fmt::ArgList args)
+	{
+		Log(format(formatString, args));
+	}
+
 	void Logging::LogWin32Error()
 	{
 		DWORD errorCode = GetLastError();
@@ -77,7 +87,7 @@ namespace Engine
 	}
 
 	//Returns the last Win32 error, in string format. Returns an empty string if there is no error.
-	std::string Logging::GetWin32ErrorString()
+	String Logging::GetWin32ErrorString()
 	{
 		DWORD errorCode = GetLastError();
 		if (errorCode == 0)
@@ -102,7 +112,7 @@ namespace Engine
 		_logToFile = enabled;
 	}
 
-	void Logging::SetLogPath(const std::string& filePath)
+	void Logging::SetLogPath(const String& filePath)
 	{
 		_logFilePath = filePath;
 	}

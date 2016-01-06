@@ -1,6 +1,6 @@
 #pragma once
-#include <errhandlingapi.h>
-#include <string>
+
+#include "../Data/String.h"
 
 // Checks if a result has failed and logs an error.
 #define LOGFAILED(x,y) if(FAILED(x)) { Engine::Logging::LogError(y); }
@@ -19,14 +19,16 @@ namespace Engine
 	class Logging
 	{
 	public:
-		static void Log(const std::string& message);
-		static void LogError(const std::string& message);
-		static void LogError(const std::wstring& message);
-		static void LogWarning(const std::string& message);
+		static void Log(const String& message);
+		static void Log(fmt::CStringRef formatString, fmt::ArgList args);
+		static void LogError(const String& message);
+		static void LogError(fmt::CStringRef formatString, fmt::ArgList args);
+		static void LogWarning(const String& message);
+		static void LogWarning(fmt::CStringRef formatString, fmt::ArgList args);
 		static void LogWin32Error();
-		static std::string GetWin32ErrorString();
+		static String GetWin32ErrorString();
 		static void EnableFileLogging(bool enabled);
-		static void SetLogPath(const std::string& filePath);
+		static void SetLogPath(const String& filePath);
 
 	private:
 		enum LogPriority
@@ -38,7 +40,7 @@ namespace Engine
 
 		static LogPriority LogLevel;
 		static bool _logToFile;
-		static std::string _logFilePath;
+		static String _logFilePath;
 	};
 }
 
