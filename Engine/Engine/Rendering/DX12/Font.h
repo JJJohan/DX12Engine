@@ -1,21 +1,30 @@
 #pragma once
+
 #include <string>
-#include "RenderObject.h"
+#include <unordered_map>
+#include "HeapResource.h"
 
 namespace Engine
 {
-	class Font : RenderObject
+	class Font : HeapResource
 	{
 	public:
-		Font();
-		~Font();
-
-		void LoadFont(std::string imageFile, std::string fontFile);
-		void SetText(std::string text);
+		static void LoadFont(std::string fontName, std::string textureFile, std::string fontFile);
 
 	private:
+		struct Letter
+		{
+			float LeftUv;
+			float RightUv;
+			float Width;
+		};
 
-		std::string _text;
+		std::string _name;
+		std::unordered_map<char, Letter> _chars;
+
+		static std::unordered_map<std::string, Font> _fonts;
+
+		friend class Text;
 	};
 }
 
