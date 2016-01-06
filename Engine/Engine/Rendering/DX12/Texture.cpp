@@ -7,6 +7,7 @@
 #include "../../Factory/Factory.h"
 #include "CommandQueue.h"
 #include "HeapManager.h"
+#include "../../External/src/FreeImage/FreeImage.h"
 
 namespace Engine
 {
@@ -33,38 +34,81 @@ namespace Engine
 		}
 	}
 
-	void Texture::LoadFromDDS(const std::string& filePath)
+	void Texture::Load(const std::string& filePath)
 	{
-		// Open the file
-		std::fstream file;
-		file.open(filePath, std::ios_base::in | std::ios_base::binary | std::ios_base::ate);
-		if (!file.is_open())
+		const char* filename = filePath.c_str();
+
+		// Image format
+		FREE_IMAGE_FORMAT fif = FIF_UNKNOWN;
+
+		// Pointer to the image, once loaded
+		FIBITMAP *dib = nullptr;
+
+		// Check the file signature and deduce its format
+		fif = FreeImage_GetFileType(filename, 0);
+
+		// If still unknown, try to guess the file format from the file extension
+		if (fif == FIF_UNKNOWN)
 		{
-			std::stringstream ss;
-			ss << "Texture::LoadDDS() : Could not open file at '" << filePath << "'.\n";
-			Logging::LogError(ss.str());
+			fif = FreeImage_GetFIFFromFilename(filename);
+		}
+
+		// If still unkown, return failure
+		if (fif == FIF_UNKNOWN)
+		{
+			Logging::LogError("File specified is not a supported image file.");
 			return;
 		}
 
-		// Read the file
-		size_t size = file.tellg();
-		_fileBuffer = std::unique_ptr<char[]>(new char[size]);
-		file.seekg(std::ios_base::beg);
-		file.read(_fileBuffer.get(), size);
+		// Check that the plugin has reading capabilities and load the file
+		if (FreeImage_FIFSupportsReading(fif))
+		{
+			dib = FreeImage_Load(fif, filename);
+		}
+		
+		// If the image failed to load, return failure
+		if (!dib)
+		{
+			Logging::LogError("Failed to load image file.");
+			return;
+		}
 
-		file.close();
+		// Convert to 32-bit.
+		if (FreeImage_GetBPP(dib) != 32)
+		{
+			FIBITMAP *tmp = FreeImage_ConvertTo32Bits(dib);
+			FreeImage_Unload(dib);
+			dib = tmp;
+		}
 
-		HeapTask(std::bind(&Texture::Load, this));
+		// Correct the image.
+		FreeImage_FlipVertical(dib);
+
+		// Retrieve the image data
+		BYTE* bytes = FreeImage_GetBits(dib);
+		_size = FreeImage_GetDIBSize(dib);
+
+		// Get the image width and height
+		_width = FreeImage_GetWidth(dib);
+		_height = FreeImage_GetHeight(dib);
+
+		_fileBuffer = std::unique_ptr<BYTE>(new BYTE[_size]);
+		memcpy(_fileBuffer.get(), bytes, _size);
+
+		// Free FreeImage's copy of the data
+		FreeImage_Unload(dib);
+
+		HeapTask(std::bind(&Texture::Finalise, this));
 	}
 
-	void Texture::Load()
+	void Texture::Finalise()
 	{
 		ID3D12GraphicsCommandList* commandList = static_cast<ID3D12GraphicsCommandList*>(Factory::GetCommandList());
 
 		// Describe and create a Texture2D.
 		D3D12_RESOURCE_DESC textureDesc = {};
 		textureDesc.MipLevels = 1;
-		textureDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+		textureDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
 		textureDesc.Width = _width;
 		textureDesc.Height = _height;
 		textureDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
@@ -73,9 +117,8 @@ namespace Engine
 		textureDesc.SampleDesc.Quality = 0;
 		textureDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
 
-		size_t textureSize = _width * _height * 4;
-		PrepareHeapResource(textureSize, textureDesc);
-
+		// Allocate espace and upload to the heap.
+		PrepareHeapResource(_size, textureDesc);
 		_heapSize = GetRequiredIntermediateSize(_pResource, 0, 1);
 		HeapManager::Upload(this, _fileBuffer.get(), _width * 4, int(_heapSize), D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 
@@ -84,7 +127,7 @@ namespace Engine
 		CD3DX12_CPU_DESCRIPTOR_HANDLE srvHandle(_pSrvHeap->GetCPUDescriptorHandleForHeapStart(), _index, _descSize);
 		D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
 		srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-		srvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+		srvDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
 		srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
 		srvDesc.Texture2D.MipLevels = 1;
 		_pDevice->CreateShaderResourceView(_pResource, &srvDesc, srvHandle);

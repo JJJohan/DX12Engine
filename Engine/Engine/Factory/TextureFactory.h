@@ -9,7 +9,7 @@ namespace Engine
 	class TextureFactory : public Factory
 	{
 	public:
-		static Texture* CreateTexture(int width, int height);
+		static Texture* CreateTexture();
 	};
 }
 

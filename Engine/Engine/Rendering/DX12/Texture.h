@@ -16,21 +16,24 @@ namespace Engine
 	public:
 		~Texture();
 
-		void LoadFromDDS(const std::string& filePath);
+		void Load(const std::string& filePath);
 		void Bind(ID3D12GraphicsCommandList* commandList) const;
 
-		const static int TextureLimit = 32;
+		const static int TextureLimit = 64;
 
 	private:
 		Texture();
 
-		void Load();
+		void Finalise();
 
-		std::unique_ptr<char[]> _fileBuffer;
+		std::unique_ptr<BYTE> _fileBuffer;
 		ID3D12DescriptorHeap* _pSrvHeap;
+		int _index;
+
+		// Image data
 		int _width;
 		int _height;
-		int _index;
+		size_t _size;
 
 		static int GetFreeHeapIndex();
 		static UINT _descSize;
