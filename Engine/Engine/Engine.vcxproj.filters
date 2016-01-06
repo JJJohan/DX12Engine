@@ -32,6 +32,15 @@
     <Filter Include="Source Files\Factory">
       <UniqueIdentifier>{73530c43-1115-4115-b8e8-e79960bc0152}</UniqueIdentifier>
     </Filter>
+    <Filter Include="External">
+      <UniqueIdentifier>{4f6fb900-cfca-4a4c-a946-ead4729b3afb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="External\CPPFormat">
+      <UniqueIdentifier>{9c1705c1-a340-4fe4-bd07-32bc4dd4457a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="External\FreeImage">
+      <UniqueIdentifier>{73f8f668-7d9d-41a0-a9c0-7b3ede4454e0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\Core.cpp">
@@ -133,6 +142,15 @@
     <ClCompile Include="Rendering\DX12\HeapResource.cpp">
       <Filter>Source Files\Rendering\DX12</Filter>
     </ClCompile>
+    <ClCompile Include="Rendering\DX12\Text.cpp">
+      <Filter>Source Files\Rendering\DX12</Filter>
+    </ClCompile>
+    <ClCompile Include="Data\String.cpp">
+      <Filter>Source Files\Data</Filter>
+    </ClCompile>
+    <ClCompile Include="External\src\CPPFormat\format.cc">
+      <Filter>External\CPPFormat</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\Core.h">
@@ -176,9 +194,6 @@
     </ClInclude>
     <ClInclude Include="Utils\CPU\Processor.h">
       <Filter>Source Files\Utils\CPU</Filter>
-    </ClInclude>
-    <ClInclude Include="Utils\StringUtils.h">
-      <Filter>Source Files\Utils</Filter>
     </ClInclude>
     <ClInclude Include="Utils\Win32Utils.h">
       <Filter>Source Files\Utils</Filter>
@@ -242,6 +257,18 @@
     </ClInclude>
     <ClInclude Include="Rendering\DX12\HeapResource.h">
       <Filter>Source Files\Rendering\DX12</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\DX12\Text.h">
+      <Filter>Source Files\Rendering\DX12</Filter>
+    </ClInclude>
+    <ClInclude Include="Data\String.h">
+      <Filter>Source Files\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="External\src\CPPFormat\format.h">
+      <Filter>External\CPPFormat</Filter>
+    </ClInclude>
+    <ClInclude Include="External\src\FreeImage\FreeImage.h">
+      <Filter>External\FreeImage</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
