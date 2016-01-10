@@ -5,11 +5,9 @@
 #include "Rendering/DX12/Texture.h"
 #include "Rendering/DX12/RenderObject.h"
 #include "Rendering/DX12/VertexBuffer.h"
+#include "Rendering/DX12/IndexBuffer.h"
 #include "Rendering/DX12/DX12Renderer.h"
-#include "Factory/RenderObjectFactory.h"
-#include "Factory/MaterialFactory.h"
-#include "Factory/TextureFactory.h"
-#include "Factory/VertexBufferFactory.h"
+#include "Factory/ResourceFactory.h"
 #include "Utils/Helpers.h"
 
 using namespace Engine;
@@ -26,79 +24,85 @@ public:
 
 	DX12Renderer* Renderer;
 
-	private:
-		RenderObject* _pTriangle;
-		Texture* _pTexture;
-		Material* _pMaterial;
+private:
+	RenderObject* _pTriangle;
+	Texture* _pTexture;
+	Material* _pMaterial;
 
-		RenderObject* _pTriangle2;
-		Texture* _pTexture2;
-		Material* _pMaterial2;
+	RenderObject* _pTriangle2;
+	Texture* _pTexture2;
+	Material* _pMaterial2;
 };
 
 Game::Game()
 	: Renderer(nullptr)
-	, _pTriangle(nullptr)
-	, _pTexture(nullptr)
-	, _pMaterial(nullptr)
-	, _pTriangle2(nullptr)
-	, _pTexture2(nullptr)
-	, _pMaterial2(nullptr)
+	  , _pTriangle(nullptr)
+	  , _pTexture(nullptr)
+	  , _pMaterial(nullptr)
+	  , _pTriangle2(nullptr)
+	  , _pTexture2(nullptr)
+	  , _pMaterial2(nullptr)
 {
-	
 }
 
 void Game::Start()
 {
 	// Create an example triangle object.
 	std::vector<VertexPosUv> triangleVertices =
-	{
-		{ { 0.0f, 0.25f, 0.0f },{ 0.5f, 0.0f } },
-		{ { 0.25f, -0.25f, 0.0f },{ 1.0f, 64.0f } },
-		{ { -0.25f, -0.25f, 0.0f },{ 0.0f, 64.0f } }
-	};
+		{
+			{{0.0f, 0.25f, 0.0f},{0.5f, 0.0f}},
+			{{0.25f, -0.25f, 0.0f},{1.0f, 64.0f}},
+			{{-0.25f, -0.25f, 0.0f},{0.0f, 64.0f}}
+		};
 
-	VertexBuffer<VertexPosUv>* vertexBuffer = VertexBufferFactory::CreateVertexBuffer<VertexPosUv>();
+	VertexBuffer<VertexPosUv>* vertexBuffer = ResourceFactory::CreateVertexBuffer<VertexPosUv>();
 	vertexBuffer->SetVertices(triangleVertices);
 
-	_pTexture = TextureFactory::CreateTexture();
+	_pTexture = ResourceFactory::CreateTexture();
 	_pTexture->Load("C:\\Users\\JJJohan\\Source\\Repos\\DX12Engine\\Engine\\Build\\Textures\\font.dds");
 
-	_pMaterial = MaterialFactory::CreateMaterial();
+	_pMaterial = ResourceFactory::CreateMaterial();
 	_pMaterial->SetTexture(_pTexture);
 	_pMaterial->LoadVertexShader(GetRelativeFilePath("Shaders\\DiffuseTexture.hlsl"), "VSMain", "vs_5_1");
 	_pMaterial->LoadPixelShader(GetRelativeFilePath("Shaders\\DiffuseTexture.hlsl"), "PSMain", "ps_5_1");
 	_pMaterial->Finalise(vertexBuffer->GetInputLayout());
 
-	_pTriangle = RenderObjectFactory::CreateRenderObject();
+	_pTriangle = new RenderObject();
 	_pTriangle->SetVertexBuffer(vertexBuffer);
 	_pTriangle->SetMaterial(_pMaterial);
 
 	// Create an example triangle object.
 	std::vector<VertexPosUv> vertices2 =
-	{
-		{ { 1 + -0.25f, 0.25f, 0.0f },{ 0.0f, 0.0f } },
-		{ { 1 + 0.25f, -0.25f, 0.0f },{ 1.0f, 1.0f } },
-		{ { 1 + -0.25f, -0.25f, 0.0f },{ 0.0f, 1.0f } },
+		{
+			{{1 + -0.25f, 0.25f, 0.0f},{0.0f, 0.0f}}, // bottom left
+			{{1 + 0.25f, -0.25f, 0.0f},{1.0f, 1.0f}}, // top right
+			{{1 + 0.25f, 0.25f, 0.0f},{1.0f, 0.0f}}, // bottom right
+			{{1 + -0.25f, -0.25f, 0.0f},{0.0f, 1.0f}} // top left
+		};
 
-		{ { 1 + 0.25f, 0.25f, 0.0f },{ 1.0f, 0.0f } },
-		{ { 1 + 0.25f, -0.25f, 0.0f },{ 1.0f, 1.0f } },
-		{ { 1 + -0.25f, 0.25f, 0.0f },{ 0.0f, 0.0f } },
-	};
+	std::vector<int> indices =
+		{
+			1, 0, 2,
+			0, 1, 3
+		};
 
-	VertexBuffer<VertexPosUv>* vertexBuffer2 = VertexBufferFactory::CreateVertexBuffer<VertexPosUv>();
+	VertexBuffer<VertexPosUv>* vertexBuffer2 = ResourceFactory::CreateVertexBuffer<VertexPosUv>();
 	vertexBuffer2->SetVertices(vertices2);
 
-	_pTexture2 = TextureFactory::CreateTexture();
+	IndexBuffer* indexBuffer = ResourceFactory::CreateIndexBuffer();
+	indexBuffer->SetIndices(indices);
+
+	_pTexture2 = ResourceFactory::CreateTexture();
 	_pTexture2->Load("C:\\Users\\JJJohan\\Desktop\\test2.png");
 
-	_pMaterial2 = MaterialFactory::CreateMaterial();
+	_pMaterial2 = ResourceFactory::CreateMaterial();
 	_pMaterial2->SetTexture(_pTexture2);
 	_pMaterial2->LoadVertexShader(GetRelativeFilePath("Shaders\\DiffuseTexture.hlsl"), "VSMain", "vs_5_1");
 	_pMaterial2->LoadPixelShader(GetRelativeFilePath("Shaders\\DiffuseTexture.hlsl"), "PSMain", "ps_5_1");
 	_pMaterial2->Finalise(vertexBuffer2->GetInputLayout());
 
-	_pTriangle2 = RenderObjectFactory::CreateRenderObject();
+	_pTriangle2 = new RenderObject();
+	_pTriangle2->SetIndexBuffer(indexBuffer);
 	_pTriangle2->SetVertexBuffer(vertexBuffer2);
 	_pTriangle2->SetMaterial(_pMaterial2);
 }
@@ -161,12 +165,12 @@ int WINAPI WinMain(HINSTANCE hInstance,
 	game.Renderer = static_cast<DX12Renderer*>(renderer);
 
 	ENGINE_LINK_DESC engineLink =
-	{
-		std::bind(&Game::Start, &game),
-		std::bind(&Game::Update, &game),
-		std::bind(&Game::Draw, &game),
-		std::bind(&Game::Destroy, &game)
-	};
+		{
+			std::bind(&Game::Start, &game),
+			std::bind(&Game::Update, &game),
+			std::bind(&Game::Draw, &game),
+			std::bind(&Game::Destroy, &game)
+		};
 
 	Engine::Core::Initialise(1024, 768, true, engineLink);
 
@@ -176,7 +180,7 @@ int WINAPI WinMain(HINSTANCE hInstance,
 		{
 			// Update returned false, exit.
 			break;
-		}	
+		}
 
 		timer += Engine::Time::DeltaTime();
 		if (timer > 1.0f)
@@ -196,3 +200,4 @@ int WINAPI WinMain(HINSTANCE hInstance,
 
 	return EXIT_SUCCESS;
 }
+

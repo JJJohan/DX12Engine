@@ -41,6 +41,33 @@
     <Filter Include="External\FreeImage">
       <UniqueIdentifier>{73f8f668-7d9d-41a0-a9c0-7b3ede4454e0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{3b9c69e1-dc05-4650-83bd-1d4e6e69ca69}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Core">
+      <UniqueIdentifier>{f78a93cc-9a1d-4c0a-9522-f93eda00f2fb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Data">
+      <UniqueIdentifier>{af275900-f70b-431d-81c9-b73ead91e087}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Input">
+      <UniqueIdentifier>{97e93a9e-5bb0-49f1-8f03-756c07ca956b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Rendering">
+      <UniqueIdentifier>{62850a45-f8b0-4f82-8096-3d87091a52e5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Rendering\DX12">
+      <UniqueIdentifier>{bb1748d1-f421-4c5d-9349-c04331eea75a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Utils">
+      <UniqueIdentifier>{33684bae-9596-44db-8bcd-bee7f5d29e05}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Factory">
+      <UniqueIdentifier>{81b68319-2866-42c5-9b71-905a2f6cd3c0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Utils\CPU">
+      <UniqueIdentifier>{1008a912-2932-42e3-b93c-3aca8c5afb4c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\Core.cpp">
@@ -121,21 +148,6 @@
     <ClCompile Include="Rendering\DX12\Material.cpp">
       <Filter>Source Files\Rendering\DX12</Filter>
     </ClCompile>
-    <ClCompile Include="Factory\RenderObjectFactory.cpp">
-      <Filter>Source Files\Factory</Filter>
-    </ClCompile>
-    <ClCompile Include="Factory\MaterialFactory.cpp">
-      <Filter>Source Files\Factory</Filter>
-    </ClCompile>
-    <ClCompile Include="Factory\IndexBufferFactory.cpp">
-      <Filter>Source Files\Factory</Filter>
-    </ClCompile>
-    <ClCompile Include="Factory\TextureFactory.cpp">
-      <Filter>Source Files\Factory</Filter>
-    </ClCompile>
-    <ClCompile Include="Factory\Factory.cpp">
-      <Filter>Source Files\Factory</Filter>
-    </ClCompile>
     <ClCompile Include="Rendering\DX12\HeapManager.cpp">
       <Filter>Source Files\Rendering\DX12</Filter>
     </ClCompile>
@@ -151,124 +163,130 @@
     <ClCompile Include="External\src\CPPFormat\format.cc">
       <Filter>External\CPPFormat</Filter>
     </ClCompile>
+    <ClCompile Include="Data\Transform.cpp">
+      <Filter>Source Files\Data</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\DX12\FontManager.cpp">
+      <Filter>Source Files\Rendering\DX12</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\DX12\ConstantBuffer.cpp">
+      <Filter>Source Files\Rendering\DX12</Filter>
+    </ClCompile>
+    <ClCompile Include="Factory\ResourceFactory.cpp">
+      <Filter>Source Files\Factory</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Core\Core.h">
-      <Filter>Source Files\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Core\Time.h">
-      <Filter>Source Files\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Data\Colour.h">
-      <Filter>Source Files\Data</Filter>
-    </ClInclude>
-    <ClInclude Include="Data\Quaternion.h">
-      <Filter>Source Files\Data</Filter>
-    </ClInclude>
-    <ClInclude Include="Data\Vector2.h">
-      <Filter>Source Files\Data</Filter>
-    </ClInclude>
-    <ClInclude Include="Data\Vector3.h">
-      <Filter>Source Files\Data</Filter>
-    </ClInclude>
-    <ClInclude Include="Input\Input.h">
-      <Filter>Source Files\Input</Filter>
-    </ClInclude>
-    <ClInclude Include="Utils\Logging.h">
-      <Filter>Source Files\Utils</Filter>
-    </ClInclude>
-    <ClInclude Include="Utils\SystemInfo.h">
-      <Filter>Source Files\Utils</Filter>
-    </ClInclude>
-    <ClInclude Include="Rendering\IRenderer.h">
-      <Filter>Source Files\Rendering</Filter>
-    </ClInclude>
-    <ClInclude Include="Rendering\Renderer.h">
-      <Filter>Source Files\Rendering</Filter>
-    </ClInclude>
-    <ClInclude Include="Utils\Helpers.h">
-      <Filter>Source Files\Utils</Filter>
-    </ClInclude>
     <ClInclude Include="Utils\Console.h">
       <Filter>Source Files\Utils</Filter>
-    </ClInclude>
-    <ClInclude Include="Utils\CPU\Processor.h">
-      <Filter>Source Files\Utils\CPU</Filter>
-    </ClInclude>
-    <ClInclude Include="Utils\Win32Utils.h">
-      <Filter>Source Files\Utils</Filter>
-    </ClInclude>
-    <ClInclude Include="Rendering\DX12\Camera.h">
-      <Filter>Source Files\Rendering\DX12</Filter>
-    </ClInclude>
-    <ClInclude Include="Rendering\DX12\FeatureSupport.h">
-      <Filter>Source Files\Rendering\DX12</Filter>
-    </ClInclude>
-    <ClInclude Include="Rendering\DX12\DX12Renderer.h">
-      <Filter>Source Files\Rendering\DX12</Filter>
-    </ClInclude>
-    <ClInclude Include="Input\Event.h">
-      <Filter>Source Files\Input</Filter>
-    </ClInclude>
-    <ClInclude Include="Rendering\DX12\CommandQueue.h">
-      <Filter>Source Files\Rendering\DX12</Filter>
-    </ClInclude>
-    <ClInclude Include="Utils\Math.h">
-      <Filter>Source Files\Utils</Filter>
-    </ClInclude>
-    <ClInclude Include="Rendering\DX12\RenderObject.h">
-      <Filter>Source Files\Rendering\DX12</Filter>
-    </ClInclude>
-    <ClInclude Include="Rendering\DX12\VertexBuffer.h">
-      <Filter>Source Files\Rendering\DX12</Filter>
-    </ClInclude>
-    <ClInclude Include="Rendering\DX12\Font.h">
-      <Filter>Source Files\Rendering\DX12</Filter>
-    </ClInclude>
-    <ClInclude Include="Rendering\DX12\IndexBuffer.h">
-      <Filter>Source Files\Rendering\DX12</Filter>
-    </ClInclude>
-    <ClInclude Include="Rendering\DX12\Texture.h">
-      <Filter>Source Files\Rendering\DX12</Filter>
-    </ClInclude>
-    <ClInclude Include="Rendering\DX12\Material.h">
-      <Filter>Source Files\Rendering\DX12</Filter>
-    </ClInclude>
-    <ClInclude Include="Factory\Factory.h">
-      <Filter>Source Files\Factory</Filter>
-    </ClInclude>
-    <ClInclude Include="Factory\RenderObjectFactory.h">
-      <Filter>Source Files\Factory</Filter>
-    </ClInclude>
-    <ClInclude Include="Factory\MaterialFactory.h">
-      <Filter>Source Files\Factory</Filter>
-    </ClInclude>
-    <ClInclude Include="Factory\VertexBufferFactory.h">
-      <Filter>Source Files\Factory</Filter>
-    </ClInclude>
-    <ClInclude Include="Factory\IndexBufferFactory.h">
-      <Filter>Source Files\Factory</Filter>
-    </ClInclude>
-    <ClInclude Include="Factory\TextureFactory.h">
-      <Filter>Source Files\Factory</Filter>
-    </ClInclude>
-    <ClInclude Include="Rendering\DX12\HeapManager.h">
-      <Filter>Source Files\Rendering\DX12</Filter>
-    </ClInclude>
-    <ClInclude Include="Rendering\DX12\HeapResource.h">
-      <Filter>Source Files\Rendering\DX12</Filter>
-    </ClInclude>
-    <ClInclude Include="Rendering\DX12\Text.h">
-      <Filter>Source Files\Rendering\DX12</Filter>
-    </ClInclude>
-    <ClInclude Include="Data\String.h">
-      <Filter>Source Files\Data</Filter>
     </ClInclude>
     <ClInclude Include="External\src\CPPFormat\format.h">
       <Filter>External\CPPFormat</Filter>
     </ClInclude>
     <ClInclude Include="External\src\FreeImage\FreeImage.h">
       <Filter>External\FreeImage</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Core.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Time.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Data\Colour.h">
+      <Filter>Header Files\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="Data\Quaternion.h">
+      <Filter>Header Files\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="Data\String.h">
+      <Filter>Header Files\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="Data\Transform.h">
+      <Filter>Header Files\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="Data\Vector2.h">
+      <Filter>Header Files\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="Data\Vector3.h">
+      <Filter>Header Files\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="Input\Event.h">
+      <Filter>Header Files\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="Input\Input.h">
+      <Filter>Header Files\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\DX12\Camera.h">
+      <Filter>Header Files\Rendering\DX12</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\DX12\CommandQueue.h">
+      <Filter>Header Files\Rendering\DX12</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\DX12\DX12Renderer.h">
+      <Filter>Header Files\Rendering\DX12</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\DX12\FeatureSupport.h">
+      <Filter>Header Files\Rendering\DX12</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\DX12\Font.h">
+      <Filter>Header Files\Rendering\DX12</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\DX12\HeapManager.h">
+      <Filter>Header Files\Rendering\DX12</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\DX12\HeapResource.h">
+      <Filter>Header Files\Rendering\DX12</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\DX12\IndexBuffer.h">
+      <Filter>Header Files\Rendering\DX12</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\DX12\Material.h">
+      <Filter>Header Files\Rendering\DX12</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\DX12\RenderObject.h">
+      <Filter>Header Files\Rendering\DX12</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\DX12\Text.h">
+      <Filter>Header Files\Rendering\DX12</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\DX12\Texture.h">
+      <Filter>Header Files\Rendering\DX12</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\DX12\VertexBuffer.h">
+      <Filter>Header Files\Rendering\DX12</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\Renderer.h">
+      <Filter>Header Files\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\IRenderer.h">
+      <Filter>Header Files\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils\CPU\Processor.h">
+      <Filter>Header Files\Utils\CPU</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils\Win32Utils.h">
+      <Filter>Header Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils\SystemInfo.h">
+      <Filter>Header Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils\Math.h">
+      <Filter>Header Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils\Logging.h">
+      <Filter>Header Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils\Helpers.h">
+      <Filter>Header Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\DX12\FontManager.h">
+      <Filter>Header Files\Rendering\DX12</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\DX12\ConstantBuffer.h">
+      <Filter>Header Files\Rendering\DX12</Filter>
+    </ClInclude>
+    <ClInclude Include="Factory\ResourceFactory.h">
+      <Filter>Header Files\Factory</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
