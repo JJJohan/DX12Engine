@@ -1,18 +1,25 @@
+#include <fstream>
 #include "Font.h"
-#include "../../Utils/Logging.h"
+#include "Texture.h"
 
 namespace Engine
 {
-	std::unordered_map<std::string, Font> Font::_fonts = std::unordered_map<std::string, Font>();
-
-	void Font::LoadFont(std::string fontName, std::string textureFile, std::string fontFile)
+	Font::Font()
+		: _pTexture(nullptr)
 	{
-		// Check if the font already exists.
-		if (_fonts.find("") != _fonts.end())
+	}
+
+	Font::~Font()
+	{
+		if (_pTexture != nullptr)
 		{
-			Logging::LogError("The font '{0}' has already been loaded.");
-			return;
+			delete _pTexture;
 		}
+	}
+
+	const std::string& Font::GetName() const
+	{
+		return _name;
 	}
 }
 

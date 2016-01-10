@@ -6,25 +6,30 @@
 
 namespace Engine
 {
+	class Texture;
+
 	class Font : HeapResource
 	{
 	public:
-		static void LoadFont(std::string fontName, std::string textureFile, std::string fontFile);
+		Font();
+		~Font();
 
-	private:
 		struct Letter
 		{
 			float LeftUv;
 			float RightUv;
-			float Width;
+			int Width;
 		};
 
+		const std::string& GetName() const;
+
+	private:
 		std::string _name;
 		std::unordered_map<char, Letter> _chars;
-
-		static std::unordered_map<std::string, Font> _fonts;
+		Texture* _pTexture;
 
 		friend class Text;
+		friend class FontManager;
 	};
 }
 
