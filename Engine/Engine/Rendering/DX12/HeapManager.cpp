@@ -1,8 +1,9 @@
 #include "HeapManager.h"
 #include "d3dx12.h"
 #include "../../Utils/Logging.h"
-#include "../../Factory/Factory.h"
+#include "../../Factory/ResourceFactory.h"
 #include "HeapResource.h"
+#include <mutex>
 
 namespace Engine
 {
@@ -23,6 +24,8 @@ namespace Engine
 
 		if (addToList)
 		{
+			std::mutex mutex;
+			mutex.lock();
 			if (!heapResource->_dynamic)
 			{
 				_staticUploadHeaps.push_back(heapResource);
@@ -31,6 +34,7 @@ namespace Engine
 			{
 				_dynamicUploadHeaps.push_back(heapResource);
 			}
+			mutex.unlock();
 		}
 	}
 
@@ -96,6 +100,11 @@ namespace Engine
 		_dynamicUploadHeaps.clear();
 	}
 
+	void HeapManager::Upload(HeapResource* heap, void* data, enum D3D12_RESOURCE_STATES destState)
+	{
+		Upload(heap, data, int(heap->_heapSize), int(heap->_heapSize), destState);
+	}
+
 	void HeapManager::Upload(HeapResource* heap, void* data, int rowPitch, int slicePitch, enum D3D12_RESOURCE_STATES destState)
 	{
 		bool cleaned = false;
@@ -108,12 +117,11 @@ namespace Engine
 			}
 
 			RequestHeap(heap, true);
-			heap->_lastHeapSize = heap->_heapSize;
 		}
 
 		if (!heap->_dynamic)
 		{
-			ID3D12GraphicsCommandList* commandList = static_cast<ID3D12GraphicsCommandList*>(Factory::GetCommandList());
+			ID3D12GraphicsCommandList* commandList = static_cast<ID3D12GraphicsCommandList*>(ResourceFactory::GetCommandList());
 
 			D3D12_SUBRESOURCE_DATA subresourceData = {};
 			subresourceData.pData = data;
@@ -122,10 +130,17 @@ namespace Engine
 
 			intptr_t ptr = reinterpret_cast<intptr_t>(heap->_pResource);
 			UpdateSubresources(commandList, heap->_pResource, heap->_pHeap, 0, 0, 1, &subresourceData);
+			commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(heap->_pResource, D3D12_RESOURCE_STATE_COPY_DEST, destState));
+
 		}
 		else
 		{
 			Logging::LogError("Dynamic heaps not implemented.");
 		}
+	}
+
+	void HeapManager::SetDevice(ID3D12Device* device)
+	{
+		_pDevice = device;
 	}
 }
