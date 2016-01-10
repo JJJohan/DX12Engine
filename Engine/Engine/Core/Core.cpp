@@ -1,6 +1,4 @@
 #include "Core.h"
-#include "../Rendering/DX12/DX12Renderer.h"
-#include "../Factory/Factory.h"
 
 namespace Engine
 {
@@ -69,8 +67,6 @@ namespace Engine
 			Logging::LogError("Tried to begin rendering without a renderer!");
 			return;
 		}
-
-		Factory::_pRenderer = static_cast<DX12Renderer*>(_renderer);
 
 		_renderer->AssignCreateMethod(engineLink.CreateMethod);
 		_renderer->AssignDrawLoop(engineLink.DrawLoop);
