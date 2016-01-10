@@ -1,9 +1,10 @@
-#include "CommandQueue.h"
 #include <thread>
-#include "../../Utils/Logging.h"
-#include "../../Factory/Factory.h"
-#include "../../Utils/SystemInfo.h"
 #include <sstream>
+#include "CommandQueue.h"
+#include "../../Utils/Logging.h"
+#include "../../Factory/ResourceFactory.h"
+#include "../../Utils/SystemInfo.h"
+
 
 namespace Engine
 {
@@ -35,17 +36,17 @@ namespace Engine
 
 	void CommandQueue::RunTask(CommandThread* commandThread)
 	{
-		Factory::AssignCommandList(commandThread->CommandList);
+		ResourceFactory::AssignCommandList(commandThread->CommandList);
 		ID3D12GraphicsCommandList* graphicsCmdList = static_cast<ID3D12GraphicsCommandList*>(commandThread->CommandList);
 
 		while (!_releaseRequested)
 		{
 			if (commandThread->Task == nullptr)
 			{
-				std::this_thread::sleep_for(std::chrono::milliseconds(1));
+				std::this_thread::sleep_for(std::chrono::microseconds(1));
 				if (commandThread->TasksCompleted == 0)
 				{
-					commandThread->IdleTimer += 1.0f;
+					commandThread->IdleTimer += 0.001f;
 					if (commandThread->IdleTimer > 2000.0f)
 					{
 						break;
