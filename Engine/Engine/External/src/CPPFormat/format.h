@@ -195,9 +195,7 @@ namespace fmt
 #endif
 
 #ifndef FMT_NOEXCEPT
-# if FMT_USE_NOEXCEPT || FMT_HAS_FEATURE(cxx_noexcept) ||
-(FMT_GCC_VERSION >= 408 && FMT_HAS_GXX_CXX11) ||
-_MSC_VER >= 1900
+# if FMT_USE_NOEXCEPT || FMT_HAS_FEATURE(cxx_noexcept) || (FMT_GCC_VERSION >= 408 && FMT_HAS_GXX_CXX11) || _MSC_VER >= 1900
 #  define FMT_NOEXCEPT noexcept
 # else
 #  define FMT_NOEXCEPT throw()
@@ -229,8 +227,7 @@ _MSC_VER >= 1900
 # define FMT_USE_DELETED_FUNCTIONS 0
 #endif
 
-#if FMT_USE_DELETED_FUNCTIONS || FMT_HAS_FEATURE(cxx_deleted_functions) ||
-(FMT_GCC_VERSION >= 404 && FMT_HAS_GXX_CXX11) || _MSC_VER >= 1800
+#if FMT_USE_DELETED_FUNCTIONS || FMT_HAS_FEATURE(cxx_deleted_functions) || (FMT_GCC_VERSION >= 404 && FMT_HAS_GXX_CXX11) || _MSC_VER >= 1800
 # define FMT_DELETED_OR_UNDEFINED  = delete
 # define FMT_DISALLOW_COPY_AND_ASSIGN(TypeName) \
     TypeName(const TypeName&) = delete; \
