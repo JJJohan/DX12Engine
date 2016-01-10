@@ -20,15 +20,33 @@ namespace Engine
 	{
 	public:
 		static void Log(const String& message);
-		static void Log(fmt::CStringRef formatString, fmt::ArgList args);
 		static void LogError(const String& message);
-		static void LogError(fmt::CStringRef formatString, fmt::ArgList args);
 		static void LogWarning(const String& message);
-		static void LogWarning(fmt::CStringRef formatString, fmt::ArgList args);
 		static void LogWin32Error();
 		static String GetWin32ErrorString();
 		static void EnableFileLogging(bool enabled);
 		static void SetLogPath(const String& filePath);
+
+		template <typename... Args>
+		static void Log(const String& string, Args ... args)
+		{
+			std::string text = fmt::format(string.Str(), args...);
+			Log(text);
+		}
+
+		template <typename... Args>
+		static void LogWarning(const String& string, Args ... args)
+		{
+			std::string text = fmt::format(string.Str(), args...);
+			LogWarning(text);
+		}
+
+		template <typename... Args>
+		static void LogError(const String& string, Args ... args)
+		{
+			std::string text = fmt::format(string.Str(), args...);
+			LogError(text);
+		}
 
 	private:
 		enum LogPriority

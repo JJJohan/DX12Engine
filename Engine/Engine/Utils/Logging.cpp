@@ -21,20 +21,10 @@ namespace Engine
 		Log(message);
 	}
 
-	void Logging::LogError(fmt::CStringRef formatString, fmt::ArgList args)
-	{
-		LogError(format(formatString, args));
-	}
-
 	void Logging::LogWarning(const String& message)
 	{
 		LogLevel = LogPriority::Warning;
 		Log(message);
-	}
-
-	void Logging::LogWarning(fmt::CStringRef formatString, fmt::ArgList args)
-	{
-		LogWarning(format(formatString, args));
 	}
 
 	void Logging::Log(const String& message)
@@ -69,11 +59,6 @@ namespace Engine
 		Console::SetColour(currentColour);
 #endif
 		LogLevel = LogPriority::Info;
-	}
-
-	void Logging::Log(fmt::CStringRef formatString, fmt::ArgList args)
-	{
-		Log(format(formatString, args));
 	}
 
 	void Logging::LogWin32Error()

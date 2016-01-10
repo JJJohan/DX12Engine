@@ -124,21 +124,21 @@ namespace Engine
 		return s;
 	}
 
-	std::vector<String>& String::Split(const String& s, char delim, std::vector<String>& elems) const
+	std::vector<String>& String::Split(char delim, std::vector<String>& elems) const
 	{
-		std::stringstream ss = s;
+		std::stringstream ss(_string);
 		std::string item;
-		while (std::getline(ss, item, delim))
+		while (getline(ss, item, delim))
 		{
 			elems.push_back(item);
 		}
 		return elems;
 	}
 
-	std::vector<String> String::Split(const String& s, char delim) const
+	std::vector<String> String::Split(char delim) const
 	{
 		std::vector<String> elems;
-		Split(s, delim, elems);
+		Split(delim, elems);
 		return elems;
 	}
 
@@ -152,8 +152,29 @@ namespace Engine
 		return std::wstring(_string.begin(), _string.end());
 	}
 
+	int String::ToInt() const
+	{
+		return stoi(_string);
+	}
+
+	float String::ToFloat() const
+	{
+		return stof(_string);
+	}
+
+	double String::ToDouble() const
+	{
+		return stod(_string);
+	}
+
 	String::operator std::stringstream() const
 	{
 		return std::stringstream(_string);
 	}
+
+	const std::string& String::Str() const
+	{
+		return _string;
+	}
 }
+

@@ -27,15 +27,20 @@ namespace Engine
 		operator std::wstring() const;
 		operator std::stringstream() const;
 
+		int ToInt() const;
+		float ToFloat() const;
+		double ToDouble() const;
+
 		String Trim();
 		String ToLower() const;
 		String ToUpper() const;
 		bool Contains(String string) const;
 		size_t Length() const;
-		std::vector<String> Split(const String& s, char delim) const;
+		std::vector<String> Split(char delim) const;
+		const std::string& Str() const;
 
 		template <typename... Args>
-		static String Format(const String& string, Args... args)
+		static String Format(const String& string, Args ... args)
 		{
 			std::string text = fmt::format(string._string, args...);
 			return String(text);
@@ -44,6 +49,7 @@ namespace Engine
 	private:
 		std::string _string;
 
-		std::vector<String>& Split(const String& s, char delim, std::vector<String>& elems) const;
+		std::vector<String>& Split(char delim, std::vector<String>& elems) const;
 	};
 }
+
