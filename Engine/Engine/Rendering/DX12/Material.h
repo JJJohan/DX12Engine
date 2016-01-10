@@ -28,7 +28,7 @@ namespace Engine
 		ID3DBlob* GetPixelShader() const;
 
 		ID3D12PipelineState* GetPipelineState() const;
-		
+
 		void Finalise(std::vector<D3D12_INPUT_ELEMENT_DESC> inputLayout);
 
 		void Bind(ID3D12GraphicsCommandList* commandList) const;
@@ -54,7 +54,7 @@ namespace Engine
 		ID3D12Device* _pDevice;
 		ID3D12RootSignature* _pRootSignature;
 
-		friend class MaterialFactory;
+		friend class ResourceFactory;
 	};
 }
 

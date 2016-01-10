@@ -1,11 +1,8 @@
 #pragma once
 
-#include <d3d12.h>
-#include <wrl/client.h>
 #include <DirectXMath.h>
 #include "VertexBuffer.h"
-
-using namespace Microsoft::WRL;
+#include "../../Data/Transform.h"
 
 namespace Engine
 {
@@ -15,6 +12,7 @@ namespace Engine
 	class RenderObject
 	{
 	public:
+		RenderObject();
 		virtual ~RenderObject();
 
 		template <typename T>
@@ -36,14 +34,12 @@ namespace Engine
 
 		void Draw() const;
 
-	private:
-		RenderObject();
+		Transform Transform;
 
+	private:
 		VertexBufferBase* _pVertexBuffer;
 		IndexBuffer* _pIndexBuffer;
 		Material* _pMaterial;
-
-		ComPtr<ID3D12Device> _device;
 
 		XMMATRIX _worldMatrix;
 

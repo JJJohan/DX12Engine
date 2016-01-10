@@ -6,10 +6,7 @@
 #include "HeapResource.h"
 #include "d3dx12.h"
 #include "../../Utils/Logging.h"
-#include "DX12Renderer.h"
-#include "CommandQueue.h"
 #include "HeapManager.h"
-#include "../../Factory/Factory.h"
 
 using namespace DirectX;
 using namespace Microsoft::WRL;
@@ -89,17 +86,15 @@ namespace Engine
 	private:
 		void CreateVertexBuffer()
 		{
-			ID3D12GraphicsCommandList* commandList = static_cast<ID3D12GraphicsCommandList*>(Factory::GetCommandList());
+			_heapSize = size_t(sizeof(T) * _vertexCount);
+			PrepareHeapResource();
 
-			size_t vertexBufferSize = size_t(sizeof(T) * _vertexCount);
-			PrepareHeapResource(vertexBufferSize);
-
-			HeapManager::Upload(this, &_vertices[0], int(vertexBufferSize), int(vertexBufferSize), D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
+			HeapManager::Upload(this, &_vertices[0], D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
 
 			// Initialize the vertex buffer view.
 			_vertexBufferView.BufferLocation = _pResource->GetGPUVirtualAddress();
 			_vertexBufferView.StrideInBytes = sizeof(T);
-			_vertexBufferView.SizeInBytes = UINT(vertexBufferSize);
+			_vertexBufferView.SizeInBytes = UINT(_heapSize);
 		}
 
 		VertexBuffer<T>()
@@ -107,10 +102,10 @@ namespace Engine
 			if (std::is_same<T, VertexPosCol>())
 			{
 				std::vector<D3D12_INPUT_ELEMENT_DESC> inputElementDescs =
-				{
-					{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-					{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
-				};
+					{
+						{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
+						{"COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0}
+					};
 
 				_inputLayout = inputElementDescs;
 				return;
@@ -119,11 +114,11 @@ namespace Engine
 			if (std::is_same<T, VertexPosColUv>())
 			{
 				std::vector<D3D12_INPUT_ELEMENT_DESC> inputElementDescs =
-				{
-					{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-					{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-					{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 28, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
-				};
+					{
+						{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
+						{"COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
+						{"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 28, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0}
+					};
 
 				_inputLayout = inputElementDescs;
 				return;
@@ -132,10 +127,10 @@ namespace Engine
 			if (std::is_same<T, VertexPosUv>())
 			{
 				std::vector<D3D12_INPUT_ELEMENT_DESC> inputElementDescs =
-				{
-					{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-					{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
-				};
+					{
+						{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
+						{"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0}
+					};
 
 				_inputLayout = inputElementDescs;
 				return;
@@ -146,7 +141,7 @@ namespace Engine
 
 		std::vector<T> _vertices;
 
-		friend class VertexBufferFactory;
+		friend class ResourceFactory;
 	};
 }
 

@@ -10,12 +10,15 @@ namespace Engine
 {
 	class HeapResource
 	{
+	public:
+		ID3D12Resource* GetResource() const;
+
 	protected:
 		HeapResource();
 		virtual ~HeapResource();
 
-		void PrepareHeapResource(size_t resourceSize);
-		void PrepareHeapResource(size_t resourceSize, const D3D12_RESOURCE_DESC& resourceDesc);
+		void PrepareHeapResource();
+		void PrepareHeapResource(const D3D12_RESOURCE_DESC& resourceDesc);
 		void HeapTask(const std::function<void()>& heapTask);
 		void MarkDynamic();
 
@@ -30,8 +33,6 @@ namespace Engine
 		ID3D12Resource* _pHeap;
 
 		friend class HeapManager;
-		friend class TextureFactory;
-		friend class VertexBufferFactory;
-		friend class IndexBufferFactory;
 	};
 }
+

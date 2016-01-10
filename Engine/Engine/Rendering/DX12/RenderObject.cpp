@@ -1,7 +1,7 @@
 #include "RenderObject.h"
 #include "IndexBuffer.h"
 #include "Material.h"
-#include "../../Factory/Factory.h"
+#include "../../Factory/ResourceFactory.h"
 
 namespace Engine
 {
@@ -14,8 +14,6 @@ namespace Engine
 
 	RenderObject::~RenderObject()
 	{
-		_device.Reset();
-
 		delete _pVertexBuffer;
 		delete _pIndexBuffer;
 	}
@@ -42,11 +40,19 @@ namespace Engine
 
 	void RenderObject::Draw() const
 	{
-		ID3D12GraphicsCommandList* commandList = static_cast<ID3D12GraphicsCommandList*>(Factory::GetCommandList());
+		ID3D12GraphicsCommandList* commandList = static_cast<ID3D12GraphicsCommandList*>(ResourceFactory::GetCommandList());
 		commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		_pMaterial->Bind(commandList);
 		_pVertexBuffer->Bind(commandList);
-		commandList->DrawInstanced(UINT(_pVertexBuffer->Count()), 1, 0, 0);
+		if (_pIndexBuffer != nullptr)
+		{
+			_pIndexBuffer->Bind(commandList);
+			commandList->DrawIndexedInstanced(UINT(_pIndexBuffer->Count()), 1, 0, 0, 0);
+		}
+		else
+		{
+			commandList->DrawInstanced(UINT(_pVertexBuffer->Count()), 1, 0, 0);
+		}
 	}
 }
 

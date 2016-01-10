@@ -16,7 +16,7 @@ namespace Engine
 	public:
 		~Texture();
 
-		void Load(const std::string& filePath);
+		bool Load(const std::string& filePath);
 		void Bind(ID3D12GraphicsCommandList* commandList) const;
 
 		const static int TextureLimit = 64;
@@ -39,7 +39,7 @@ namespace Engine
 		static UINT _descSize;
 		static std::vector<bool> _heapSlotsInUse;
 
-		friend class TextureFactory;
+		friend class ResourceFactory;
 	};
 }
 

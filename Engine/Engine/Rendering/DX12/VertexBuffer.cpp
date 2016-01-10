@@ -4,7 +4,7 @@ namespace Engine
 {
 	VertexBufferBase::VertexBufferBase()
 		: _vertexCount(0)
-		, _vertexBufferView()
+		  , _vertexBufferView()
 	{
 	}
 

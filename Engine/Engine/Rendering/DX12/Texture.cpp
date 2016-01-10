@@ -1,12 +1,9 @@
-#include "Texture.h"
-#include <fstream>
-#include "../../Utils/Logging.h"
-#include <sstream>
 #include <memory>
+#include "Texture.h"
 #include "d3dx12.h"
-#include "../../Factory/Factory.h"
-#include "CommandQueue.h"
 #include "HeapManager.h"
+#include "../../Utils/Logging.h"
+#include "../../Factory/ResourceFactory.h"
 #include "../../External/src/FreeImage/FreeImage.h"
 
 namespace Engine
@@ -16,8 +13,9 @@ namespace Engine
 
 	Texture::Texture()
 		: _pSrvHeap(nullptr)
-		, _width(0)
-		, _height(0)
+		  , _width(0)
+		  , _height(0)
+		  , _size(0)
 	{
 		_index = GetFreeHeapIndex();
 		if (_index == -1)
@@ -34,7 +32,7 @@ namespace Engine
 		}
 	}
 
-	void Texture::Load(const std::string& filePath)
+	bool Texture::Load(const std::string& filePath)
 	{
 		const char* filename = filePath.c_str();
 
@@ -42,7 +40,7 @@ namespace Engine
 		FREE_IMAGE_FORMAT fif = FIF_UNKNOWN;
 
 		// Pointer to the image, once loaded
-		FIBITMAP *dib = nullptr;
+		FIBITMAP* dib = nullptr;
 
 		// Check the file signature and deduce its format
 		fif = FreeImage_GetFileType(filename, 0);
@@ -57,7 +55,7 @@ namespace Engine
 		if (fif == FIF_UNKNOWN)
 		{
 			Logging::LogError("File specified is not a supported image file.");
-			return;
+			return false;
 		}
 
 		// Check that the plugin has reading capabilities and load the file
@@ -65,18 +63,18 @@ namespace Engine
 		{
 			dib = FreeImage_Load(fif, filename);
 		}
-		
+
 		// If the image failed to load, return failure
 		if (!dib)
 		{
 			Logging::LogError("Failed to load image file.");
-			return;
+			return false;
 		}
 
 		// Convert to 32-bit.
 		if (FreeImage_GetBPP(dib) != 32)
 		{
-			FIBITMAP *tmp = FreeImage_ConvertTo32Bits(dib);
+			FIBITMAP* tmp = FreeImage_ConvertTo32Bits(dib);
 			FreeImage_Unload(dib);
 			dib = tmp;
 		}
@@ -99,11 +97,13 @@ namespace Engine
 		FreeImage_Unload(dib);
 
 		HeapTask(std::bind(&Texture::Finalise, this));
+
+		return true;
 	}
 
 	void Texture::Finalise()
 	{
-		ID3D12GraphicsCommandList* commandList = static_cast<ID3D12GraphicsCommandList*>(Factory::GetCommandList());
+		ID3D12GraphicsCommandList* commandList = static_cast<ID3D12GraphicsCommandList*>(ResourceFactory::GetCommandList());
 
 		// Describe and create a Texture2D.
 		D3D12_RESOURCE_DESC textureDesc = {};
@@ -117,16 +117,16 @@ namespace Engine
 		textureDesc.SampleDesc.Quality = 0;
 		textureDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
 
-		// Allocate espace and upload to the heap.
-		PrepareHeapResource(_size, textureDesc);
-		_heapSize = GetRequiredIntermediateSize(_pResource, 0, 1);
+		// Allocate space and upload to the heap.
+		_heapSize = _width * _height * 4;
+		PrepareHeapResource(textureDesc);
 		HeapManager::Upload(this, _fileBuffer.get(), _width * 4, int(_heapSize), D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 
 		// Describe and create a SRV for the texture.
 		_descSize = _pDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 		CD3DX12_CPU_DESCRIPTOR_HANDLE srvHandle(_pSrvHeap->GetCPUDescriptorHandleForHeapStart(), _index, _descSize);
 		D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
-		srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+		srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING ;
 		srvDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
 		srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
 		srvDesc.Texture2D.MipLevels = 1;

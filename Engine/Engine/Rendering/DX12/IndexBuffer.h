@@ -9,8 +9,7 @@ namespace Engine
 	class IndexBuffer : HeapResource
 	{
 	public:
-		~IndexBuffer();
-
+		void Bind(ID3D12GraphicsCommandList* commandList) const;
 		int Count() const;
 
 		void SetIndices(std::vector<int> indices);
@@ -18,12 +17,13 @@ namespace Engine
 
 	private:
 		IndexBuffer();
+		void CreateIndexBuffer();
 
 		std::vector<int> _indices;
 		size_t _indexCount;
 		D3D12_INDEX_BUFFER_VIEW _indexBufferView;
 
-		friend class IndexBufferFactory;
+		friend class ResourceFactory;
 	};
 }
 

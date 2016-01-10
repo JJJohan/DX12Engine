@@ -43,13 +43,12 @@ namespace Engine
 
 	Material::Material()
 		: _pPipelineState(nullptr)
-		, _pVertexShader(nullptr)
-		, _pPixelShader(nullptr)
-		, _pTexture(nullptr)
-		, _pDevice(nullptr)
-		, _pRootSignature(nullptr)
+		  , _pVertexShader(nullptr)
+		  , _pPixelShader(nullptr)
+		  , _pTexture(nullptr)
+		  , _pDevice(nullptr)
+		  , _pRootSignature(nullptr)
 	{
-		
 	}
 
 	void Material::LoadVertexShader(const std::string& shaderPath, const std::string& entryPoint, const std::string& shaderVersion)
@@ -99,7 +98,7 @@ namespace Engine
 			psoDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
 			psoDesc.DepthStencilState.DepthEnable = FALSE;
 			psoDesc.DepthStencilState.StencilEnable = FALSE;
-			psoDesc.SampleMask = UINT_MAX;
+			psoDesc.SampleMask = UINT_MAX ;
 			psoDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 			psoDesc.NumRenderTargets = 1;
 			psoDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
