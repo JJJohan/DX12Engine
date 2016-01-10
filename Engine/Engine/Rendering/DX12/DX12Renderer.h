@@ -66,11 +66,7 @@ namespace Engine
 		void PopulateCommandList();
 		bool WaitForPreviousFrame();
 
-		friend class RenderObjectFactory;
-		friend class MaterialFactory;
-		friend class TextureFactory;
-		friend class VertexBufferFactory;
-		friend class IndexBufferFactory;
+		friend class ResourceFactory;
 	};
 }
 

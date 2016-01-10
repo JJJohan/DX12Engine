@@ -1,12 +1,13 @@
 #include <D3Dcompiler.h>
 #include "DX12Renderer.h"
-#include "../../Utils/Helpers.h"
 #include "d3dx12.h"
 #include "CommandQueue.h"
 #include "Material.h"
-#include "../../Factory/Factory.h"
 #include "HeapManager.h"
 #include "Texture.h"
+#include "../../Utils/Helpers.h"
+#include "../../Factory/ResourceFactory.h"
+#include "ConstantBuffer.h"
 
 namespace Engine
 {
@@ -97,6 +98,11 @@ namespace Engine
 		// fences to determine GPU execution progress.
 		LOGFAILEDCOMRETURN(_commandAllocator->Reset(), EXIT_FAILURE);
 
+		// Check if the camera has moved.
+		if (_pCamera->Update())
+		{
+		}
+
 		// Execute any queued GPU tasks.
 		std::vector<ID3D12CommandList*> commandLists = CommandQueue::Process(_device.Get());
 		if (!commandLists.empty())
@@ -106,13 +112,8 @@ namespace Engine
 
 		// Begin the render process.
 		PopulateCommandList();
-		ID3D12CommandList* ppCommandLists[] = { _commandList.Get() };
+		ID3D12CommandList* ppCommandLists[] = {_commandList.Get()};
 		_commandQueue->ExecuteCommandLists(_countof(ppCommandLists), ppCommandLists);
-
-		// Check if the camera has moved.
-		if (_pCamera->Update())
-		{
-		}
 
 		// Present the frame.
 		LOGFAILEDCOMRETURN(_swapChain->Present(_vsync, 0), EXIT_FAILURE);
@@ -282,7 +283,7 @@ namespace Engine
 			_device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&_commandAllocator)),
 			EXIT_FAILURE);
 
-		HeapManager::_pDevice = _device.Get();
+		HeapManager::SetDevice(_device.Get());
 		_device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, _commandAllocator.Get(), nullptr, IID_PPV_ARGS(&_commandList));
 		_commandList->Close();
 
@@ -330,6 +331,9 @@ namespace Engine
 				EXIT_FAILURE);
 		}
 
+		// Initialise factory pointers.
+		ResourceFactory::_init(static_cast<DX12Renderer*>(this));
+
 		// Call the resource creation method.
 		CommandQueue::Enqueue(_createMethod);
 		std::vector<ID3D12CommandList*> commandLists = CommandQueue::Process(_device.Get());
@@ -343,7 +347,7 @@ namespace Engine
 
 	void DX12Renderer::PopulateCommandList()
 	{
-		Factory::AssignCommandList(_commandList.Get());
+		ResourceFactory::AssignCommandList(_commandList.Get());
 		_commandList->Reset(_commandAllocator.Get(), nullptr);
 
 		// Set necessary state.
@@ -352,13 +356,13 @@ namespace Engine
 		_commandList->RSSetScissorRects(1, &_scissorRect);
 		Material::ClearPSOHistory();
 
-		// Point to the camera's constant buffer for camera transformation data.
-		_commandList->SetGraphicsRootConstantBufferView(0, _pCamera->GetCBuffer()->GetGPUVirtualAddress());
-
 		// Point to textures in SRV heap.
 		ID3D12DescriptorHeap* ppHeaps[] = {_srvHeap.Get()};
 		_commandList->SetDescriptorHeaps(_countof(ppHeaps), ppHeaps);
 		_commandList->SetGraphicsRootDescriptorTable(1, _srvHeap->GetGPUDescriptorHandleForHeapStart());
+
+		// Bind the camera.
+		_pCamera->Bind(_commandList.Get());
 
 		// Indicate that the back buffer will be used as a render target.
 		_commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(_renderTargets[_frameIndex].Get(),
