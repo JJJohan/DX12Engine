@@ -98,5 +98,5 @@ namespace Engine
 	{
 		Rotate(XMFLOAT3(pitch, yaw, roll));
 	}
-
 }
+

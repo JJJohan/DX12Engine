@@ -4,7 +4,7 @@
 namespace Engine
 {
 	class Vector3;
-	
+
 	class Quaternion
 	{
 	public:

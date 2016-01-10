@@ -15,7 +15,7 @@ namespace Engine
 	{
 		// Create the GPU upload buffer.
 		LOGFAILEDCOM(_pDevice->CreateCommittedResource(
-			&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
+				&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
 			D3D12_HEAP_FLAG_NONE,
 			&CD3DX12_RESOURCE_DESC::Buffer(heapResource->_heapSize),
 			D3D12_RESOURCE_STATE_GENERIC_READ,
@@ -131,7 +131,6 @@ namespace Engine
 			intptr_t ptr = reinterpret_cast<intptr_t>(heap->_pResource);
 			UpdateSubresources(commandList, heap->_pResource, heap->_pHeap, 0, 0, 1, &subresourceData);
 			commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(heap->_pResource, D3D12_RESOURCE_STATE_COPY_DEST, destState));
-
 		}
 		else
 		{
@@ -144,3 +143,4 @@ namespace Engine
 		_pDevice = device;
 	}
 }
+
