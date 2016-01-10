@@ -1,4 +1,5 @@
 #pragma once
+
 #include <chrono>
 
 namespace Engine
@@ -8,9 +9,9 @@ namespace Engine
 	class Time
 	{
 	public:
-		static float const DeltaTime();
-		static float const RunningTime();
-		static float const GPUTime();
+		static float DeltaTime();
+		static float RunningTime();
+		static float GPUTime();
 
 	private:
 		static void Update();

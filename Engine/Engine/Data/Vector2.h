@@ -11,12 +11,12 @@ namespace Engine
 		Vector2(float x, float y);
 		Vector2(int x, int y);
 
-		Vector2 operator+(const Vector2& rhs);
-		Vector2 operator*(const Vector2& rhs);
-		Vector2 operator-(const Vector2& rhs);
-		Vector2 operator/(const Vector2& rhs);
-		Vector2 operator*(const float& rhs);
-		Vector2 operator/(const float& rhs);
+		Vector2 operator+(const Vector2& rhs) const;
+		Vector2 operator*(const Vector2& rhs) const;
+		Vector2 operator-(const Vector2& rhs) const;
+		Vector2 operator/(const Vector2& rhs) const;
+		Vector2 operator*(const float& rhs) const;
+		Vector2 operator/(const float& rhs) const;
 
 		Vector2& operator+=(const Vector2& rhs);
 		Vector2& operator*=(const Vector2& rhs);
@@ -25,7 +25,7 @@ namespace Engine
 		Vector2& operator*=(const float& rhs);
 		Vector2& operator/=(const float& rhs);
 
-		DirectX::XMVECTOR GetXMVector();
+		DirectX::XMVECTOR GetXMVector() const;
 
 		static const Vector2 Zero;
 		static const Vector2 One;

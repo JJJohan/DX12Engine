@@ -1,5 +1,4 @@
 #include "Text.h"
-#include "Font.h"
 
 namespace Engine
 {
@@ -15,7 +14,7 @@ namespace Engine
 	void Text::SetText(std::string text)
 	{
 		_text = text;
-		size_t letters = text.size();
+		//size_t letters = text.size();
 
 		// Update vertex buffer
 		std::vector<VertexPosColUv> vertices;

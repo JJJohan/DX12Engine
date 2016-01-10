@@ -206,7 +206,7 @@ namespace Engine
 		std::wstring wide = std::wstring(fileName.begin(), fileName.end());
 		DWORD verHandle = NULL;
 		UINT size = 0;
-		LPBYTE lpBuffer = NULL;
+		LPBYTE lpBuffer = nullptr;
 		DWORD verSize = GetFileVersionInfoSize(wide.c_str(), &verHandle);
 		std::stringstream versionStream;
 
@@ -216,11 +216,11 @@ namespace Engine
 
 			if (GetFileVersionInfo(wide.c_str(), verHandle, verSize, verData))
 			{
-				if (VerQueryValue(verData, L"\\", (VOID FAR* FAR*)&lpBuffer, &size))
+				if (VerQueryValue(verData, L"\\", reinterpret_cast<VOID FAR* FAR*>(&lpBuffer), &size))
 				{
 					if (size)
 					{
-						VS_FIXEDFILEINFO* verInfo = (VS_FIXEDFILEINFO*)lpBuffer;
+						VS_FIXEDFILEINFO* verInfo = reinterpret_cast<VS_FIXEDFILEINFO*>(lpBuffer);
 						if (verInfo->dwSignature == 0xfeef04bd)
 						{
 							// Doesn't matter if you are on 32 bit or 64 bit,

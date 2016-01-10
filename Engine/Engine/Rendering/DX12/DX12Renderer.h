@@ -63,7 +63,7 @@ namespace Engine
 
 		bool LoadPipeline();
 		bool LoadAssets();
-		void PopulateCommandList();
+		void PopulateCommandList() const;
 		bool WaitForPreviousFrame();
 
 		friend class ResourceFactory;

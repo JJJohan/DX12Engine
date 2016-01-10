@@ -1,7 +1,6 @@
 #pragma once
 
 #include <comdef.h>
-#include <string>
 #include "Logging.h"
 #include "../Core/Core.h"
 

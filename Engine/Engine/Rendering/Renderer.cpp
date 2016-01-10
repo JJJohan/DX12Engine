@@ -1,6 +1,5 @@
 #include "Renderer.h"
 #include "DX12\DX12Renderer.h"
-#include "../Core/Core.h"
 
 namespace Engine
 {

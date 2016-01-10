@@ -7,14 +7,15 @@
 #include "Texture.h"
 #include "../../Utils/Helpers.h"
 #include "../../Factory/ResourceFactory.h"
-#include "ConstantBuffer.h"
 
 namespace Engine
 {
 	DX12Renderer* DX12Renderer::_instance = nullptr;
 
 	DX12Renderer::DX12Renderer()
-		: _pCamera(nullptr)
+		: _featureInfo()
+		  , _pCamera(nullptr)
+		  , _scissorRect()
 		  , _swapChain(nullptr)
 		  , _device(nullptr)
 		  , _commandAllocator(nullptr)
@@ -28,8 +29,6 @@ namespace Engine
 		  , _fenceEvent(nullptr)
 		  , _fence(nullptr)
 		  , _fenceValue(0)
-		  , _featureInfo()
-		  , _scissorRect()
 	{
 		_instance = this;
 	}
@@ -345,7 +344,7 @@ namespace Engine
 		return EXIT_SUCCESS;
 	}
 
-	void DX12Renderer::PopulateCommandList()
+	void DX12Renderer::PopulateCommandList() const
 	{
 		ResourceFactory::AssignCommandList(_commandList.Get());
 		_commandList->Reset(_commandAllocator.Get(), nullptr);

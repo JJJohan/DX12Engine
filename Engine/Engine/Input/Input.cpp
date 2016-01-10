@@ -143,8 +143,6 @@ namespace Engine
 
 	void Input::UnregisterMouseButton(int mouseButton, MouseState mouseState, const std::function<void()>& event)
 	{
-		bool buttonPressed = (mouseState == ButtonDown) ? true : false;
-
 		auto it = _mouseEvents.find(mouseButton);
 		if (it != _mouseEvents.end())
 		{
@@ -178,8 +176,6 @@ namespace Engine
 
 	void Input::UnregisterKey(int keyCode, KeyState keyState, const std::function<void()>& event)
 	{
-		bool keyPressed = (keyState == KeyDown) ? true : false;
-
 		auto it = _keyEvents.find(keyCode);
 		if (it != _keyEvents.end())
 		{

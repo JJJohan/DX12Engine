@@ -107,7 +107,6 @@ namespace Engine
 
 	void HeapManager::Upload(HeapResource* heap, void* data, int rowPitch, int slicePitch, enum D3D12_RESOURCE_STATES destState)
 	{
-		bool cleaned = false;
 		if (heap->_pHeap == nullptr)
 		{
 			if (heap->_heapSize == 0)
@@ -128,7 +127,6 @@ namespace Engine
 			subresourceData.RowPitch = LONG_PTR(rowPitch);
 			subresourceData.SlicePitch = LONG_PTR(slicePitch);
 
-			intptr_t ptr = reinterpret_cast<intptr_t>(heap->_pResource);
 			UpdateSubresources(commandList, heap->_pResource, heap->_pHeap, 0, 0, 1, &subresourceData);
 			commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(heap->_pResource, D3D12_RESOURCE_STATE_COPY_DEST, destState));
 		}

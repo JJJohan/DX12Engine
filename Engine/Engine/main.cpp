@@ -9,6 +9,9 @@
 #include "Rendering/DX12/DX12Renderer.h"
 #include "Factory/ResourceFactory.h"
 #include "Utils/Helpers.h"
+#include "Core/Time.h"
+#include "Utils/Console.h"
+#include "Utils/SystemInfo.h"
 
 using namespace Engine;
 

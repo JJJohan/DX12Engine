@@ -1,5 +1,4 @@
 #include "Vector2.h"
-#include "DirectXPackedVector.h"
 
 using namespace DirectX;
 
@@ -29,37 +28,37 @@ namespace Engine
 		_dxVector = XMVectorSet(x, y, 0.0f, 0.0f);
 	}
 
-	Vector2 Vector2::operator+(const Vector2& rhs)
+	Vector2 Vector2::operator+(const Vector2& rhs) const
 	{
 		XMVECTOR v = XMVectorAdd(_dxVector, rhs._dxVector);
 		return Vector2(v.m128_f32[0], v.m128_f32[1]);
 	}
 
-	Vector2 Vector2::operator*(const Vector2& rhs)
+	Vector2 Vector2::operator*(const Vector2& rhs) const
 	{
 		XMVECTOR v = XMVectorMultiply(_dxVector, rhs._dxVector);
 		return Vector2(v.m128_f32[0], v.m128_f32[1]);
 	}
 
-	Vector2 Vector2::operator-(const Vector2& rhs)
+	Vector2 Vector2::operator-(const Vector2& rhs) const
 	{
 		XMVECTOR v = XMVectorSubtract(_dxVector, rhs._dxVector);
 		return Vector2(v.m128_f32[0], v.m128_f32[1]);
 	}
 
-	Vector2 Vector2::operator/(const Vector2& rhs)
+	Vector2 Vector2::operator/(const Vector2& rhs) const
 	{
 		XMVECTOR v = XMVectorDivide(_dxVector, rhs._dxVector);
 		return Vector2(v.m128_f32[0], v.m128_f32[1]);
 	}
 
-	Vector2 Vector2::operator*(const float& rhs)
+	Vector2 Vector2::operator*(const float& rhs) const
 	{
 		XMVECTOR v = XMVectorScale(_dxVector, rhs);
 		return Vector2(v.m128_f32[0], v.m128_f32[1]);
 	}
 
-	Vector2 Vector2::operator/(const float& rhs)
+	Vector2 Vector2::operator/(const float& rhs) const
 	{
 		XMVECTOR v = XMVectorScale(_dxVector, 1.0f / rhs);
 		return Vector2(v.m128_f32[0], v.m128_f32[1]);
@@ -105,7 +104,7 @@ namespace Engine
 		return *this;
 	}
 
-	DirectX::XMVECTOR Vector2::GetXMVector()
+	DirectX::XMVECTOR Vector2::GetXMVector() const
 	{
 		return _dxVector;
 	}

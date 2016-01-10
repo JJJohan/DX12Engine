@@ -66,10 +66,10 @@ namespace Engine
 
 		// Get CPU manufacturer and highest CPUID
 		__cpuid(nBuff, 0);
-		nHighestFeature = (unsigned)nBuff[0];
-		*(int*)&szMan[0] = nBuff[1];
-		*(int*)&szMan[4] = nBuff[3];
-		*(int*)&szMan[8] = nBuff[2];
+		nHighestFeature = unsigned(nBuff[0]);
+		*reinterpret_cast<int*>(&szMan[0]) = nBuff[1];
+		*reinterpret_cast<int*>(&szMan[4]) = nBuff[3];
+		*reinterpret_cast<int*>(&szMan[8]) = nBuff[2];
 		szMan[12] = 0;
 
 		if (strcmp(szMan, "AuthenticAMD") == 0)
@@ -81,19 +81,19 @@ namespace Engine
 
 		// Get highest extended feature
 		__cpuid(nBuff, 0x80000000);
-		nHighestFeatureEx = (unsigned)nBuff[0];
+		nHighestFeatureEx = unsigned(nBuff[0]);
 
 		// Get processor brand name
 		if (nHighestFeatureEx >= 0x80000004)
 		{
 			char szCPUName[49];
 			szCPUName[0] = 0;
-			__cpuid((int*)&szCPUName[0], 0x80000002);
-			__cpuid((int*)&szCPUName[16], 0x80000003);
-			__cpuid((int*)&szCPUName[32], 0x80000004);
+			__cpuid(reinterpret_cast<int*>(&szCPUName[0]), 0x80000002);
+			__cpuid(reinterpret_cast<int*>(&szCPUName[16]), 0x80000003);
+			__cpuid(reinterpret_cast<int*>(&szCPUName[32]), 0x80000004);
 			szCPUName[48] = 0;
 
-			for (int i = (int)strlen(szCPUName) - 1; i >= 0; --i)
+			for (int i = int(strlen(szCPUName)) - 1; i >= 0; --i)
 			{
 				if (szCPUName[i] == ' ')
 					szCPUName[i] = '\0';
@@ -158,7 +158,7 @@ namespace Engine
 			if (nHighestFeatureEx >= 0x80000005)
 			{
 				__cpuid(nBuff, 0x80000005);
-				_l1Cache = ((unsigned)nBuff[2]) >> 24;
+				_l1Cache = unsigned(nBuff[2]) >> 24;
 			}
 		}
 
@@ -166,7 +166,7 @@ namespace Engine
 		if (nHighestFeatureEx >= 0x80000006)
 		{
 			__cpuid(nBuff, 0x80000006);
-			_l2Cache = ((unsigned)nBuff[2]) >> 16;
+			_l2Cache = unsigned(nBuff[2]) >> 16;
 		}
 
 		// Log features
@@ -181,32 +181,32 @@ namespace Engine
 		_frequency = ReadCPUSpeedFromRegistry(0);
 	}
 
-	std::string Processor::GetName()
+	std::string Processor::GetName() const
 	{
 		return _name;
 	}
 
-	std::string Processor::GetFeatures()
+	std::string Processor::GetFeatures() const
 	{
 		return _features;
 	}
 
-	int Processor::GetL1CacheSize()
+	int Processor::GetL1CacheSize() const
 	{
 		return _l1Cache;
 	}
 
-	int Processor::GetL2CacheSize()
+	int Processor::GetL2CacheSize() const
 	{
 		return _l2Cache;
 	}
 
-	int Processor::GetLogicalCores()
+	int Processor::GetLogicalCores() const
 	{
 		return _cores;
 	}
 
-	int Processor::GetFrequency()
+	int Processor::GetFrequency() const
 	{
 		return _frequency;
 	}

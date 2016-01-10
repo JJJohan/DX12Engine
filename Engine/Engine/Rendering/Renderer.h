@@ -1,6 +1,5 @@
 #pragma once
 
-#include <memory>
 #include "IRenderer.h"
 
 namespace Engine

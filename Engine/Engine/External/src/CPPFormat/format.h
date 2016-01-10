@@ -3075,7 +3075,6 @@ inline uint64_t make_type(FMT_GEN15(FMT_ARG_TYPE_DEFAULT)) {
 			if (!str_value)
 			{
 				FMT_THROW(FormatError("string pointer is null"));
-				return;
 			}
 		}
 		std::size_t precision = spec.precision_;

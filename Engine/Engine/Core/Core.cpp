@@ -1,4 +1,7 @@
 #include "Core.h"
+#include "../Utils/Logging.h"
+#include "../Input/Input.h"
+#include "Time.h"
 
 namespace Engine
 {
@@ -71,12 +74,10 @@ namespace Engine
 		_renderer->AssignCreateMethod(engineLink.CreateMethod);
 		_renderer->AssignDrawLoop(engineLink.DrawLoop);
 
-		bool windowInit = false;
 		if (_renderer->InitWindow(width, height, windowed) != EXIT_FAILURE)
 		{
 			_renderer->SetClearColour(Engine::Colour::Blue);
 			_renderer->SetVsync(false);
-			windowInit = true;
 		}
 
 		if (!_renderThreadAssigned)

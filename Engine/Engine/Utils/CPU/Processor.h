@@ -9,13 +9,13 @@ namespace Engine
 	public:
 		Processor();
 		void Refresh();
-		std::string GetName();
-		std::string GetFeatures();
-		int GetL1CacheSize();
-		int GetL2CacheSize();
-		int GetLogicalCores();
-		int GetFrequency();
-		double GetClockSpeed();
+		std::string GetName() const;
+		std::string GetFeatures() const;
+		int GetL1CacheSize() const;
+		int GetL2CacheSize() const;
+		int GetLogicalCores() const;
+		int GetFrequency() const;
+		static double GetClockSpeed();
 
 	private:
 		std::string _features;

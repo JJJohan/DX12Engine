@@ -6,6 +6,7 @@
 #include "Console.h"
 #include "Logging.h"
 #include "..\Core\Core.h"
+#include "..\Data\Vector2.h"
 
 namespace Engine
 {

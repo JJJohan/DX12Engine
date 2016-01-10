@@ -37,7 +37,6 @@ namespace Engine
 	void CommandQueue::RunTask(CommandThread* commandThread)
 	{
 		ResourceFactory::AssignCommandList(commandThread->CommandList);
-		ID3D12GraphicsCommandList* graphicsCmdList = static_cast<ID3D12GraphicsCommandList*>(commandThread->CommandList);
 
 		while (!_releaseRequested)
 		{

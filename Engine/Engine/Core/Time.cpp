@@ -8,17 +8,17 @@ namespace Engine
 	std::chrono::steady_clock::time_point Time::_previousTime = std::chrono::steady_clock::now();
 	std::chrono::steady_clock::time_point Time::_previousTimeGPU = std::chrono::steady_clock::now();
 
-	float const Time::DeltaTime()
+	float Time::DeltaTime()
 	{
 		return _deltaTime;
 	}
 
-	float const Time::RunningTime()
+	float Time::RunningTime()
 	{
 		return _runningTime;
 	}
 
-	float const Time::GPUTime()
+	float Time::GPUTime()
 	{
 		return _gpuTime;
 	}

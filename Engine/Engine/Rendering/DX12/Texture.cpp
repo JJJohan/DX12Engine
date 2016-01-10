@@ -3,7 +3,6 @@
 #include "d3dx12.h"
 #include "HeapManager.h"
 #include "../../Utils/Logging.h"
-#include "../../Factory/ResourceFactory.h"
 #include "../../External/src/FreeImage/FreeImage.h"
 
 namespace Engine
@@ -36,14 +35,11 @@ namespace Engine
 	{
 		const char* filename = filePath.c_str();
 
-		// Image format
-		FREE_IMAGE_FORMAT fif = FIF_UNKNOWN;
-
 		// Pointer to the image, once loaded
 		FIBITMAP* dib = nullptr;
 
 		// Check the file signature and deduce its format
-		fif = FreeImage_GetFileType(filename, 0);
+		FREE_IMAGE_FORMAT fif = FreeImage_GetFileType(filename, 0);
 
 		// If still unknown, try to guess the file format from the file extension
 		if (fif == FIF_UNKNOWN)
@@ -103,8 +99,6 @@ namespace Engine
 
 	void Texture::Finalise()
 	{
-		ID3D12GraphicsCommandList* commandList = static_cast<ID3D12GraphicsCommandList*>(ResourceFactory::GetCommandList());
-
 		// Describe and create a Texture2D.
 		D3D12_RESOURCE_DESC textureDesc = {};
 		textureDesc.MipLevels = 1;
