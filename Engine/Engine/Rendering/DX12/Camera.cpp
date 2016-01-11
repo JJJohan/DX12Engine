@@ -1,5 +1,4 @@
 #include "Camera.h"
-#include "../../Factory/ResourceFactory.h"
 #include "../../Input/Input.h"
 #include "../../Core/Time.h"
 #include "ConstantBuffer.h"
@@ -7,6 +6,8 @@
 
 namespace Engine
 {
+	Camera* Camera::_pMainCamera = nullptr;
+
 	Camera* Camera::CreateCamera(ID3D12Device* device, const XMFLOAT4& screenRect, float fovInDegrees, float nearClip, float farClip)
 	{
 		Camera* camera = new Camera(device);
@@ -17,13 +18,20 @@ namespace Engine
 		camera->_viewport.Height = screenRect.w - screenRect.y;
 		camera->_viewport.MinDepth = nearClip;
 		camera->_viewport.MaxDepth = farClip;
+
+		_pMainCamera = camera;
+
 		return camera;
+	}
+
+	Camera* Camera::Main()
+	{
+		return _pMainCamera;
 	}
 
 	Camera::Camera(ID3D12Device* device)
 		: _fov(90.0f)
 		  , _pDevice(device)
-		  , _pCbuffer(nullptr)
 	{
 		Transform.SetPosition(0.0f, 0.0f, -1.0f);
 
@@ -56,26 +64,7 @@ namespace Engine
 				this->Transform.Rotate(float(y) / 10, float(x) / 10, 0.0f);
 			});
 
-		_pCbuffer = ResourceFactory::CreateConstantBuffer();
 		//_pCbuffer->GetResource()->SetName(L"Camera Data");
-	}
-
-	ConstantBuffer* Camera::GetCBuffer() const
-	{
-		return _pCbuffer;
-	}
-
-	Camera::~Camera()
-	{
-		if (_pCbuffer != nullptr)
-		{
-			delete _pCbuffer;
-		}
-	}
-
-	void Camera::Bind(ID3D12GraphicsCommandList* commandList) const
-	{
-		_pCbuffer->Bind(commandList);
 	}
 
 	bool Camera::Update()
@@ -95,22 +84,6 @@ namespace Engine
 
 			// Calculate view projection matrix
 			_vp = XMMatrixMultiply(_view, _projection);
-
-			// Transpose matrices for shaders
-			XMMATRIX viewT = XMMatrixTranspose(_view);
-			XMMATRIX projT = XMMatrixTranspose(_projection);
-			XMMATRIX vpT = XMMatrixTranspose(_vp);
-
-			// Store data into buffer
-			CameraData camData = {};
-			XMStoreFloat4x4(&camData.view, viewT);
-			XMStoreFloat4x4(&camData.proj, projT);
-			XMStoreFloat4x4(&camData.vp, vpT);
-
-			// Update the camera CBuffer.
-			_pCbuffer->SetMatrix("view", camData.view);
-			_pCbuffer->SetMatrix("proj", camData.proj);
-			_pCbuffer->SetMatrix("vp", camData.vp);
 
 			Transform.Moved = false;
 		}
@@ -142,6 +115,15 @@ namespace Engine
 	{
 		_fov = XMConvertToRadians(fov);
 		Transform.Moved = true;
+	}
+
+	void Camera::ApplyWorldMatrix(ConstantBuffer* constantBuffer, const XMMATRIX& worldMatrix) const
+	{
+		XMMATRIX mvp = XMMatrixTranspose(worldMatrix * _vp);
+		XMFLOAT4X4 mvpT;
+		XMStoreFloat4x4(&mvpT, mvp);
+
+		constantBuffer->SetMatrix("mvp", mvpT);
 	}
 
 	D3D12_VIEWPORT& Camera::GetViewPort()

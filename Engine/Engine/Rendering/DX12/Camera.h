@@ -14,6 +14,7 @@ namespace Engine
 	{
 	public:
 		static Camera* CreateCamera(ID3D12Device* device, const XMFLOAT4& screenRect, float fovInDegrees, float nearClip, float farClip);
+		static Camera* Main();
 
 		float GetFOV() const;
 		void SetFOV(float fovInDegrees);
@@ -22,22 +23,20 @@ namespace Engine
 		XMMATRIX GetViewMatrix() const;
 		XMMATRIX GetProjectionMatrix() const;
 		XMMATRIX GetVPMatrix() const;
-		ConstantBuffer* GetCBuffer() const;
 
 		bool Update();
-		void Bind(ID3D12GraphicsCommandList* commandList) const;
-
-		~Camera();
+		void ApplyWorldMatrix(ConstantBuffer* constantBuffer, const XMMATRIX& worldMatrix) const;
 
 		Transform Transform;
 
 	private:
 		Camera(ID3D12Device* device);
 
+		static Camera* _pMainCamera;
+
 		D3D12_VIEWPORT _viewport;
 		float _fov;
 		ID3D12Device* _pDevice;
-		ConstantBuffer* _pCbuffer;
 
 		XMMATRIX _view;
 		XMMATRIX _projection;
