@@ -25,6 +25,8 @@ namespace Engine
 		void Move(const Vector3& translation, Space relativeTo = World);
 		void Rotate(const Vector3& eulerAngles);
 		void Rotate(float pitch, float yaw, float roll);
+		void LookAt(float x, float y, float z);
+		void LookAt(const Vector3& position);
 
 		const Vector3& GetPosition() const;
 		const Quaternion& GetRotation() const;

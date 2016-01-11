@@ -7,6 +7,7 @@ namespace Engine
 	Transform::Transform()
 		: Moved(false)
 	{
+		_worldMatrix = XMMatrixTranslation(0.0f, 0.0f, 0.0f);
 		_scale = Vector3::One;
 	}
 
@@ -90,6 +91,19 @@ namespace Engine
 
 		XMVECTOR rotation = XMQuaternionRotationRollPitchYaw(pitch, yaw, roll);
 		_rotation = XMQuaternionMultiply(rotation, _rotation);
+
+		UpdateMatrix();
+	}
+
+	void Transform::LookAt(float x, float y, float z)
+	{
+		LookAt(Vector3(x, y, z));
+	}
+
+	void Transform::LookAt(const Vector3& position)
+	{
+		XMMATRIX lookAt = XMMatrixLookAtRH(_position, position, Vector3::Up);
+		_rotation = XMQuaternionRotationMatrix(lookAt);
 
 		UpdateMatrix();
 	}
