@@ -46,12 +46,13 @@ namespace Engine
 		ComPtr<ID3D12CommandQueue> _commandQueue;
 		ComPtr<ID3D12RootSignature> _rootSignature;
 		ComPtr<ID3D12DescriptorHeap> _rtvHeap;
-		ComPtr<ID3D12DescriptorHeap> _srvHeap;
+		ComPtr<ID3D12DescriptorHeap> _cbvSrvHeap;
 		ComPtr<ID3D12GraphicsCommandList> _commandList;
 #if _DEBUG
 		ComPtr<ID3D12DebugDevice> _debugDevice;
 #endif
 		int _rtvDescriptorSize;
+		int _cbvSrvDescriptorSize;
 		bool _useWarpDevice;
 
 		// Synchronization objects

@@ -3,11 +3,13 @@
 #include <DirectXMath.h>
 #include "VertexBuffer.h"
 #include "../../Data/Transform.h"
+#include <unordered_set>
 
 namespace Engine
 {
 	class Material;
 	class IndexBuffer;
+	class ConstantBuffer;
 
 	class RenderObject
 	{
@@ -32,18 +34,20 @@ namespace Engine
 		void SetMaterial(Material* material);
 		Material* GetMaterial() const;
 
+		void Update() const;
 		void Draw() const;
 
 		Transform Transform;
 
 	private:
+		static std::unordered_set<RenderObject*> _renderObjects;
+
 		VertexBufferBase* _pVertexBuffer;
 		IndexBuffer* _pIndexBuffer;
 		Material* _pMaterial;
+		ConstantBuffer* _pCbuffer;
 
-		XMMATRIX _worldMatrix;
-
-		friend class RenderObjectFactory;
+		friend class DX12Renderer;
 	};
 }
 

@@ -7,6 +7,7 @@
 #include "Texture.h"
 #include "../../Utils/Helpers.h"
 #include "../../Factory/ResourceFactory.h"
+#include "RenderObject.h"
 
 namespace Engine
 {
@@ -24,6 +25,7 @@ namespace Engine
 		  , _rtvHeap(nullptr)
 		  , _commandList(nullptr)
 		  , _rtvDescriptorSize(0)
+		  , _cbvSrvDescriptorSize(0)
 		  , _useWarpDevice(false)
 		  , _frameIndex(0)
 		  , _fenceEvent(nullptr)
@@ -100,6 +102,12 @@ namespace Engine
 		// Check if the camera has moved.
 		if (_pCamera->Update())
 		{
+		}
+
+		// Update objects
+		for (auto it = RenderObject::_renderObjects.begin(); it != RenderObject::_renderObjects.end(); ++it)
+		{
+			(*it)->Update();
 		}
 
 		// Execute any queued GPU tasks.
@@ -255,14 +263,15 @@ namespace Engine
 
 		// Describe and create a shader resource view (SRV) heap for the texture.
 		D3D12_DESCRIPTOR_HEAP_DESC srvHeapDesc = {};
-		srvHeapDesc.NumDescriptors = Texture::TextureLimit;
+		srvHeapDesc.NumDescriptors = ResourceFactory::TextureLimit + ResourceFactory::CBufferLimit;
 		srvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
 		srvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
 		LOGFAILEDCOMRETURN(
-			_device->CreateDescriptorHeap(&srvHeapDesc, IID_PPV_ARGS(&_srvHeap)),
+			_device->CreateDescriptorHeap(&srvHeapDesc, IID_PPV_ARGS(&_cbvSrvHeap)),
 			EXIT_FAILURE);
 
 		_rtvDescriptorSize = _device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+		_cbvSrvDescriptorSize = _device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
 		// Create frame resources.
 		CD3DX12_CPU_DESCRIPTOR_HANDLE rtvHandle(_rtvHeap->GetCPUDescriptorHandleForHeapStart());
@@ -294,12 +303,13 @@ namespace Engine
 		// Create an empty root signature.
 		{
 			// define descriptor tables for a CBV for shaders
-			CD3DX12_DESCRIPTOR_RANGE DescRange[1];
-			DescRange[0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, Texture::TextureLimit, 0);
+			CD3DX12_DESCRIPTOR_RANGE DescRange[2];
+			DescRange[0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, ResourceFactory::CBufferLimit, 0);
+			DescRange[1].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, ResourceFactory::TextureLimit, 0);
 
 			CD3DX12_ROOT_PARAMETER rootParameters[2];
-			rootParameters[0].InitAsConstantBufferView(0, 0, D3D12_SHADER_VISIBILITY_VERTEX);
-			rootParameters[1].InitAsDescriptorTable(1, &DescRange[0], D3D12_SHADER_VISIBILITY_PIXEL);
+			rootParameters[0].InitAsDescriptorTable(1, &DescRange[0], D3D12_SHADER_VISIBILITY_VERTEX);
+			rootParameters[1].InitAsDescriptorTable(1, &DescRange[1], D3D12_SHADER_VISIBILITY_PIXEL);
 
 			D3D12_STATIC_SAMPLER_DESC sampler = {};
 			sampler.Filter = D3D12_FILTER_ANISOTROPIC;
@@ -331,7 +341,7 @@ namespace Engine
 		}
 
 		// Initialise factory pointers.
-		ResourceFactory::_init(static_cast<DX12Renderer*>(this));
+		ResourceFactory::_init(static_cast<DX12Renderer*>(this), _cbvSrvHeap.Get());
 
 		// Call the resource creation method.
 		CommandQueue::Enqueue(_createMethod);
@@ -351,17 +361,15 @@ namespace Engine
 
 		// Set necessary state.
 		_commandList->SetGraphicsRootSignature(_rootSignature.Get());
+
+		// Point to CBVs and SRVs.
+		ID3D12DescriptorHeap* ppHeaps[] = { _cbvSrvHeap.Get() };
+		_commandList->SetDescriptorHeaps(_countof(ppHeaps), ppHeaps);
+		_commandList->SetGraphicsRootDescriptorTable(1, _cbvSrvHeap->GetGPUDescriptorHandleForHeapStart());
+
 		_commandList->RSSetViewports(1, &_pCamera->GetViewPort());
 		_commandList->RSSetScissorRects(1, &_scissorRect);
 		Material::ClearPSOHistory();
-
-		// Point to textures in SRV heap.
-		ID3D12DescriptorHeap* ppHeaps[] = {_srvHeap.Get()};
-		_commandList->SetDescriptorHeaps(_countof(ppHeaps), ppHeaps);
-		_commandList->SetGraphicsRootDescriptorTable(1, _srvHeap->GetGPUDescriptorHandleForHeapStart());
-
-		// Bind the camera.
-		_pCamera->Bind(_commandList.Get());
 
 		// Indicate that the back buffer will be used as a render target.
 		_commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(_renderTargets[_frameIndex].Get(),
