@@ -9,7 +9,13 @@ namespace Engine
 {
 	DX12Renderer* ResourceFactory::_pRenderer = nullptr;
 	ID3D12Device* ResourceFactory::_pDevice = nullptr;
-	thread_local ID3D12CommandList* ResourceFactory::_pCommandList = nullptr;
+	ID3D12DescriptorHeap* ResourceFactory::_pCbvSrvHeap = nullptr;
+	thread_local ID3D12CommandList* ResourceFactory::_pCommandList = nullptr;	
+
+	int ResourceFactory::_cbufferIndex = 0;
+	int ResourceFactory::_textureIndex = 0;
+	std::vector<bool> ResourceFactory::_cbufferSlots = std::vector<bool>(CBufferLimit);
+	std::vector<bool> ResourceFactory::_textureSlots = std::vector<bool>(TextureLimit);
 
 	void ResourceFactory::AssignCommandList(ID3D12CommandList* commandList)
 	{
@@ -35,6 +41,8 @@ namespace Engine
 		ConstantBuffer* constantBuffer = new ConstantBuffer();
 
 		constantBuffer->_pDevice = _pDevice;
+		constantBuffer->_descriptorSize = _pDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+		constantBuffer->_pHeap = _pCbvSrvHeap;
 
 		return constantBuffer;
 	}
@@ -54,15 +62,69 @@ namespace Engine
 		Texture* texture = new Texture();
 
 		texture->_pDevice = _pDevice;
-		texture->_pSrvHeap = _pRenderer->_srvHeap.Get();
+		texture->_pSrvHeap = _pCbvSrvHeap;
 
 		return texture;
 	}
 
-	void ResourceFactory::_init(DX12Renderer* renderer)
+	ID3D12DescriptorHeap* ResourceFactory::GetCbvSrvHeap()
+	{
+		return _pCbvSrvHeap;
+	}
+
+	void ResourceFactory::_init(DX12Renderer* renderer, ID3D12DescriptorHeap* cbvSrvHeap)
 	{
 		_pRenderer = renderer;
 		_pDevice = _pRenderer->_device.Get();
+		_pCbvSrvHeap = cbvSrvHeap;
+
+		for (int i = 0; i < TextureLimit; ++i)
+		{
+			_textureSlots.push_back(false);
+		}
+
+		for (int i = 0; i < CBufferLimit; ++i)
+		{
+			_cbufferSlots.push_back(false);
+		}
+	}
+
+	int ResourceFactory::GetTextureSlot()
+	{
+		for (int i = 0; i < TextureLimit; ++i)
+		{
+			if (_textureSlots[i] == false)
+			{
+				_textureSlots[i] = true;
+				return i;
+			}
+		}
+
+		return -1;
+	}
+
+	void ResourceFactory::FreeTextureSlot(int index)
+	{
+		_textureSlots[index] = false;
+	}
+
+	int ResourceFactory::GetCBufferSlot()
+	{
+		for (int i = 0; i < CBufferLimit; ++i)
+		{
+			if (_cbufferSlots[i] == false)
+			{
+				_cbufferSlots[i] = true;
+				return int(i + TextureLimit);
+			}
+		}
+
+		return -1;
+	}
+
+	void ResourceFactory::FreeCBufferSlot(int index)
+	{
+		_cbufferSlots[index - TextureLimit] = false;
 	}
 }
 
