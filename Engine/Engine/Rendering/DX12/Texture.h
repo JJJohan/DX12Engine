@@ -5,7 +5,6 @@
 #include <wrl/client.h>
 #include <memory>
 #include "HeapResource.h"
-#include <unordered_set>
 
 using namespace Microsoft::WRL;
 
@@ -18,8 +17,6 @@ namespace Engine
 
 		bool Load(const std::string& filePath);
 		void Bind(ID3D12GraphicsCommandList* commandList) const;
-
-		const static int TextureLimit = 64;
 
 	private:
 		Texture();
@@ -35,9 +32,7 @@ namespace Engine
 		int _height;
 		size_t _size;
 
-		static int GetFreeHeapIndex();
 		static UINT _descSize;
-		static std::vector<bool> _heapSlotsInUse;
 
 		friend class ResourceFactory;
 	};

@@ -4,10 +4,10 @@
 #include "HeapManager.h"
 #include "../../Utils/Logging.h"
 #include "../../External/src/FreeImage/FreeImage.h"
+#include "../../Factory/ResourceFactory.h"
 
 namespace Engine
 {
-	std::vector<bool> Texture::_heapSlotsInUse = std::vector<bool>(64);
 	UINT Texture::_descSize = 0;
 
 	Texture::Texture()
@@ -16,7 +16,7 @@ namespace Engine
 		  , _height(0)
 		  , _size(0)
 	{
-		_index = GetFreeHeapIndex();
+		_index = ResourceFactory::GetTextureSlot();
 		if (_index == -1)
 		{
 			Logging::LogError("Ran out of SRV slots. Consider increasing the TextureLimit constant.");
@@ -27,7 +27,7 @@ namespace Engine
 	{
 		if (_index != -1)
 		{
-			_heapSlotsInUse[_index] = false;
+			ResourceFactory::FreeTextureSlot(_index);
 		}
 	}
 
@@ -131,28 +131,6 @@ namespace Engine
 	{
 		CD3DX12_GPU_DESCRIPTOR_HANDLE srvHandle(_pSrvHeap->GetGPUDescriptorHandleForHeapStart(), _index, _descSize);
 		commandList->SetGraphicsRootDescriptorTable(1, srvHandle);
-	}
-
-	int Texture::GetFreeHeapIndex()
-	{
-		if (_heapSlotsInUse.empty())
-		{
-			for (int i = 0; i < TextureLimit; ++i)
-			{
-				_heapSlotsInUse.push_back(false);
-			}
-		}
-
-		for (int i = 0; i < TextureLimit; ++i)
-		{
-			if (_heapSlotsInUse[i] == false)
-			{
-				_heapSlotsInUse[i] = true;
-				return i;
-			}
-		}
-
-		return -1;
 	}
 }
 
