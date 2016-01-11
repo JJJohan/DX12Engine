@@ -3,13 +3,13 @@
 #include "../../Utils/Logging.h"
 #include "../../Factory/ResourceFactory.h"
 #include "HeapResource.h"
-#include <mutex>
 
 namespace Engine
 {
 	std::vector<HeapResource*> HeapManager::_dynamicUploadHeaps = std::vector<HeapResource*>();
 	std::vector<HeapResource*> HeapManager::_staticUploadHeaps = std::vector<HeapResource*>();
 	ID3D12Device* HeapManager::_pDevice = nullptr;
+	std::mutex HeapManager::_mutex;
 
 	void HeapManager::RequestHeap(HeapResource* heapResource, bool addToList)
 	{
@@ -24,8 +24,7 @@ namespace Engine
 
 		if (addToList)
 		{
-			std::mutex mutex;
-			mutex.lock();
+			_mutex.lock();
 			if (!heapResource->_dynamic)
 			{
 				_staticUploadHeaps.push_back(heapResource);
@@ -34,7 +33,7 @@ namespace Engine
 			{
 				_dynamicUploadHeaps.push_back(heapResource);
 			}
-			mutex.unlock();
+			_mutex.unlock();
 		}
 	}
 
@@ -55,6 +54,7 @@ namespace Engine
 
 	void HeapManager::UpdateHeaps()
 	{
+		_mutex.lock();
 		for (auto it = _staticUploadHeaps.begin(); it != _staticUploadHeaps.end(); ++it)
 		{
 			HeapResource* heapResource = *it;
@@ -67,7 +67,8 @@ namespace Engine
 				heapResource->_pHeap = nullptr;
 			}
 		}
-		_staticUploadHeaps.clear();
+		_staticUploadHeaps.clear();	
+		_mutex.unlock();
 
 		for (auto it = _dynamicUploadHeaps.begin(); it != _dynamicUploadHeaps.end(); ++it)
 		{

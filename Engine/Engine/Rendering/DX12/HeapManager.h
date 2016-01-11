@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <d3d12.h>
+#include <mutex>
 
 namespace Engine
 {
@@ -22,6 +23,7 @@ namespace Engine
 		static std::vector<HeapResource*> _staticUploadHeaps;
 		static std::vector<HeapResource*> _dynamicUploadHeaps;
 		static ID3D12Device* _pDevice;
+		static std::mutex _mutex;
 	};
 }
 

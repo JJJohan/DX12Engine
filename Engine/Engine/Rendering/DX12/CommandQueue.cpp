@@ -165,11 +165,11 @@ namespace Engine
 				commandThread->TasksCompleted = 0;
 				commandThread->Available = true;
 				commandThread->Open = false;
-				_releaseMutex.unlock();
 
 				ID3D12GraphicsCommandList* graphicsCmdList = static_cast<ID3D12GraphicsCommandList*>(commandThread->CommandList);
 				graphicsCmdList->Close();
 				commandLists.push_back(commandThread->CommandList);
+				_releaseMutex.unlock();
 			}
 		}
 
