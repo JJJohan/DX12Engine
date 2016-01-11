@@ -35,9 +35,13 @@ namespace Engine
 			size_t Size;
 		};
 
+		ID3D12DescriptorHeap* _pHeap;
+		int _index;
+		int _descriptorSize;
 		std::map<std::string, DataItem> _cbuffer;
 		bool _dirty;
 		size_t _bufferSize;
+
 
 		friend class ResourceFactory;
 	};
