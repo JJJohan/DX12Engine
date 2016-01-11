@@ -55,7 +55,11 @@ void Game::Start()
 		{
 			{{0.0f, 0.25f, 0.0f},{0.5f, 0.0f}},
 			{{0.25f, -0.25f, 0.0f},{1.0f, 64.0f}},
-			{{-0.25f, -0.25f, 0.0f},{0.0f, 64.0f}}
+			{{-0.25f, -0.25f, 0.0f},{0.0f, 64.0f}},
+
+			{ { -0.25f, -0.25f, 0.0f },{ 0.0f, 64.0f } },
+			{ { 0.25f, -0.25f, 0.0f },{ 1.0f, 64.0f } },
+			{ { 0.0f, 0.25f, 0.0f },{ 0.5f, 0.0f } }
 		};
 
 	VertexBuffer<VertexPosUv>* vertexBuffer = ResourceFactory::CreateVertexBuffer<VertexPosUv>();
@@ -77,10 +81,10 @@ void Game::Start()
 	// Create an example triangle object.
 	std::vector<VertexPosUv> vertices2 =
 		{
-			{{1 + -0.25f, 0.25f, 0.0f},{0.0f, 0.0f}}, // bottom left
-			{{1 + 0.25f, -0.25f, 0.0f},{1.0f, 1.0f}}, // top right
-			{{1 + 0.25f, 0.25f, 0.0f},{1.0f, 0.0f}}, // bottom right
-			{{1 + -0.25f, -0.25f, 0.0f},{0.0f, 1.0f}} // top left
+			{{-0.25f, 0.25f, 0.0f},{0.0f, 0.0f}}, // bottom left
+			{{0.25f, -0.25f, 0.0f},{1.0f, 1.0f}}, // top right
+			{{0.25f, 0.25f, 0.0f},{1.0f, 0.0f}}, // bottom right
+			{{-0.25f, -0.25f, 0.0f},{0.0f, 1.0f}} // top left
 		};
 
 	std::vector<int> indices =
@@ -119,6 +123,16 @@ void Game::Update()
 	if (!done && timer > 2.0f)
 	{
 		done = true;
+	}
+
+	if (_pTriangle != nullptr)
+	{
+		_pTriangle->Transform.Rotate(XMQuaternionRotationRollPitchYaw(45.0f * Time::DeltaTime(), 35.0f * Time::DeltaTime(), 25.0f * Time::DeltaTime()));
+	}
+
+	if (_pTriangle2 != nullptr)
+	{
+		_pTriangle2->Transform.SetPosition(cos(timer + sin(timer)), sin(timer), 0.0f);
 	}
 }
 
