@@ -6,6 +6,7 @@
 #include <memory>
 #include "d3dx12.h"
 #include "../../Factory/ResourceFactory.h"
+#include "../../Utils/Logging.h"
 
 namespace Engine
 {
@@ -110,10 +111,6 @@ namespace Engine
 			_dirty = true;
 		}
 	}
-
-	struct magic
-	{
-	};
 
 	void ConstantBuffer::UpdateBuffer()
 	{

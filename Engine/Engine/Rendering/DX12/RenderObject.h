@@ -1,6 +1,5 @@
 #pragma once
 
-#include <DirectXMath.h>
 #include "VertexBuffer.h"
 #include "../../Data/Transform.h"
 #include <unordered_set>
@@ -17,13 +16,12 @@ namespace Engine
 		RenderObject();
 		virtual ~RenderObject();
 
-		template <typename T>
-		void RenderObject::SetVertexBuffer(VertexBuffer<T>* vertexBuffer)
+		void RenderObject::SetVertexBuffer(VertexBufferInstance* vertexBuffer)
 		{
-			_pVertexBuffer = static_cast<VertexBufferBase*>(vertexBuffer);
+			_pVertexBuffer = vertexBuffer;
 		}
 
-		VertexBufferBase* RenderObject::GetVertexBuffer() const
+		VertexBufferInstance* RenderObject::GetVertexBuffer() const
 		{
 			return _pVertexBuffer;
 		}
@@ -34,15 +32,15 @@ namespace Engine
 		void SetMaterial(Material* material);
 		Material* GetMaterial() const;
 
-		void Update() const;
-		void Draw() const;
+		virtual void Update() const;
+		virtual void Draw() const;
 
 		Transform Transform;
 
 	private:
 		static std::unordered_set<RenderObject*> _renderObjects;
 
-		VertexBufferBase* _pVertexBuffer;
+		VertexBufferInstance* _pVertexBuffer;
 		IndexBuffer* _pIndexBuffer;
 		Material* _pMaterial;
 		ConstantBuffer* _pCbuffer;

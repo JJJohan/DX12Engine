@@ -53,7 +53,7 @@ namespace Engine
 
 	void RenderObject::Update() const
 	{
-		Camera::Main()->ApplyWorldMatrix(_pCbuffer, Transform.GetMatrix());
+		Camera::Main()->ApplyTransform(_pCbuffer, Transform);
 	}
 
 	void RenderObject::Draw() const

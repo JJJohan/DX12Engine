@@ -51,18 +51,18 @@ Game::Game()
 void Game::Start()
 {
 	// Create an example triangle object.
-	std::vector<VertexPosUv> triangleVertices =
+	std::vector<void*> triangleVertices =
 		{
-			{{0.0f, 0.25f, 0.0f},{0.5f, 0.0f}},
-			{{0.25f, -0.25f, 0.0f},{1.0f, 64.0f}},
-			{{-0.25f, -0.25f, 0.0f},{0.0f, 64.0f}},
+			new VertexPosUv(XMFLOAT3(0.0f, 0.25f, 0.0f), XMFLOAT2(0.5f, 0.0f)),
+			new VertexPosUv(XMFLOAT3(0.25f, -0.25f, 0.0f), XMFLOAT2(1.0f, 64.0f)),
+			new VertexPosUv(XMFLOAT3(-0.25f, -0.25f, 0.0f), XMFLOAT2(0.0f, 64.0f)),
 
-			{ { -0.25f, -0.25f, 0.0f },{ 0.0f, 64.0f } },
-			{ { 0.25f, -0.25f, 0.0f },{ 1.0f, 64.0f } },
-			{ { 0.0f, 0.25f, 0.0f },{ 0.5f, 0.0f } }
+			new VertexPosUv(XMFLOAT3(-0.25f, -0.25f, 0.0f), XMFLOAT2(0.0f, 64.0f)),
+			new VertexPosUv(XMFLOAT3(0.25f, -0.25f, 0.0f), XMFLOAT2(1.0f, 64.0f)),
+			new VertexPosUv(XMFLOAT3(0.0f, 0.25f, 0.0f), XMFLOAT2(0.5f, 0.0f))
 		};
 
-	VertexBuffer<VertexPosUv>* vertexBuffer = ResourceFactory::CreateVertexBuffer<VertexPosUv>();
+	VertexBufferInstance* vertexBuffer = ResourceFactory::CreateVertexBufferInstance(VERTEX_POS_UV);
 	vertexBuffer->SetVertices(triangleVertices);
 
 	_pTexture = ResourceFactory::CreateTexture();
@@ -79,12 +79,12 @@ void Game::Start()
 	_pTriangle->SetMaterial(_pMaterial);
 
 	// Create an example triangle object.
-	std::vector<VertexPosUv> vertices2 =
+	/*std::vector<Vertex*> vertices2 =
 		{
-			{{-0.25f, 0.25f, 0.0f},{0.0f, 0.0f}}, // bottom left
-			{{0.25f, -0.25f, 0.0f},{1.0f, 1.0f}}, // top right
-			{{0.25f, 0.25f, 0.0f},{1.0f, 0.0f}}, // bottom right
-			{{-0.25f, -0.25f, 0.0f},{0.0f, 1.0f}} // top left
+			new VertexPosUv(XMFLOAT3(-0.25f, 0.25f, 0.0f), XMFLOAT2(0.0f, 0.0f)), // bottom left
+			new VertexPosUv(XMFLOAT3(0.25f, -0.25f, 0.0f), XMFLOAT2(1.0f, 1.0f)), // top right
+			new VertexPosUv(XMFLOAT3(0.25f, 0.25f, 0.0f), XMFLOAT2(1.0f, 0.0f)), // bottom right
+			new VertexPosUv(XMFLOAT3(-0.25f, -0.25f, 0.0f), XMFLOAT2(0.0f, 1.0f)) // top left
 		};
 
 	std::vector<int> indices =
@@ -93,7 +93,7 @@ void Game::Start()
 			0, 1, 3
 		};
 
-	VertexBuffer<VertexPosUv>* vertexBuffer2 = ResourceFactory::CreateVertexBuffer<VertexPosUv>();
+	VertexBufferInstance* vertexBuffer2 = ResourceFactory::CreateVertexBufferInstance(VERTEX_POS_UV);
 	vertexBuffer2->SetVertices(vertices2);
 
 	IndexBuffer* indexBuffer = ResourceFactory::CreateIndexBuffer();
@@ -111,7 +111,7 @@ void Game::Start()
 	_pTriangle2 = new RenderObject();
 	_pTriangle2->SetIndexBuffer(indexBuffer);
 	_pTriangle2->SetVertexBuffer(vertexBuffer2);
-	_pTriangle2->SetMaterial(_pMaterial2);
+	_pTriangle2->SetMaterial(_pMaterial2);*/
 }
 
 void Game::Update()

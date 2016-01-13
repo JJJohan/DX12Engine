@@ -11,13 +11,7 @@ namespace Engine
 	Camera* Camera::CreateCamera(ID3D12Device* device, const XMFLOAT4& screenRect, float fovInDegrees, float nearClip, float farClip)
 	{
 		Camera* camera = new Camera(device);
-		camera->SetFOV(fovInDegrees);
-		camera->_viewport.TopLeftX = screenRect.x;
-		camera->_viewport.TopLeftY = screenRect.y;
-		camera->_viewport.Width = screenRect.z - screenRect.x;
-		camera->_viewport.Height = screenRect.w - screenRect.y;
-		camera->_viewport.MinDepth = nearClip;
-		camera->_viewport.MaxDepth = farClip;
+		camera->Resize(screenRect, fovInDegrees, nearClip, farClip);
 
 		_pMainCamera = camera;
 
@@ -31,7 +25,8 @@ namespace Engine
 
 	Camera::Camera(ID3D12Device* device)
 		: _fov(90.0f)
-		  , _pDevice(device)
+		, _pDevice(device)
+		, _resized(false)
 	{
 		Transform.SetPosition(0.0f, 0.0f, -1.0f);
 
@@ -63,13 +58,23 @@ namespace Engine
 			{
 				this->Transform.Rotate(float(y) / 10, float(x) / 10, 0.0f);
 			});
+	}
 
-		//_pCbuffer->GetResource()->SetName(L"Camera Data");
+	Camera::~Camera()
+	{
+		
 	}
 
 	bool Camera::Update()
 	{
 		bool transformed = Transform.Moved;
+
+		// Calculate projection matrix
+		if (_resized)
+		{
+			_projection = XMMatrixPerspectiveFovLH(_fov, _viewport.Width / _viewport.Height, _viewport.MinDepth, _viewport.MaxDepth);
+			_resized = false;
+		}
 
 		if (Transform.Moved)
 		{
@@ -78,17 +83,24 @@ namespace Engine
 
 			// Calculate view matrix
 			_view = XMMatrixLookToLH(Transform.GetPosition(), direction, Vector3::Up);
-
-			// Calculate projection matrix
-			_projection = XMMatrixPerspectiveFovLH(_fov, _viewport.Width / _viewport.Height, 0.01f, 100.0f);
-
-			// Calculate view projection matrix
 			_vp = XMMatrixMultiply(_view, _projection);
 
 			Transform.Moved = false;
 		}
 
 		return transformed;
+	}
+
+	void Camera::Resize(const XMFLOAT4& screenRect, float fovInDegrees, float nearClip, float farClip)
+	{
+		SetFOV(fovInDegrees);
+		_viewport.TopLeftX = screenRect.x;
+		_viewport.TopLeftY = screenRect.y;
+		_viewport.Width = screenRect.z - screenRect.x;
+		_viewport.Height = screenRect.w - screenRect.y;
+		_viewport.MinDepth = nearClip;
+		_viewport.MaxDepth = farClip;
+		_resized = true;
 	}
 
 	XMMATRIX Camera::GetViewMatrix() const
@@ -117,13 +129,13 @@ namespace Engine
 		Transform.Moved = true;
 	}
 
-	void Camera::ApplyWorldMatrix(ConstantBuffer* constantBuffer, const XMMATRIX& worldMatrix) const
+	void Camera::ApplyTransform(ConstantBuffer* buffer, const Engine::Transform& transform) const
 	{
-		XMMATRIX mvp = XMMatrixTranspose(worldMatrix * _vp);
+		XMMATRIX mvp = XMMatrixTranspose(transform.GetMatrix() * _vp);
 		XMFLOAT4X4 mvpT;
 		XMStoreFloat4x4(&mvpT, mvp);
 
-		constantBuffer->SetMatrix("mvp", mvpT);
+		buffer->SetMatrix("mvp", mvpT);
 	}
 
 	D3D12_VIEWPORT& Camera::GetViewPort()

@@ -1,145 +1,108 @@
 #pragma once
 
-#include <DirectXMath.h>
-#include <wrl/client.h>
 #include <vector>
+#include <unordered_set>
+#include <d3d12.h>
+#include <DirectXMath.h>
 #include "HeapResource.h"
-#include "d3dx12.h"
-#include "../../Utils/Logging.h"
-#include "HeapManager.h"
-
-using namespace DirectX;
-using namespace Microsoft::WRL;
+#include <set>
 
 namespace Engine
 {
+	enum VertexType
+	{
+		VERTEX_POS_COL,
+		VERTEX_POS_COL_UV,
+		VERTEX_POS_UV
+	};
+
 	struct VertexPosCol
 	{
-		VertexPosCol(XMFLOAT3 pos, XMFLOAT4 col)
+		VertexPosCol(DirectX::XMFLOAT3 pos, DirectX::XMFLOAT4 col)
 		{
 			Pos = pos;
 			Col = col;
 		}
 
-		XMFLOAT3 Pos;
-		XMFLOAT4 Col;
+		DirectX::XMFLOAT3 Pos;
+		DirectX::XMFLOAT4 Col;
 	};
 
 	struct VertexPosColUv
 	{
-		VertexPosColUv(XMFLOAT3 pos, XMFLOAT4 col, XMFLOAT2 uv)
+		VertexPosColUv(DirectX::XMFLOAT3 pos, DirectX::XMFLOAT4 col, DirectX::XMFLOAT2 uv)
 		{
 			Pos = pos;
 			Col = col;
 			Uv = uv;
 		}
 
-		XMFLOAT3 Pos;
-		XMFLOAT4 Col;
-		XMFLOAT2 Uv;
+		DirectX::XMFLOAT3 Pos;
+		DirectX::XMFLOAT4 Col;
+		DirectX::XMFLOAT2 Uv;
 	};
 
 	struct VertexPosUv
 	{
-		VertexPosUv(XMFLOAT3 pos, XMFLOAT2 uv)
+		VertexPosUv(DirectX::XMFLOAT3 pos, DirectX::XMFLOAT2 uv)
 		{
 			Pos = pos;
 			Uv = uv;
 		}
 
-		XMFLOAT3 Pos;
-		XMFLOAT2 Uv;
+		DirectX::XMFLOAT3 Pos;
+		DirectX::XMFLOAT2 Uv;
 	};
 
-	class VertexBufferBase : protected HeapResource
+	class VertexBufferInstance;
+
+	class VertexBuffer : protected HeapResource
 	{
 	public:
+		~VertexBuffer();
+
 		void Bind(ID3D12GraphicsCommandList* commandList) const;
-		const std::vector<D3D12_INPUT_ELEMENT_DESC>& GetInputLayout() const;
-		int Count() const;
-
-	protected:
-		VertexBufferBase();
-
-		size_t _vertexCount;
-		D3D12_VERTEX_BUFFER_VIEW _vertexBufferView;
-		std::vector<D3D12_INPUT_ELEMENT_DESC> _inputLayout;
-	};
-
-	template <typename T>
-	class VertexBuffer : public VertexBufferBase
-	{
-	public:
-		void SetVertices(std::vector<T> vertices)
-		{
-			_vertices = vertices;
-			_vertexCount = _vertices.size();
-
-			HeapTask(std::bind(&VertexBuffer::CreateVertexBuffer, this));
-		}
-
-		std::vector<T> GetVertices() const
-		{
-			return _vertices;
-		}
 
 	private:
-		void CreateVertexBuffer()
-		{
-			_heapSize = size_t(sizeof(T) * _vertexCount);
-			PrepareHeapResource();
+		VertexBuffer();
+		void RequestBuild();
+		void Build();
 
-			HeapManager::Upload(this, &_vertices[0], D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
+		static VertexBuffer* PrepareBuffer(VertexBufferInstance* instance, ID3D12Device* device);
 
-			// Initialize the vertex buffer view.
-			_vertexBufferView.BufferLocation = _pResource->GetGPUVirtualAddress();
-			_vertexBufferView.StrideInBytes = sizeof(T);
-			_vertexBufferView.SizeInBytes = UINT(_heapSize);
-		}
+		static std::unordered_set<VertexBuffer*> _vertexBuffers;
+		std::set<VertexBufferInstance*> _instances;
 
-		VertexBuffer<T>()
-		{
-			if (std::is_same<T, VertexPosCol>())
-			{
-				std::vector<D3D12_INPUT_ELEMENT_DESC> inputElementDescs =
-					{
-						{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
-						{"COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0}
-					};
+		size_t _totalSize;
+		D3D12_VERTEX_BUFFER_VIEW _vertexBufferView;
 
-				_inputLayout = inputElementDescs;
-				return;
-			}
+		friend class VertexBufferInstance;
+	};
 
-			if (std::is_same<T, VertexPosColUv>())
-			{
-				std::vector<D3D12_INPUT_ELEMENT_DESC> inputElementDescs =
-					{
-						{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
-						{"COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
-						{"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 28, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0}
-					};
+	class VertexBufferInstance
+	{
+	public:
+		~VertexBufferInstance();
 
-				_inputLayout = inputElementDescs;
-				return;
-			}
+		void Bind(ID3D12GraphicsCommandList* commandList) const;
 
-			if (std::is_same<T, VertexPosUv>())
-			{
-				std::vector<D3D12_INPUT_ELEMENT_DESC> inputElementDescs =
-					{
-						{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
-						{"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0}
-					};
+		void SetVertices(std::vector<void*> vertices);
+		std::vector<void*> GetVertices() const;
 
-				_inputLayout = inputElementDescs;
-				return;
-			}
+		const std::vector<D3D12_INPUT_ELEMENT_DESC>& GetInputLayout() const;
+		size_t Count() const;
+		size_t VertexSize() const;
 
-			Logging::LogError("Unknown vertex layout.");
-		}
+	private:
+		VertexBufferInstance(VertexType vertexType);
 
-		std::vector<T> _vertices;
+		ID3D12Device* _pDevice;
+		std::vector<void*> _vertices;
+		VertexBuffer* _pBuffer;
+		int _offset;
+		int _size;
+		size_t _vertexSize;
+		std::vector<D3D12_INPUT_ELEMENT_DESC> _inputLayout;
 
 		friend class ResourceFactory;
 	};

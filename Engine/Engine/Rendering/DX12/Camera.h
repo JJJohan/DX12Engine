@@ -16,6 +16,8 @@ namespace Engine
 		static Camera* CreateCamera(ID3D12Device* device, const XMFLOAT4& screenRect, float fovInDegrees, float nearClip, float farClip);
 		static Camera* Main();
 
+		~Camera();
+
 		float GetFOV() const;
 		void SetFOV(float fovInDegrees);
 
@@ -25,7 +27,8 @@ namespace Engine
 		XMMATRIX GetVPMatrix() const;
 
 		bool Update();
-		void ApplyWorldMatrix(ConstantBuffer* constantBuffer, const XMMATRIX& worldMatrix) const;
+		void ApplyTransform(ConstantBuffer* buffer, const Transform& transform) const;
+		void Resize(const XMFLOAT4& screenRect, float fovInDegrees, float nearClip, float farClip);
 
 		Transform Transform;
 
@@ -37,6 +40,7 @@ namespace Engine
 		D3D12_VIEWPORT _viewport;
 		float _fov;
 		ID3D12Device* _pDevice;
+		bool _resized;
 
 		XMMATRIX _view;
 		XMMATRIX _projection;

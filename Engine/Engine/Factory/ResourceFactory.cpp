@@ -4,6 +4,8 @@
 #include "../Rendering/DX12/IndexBuffer.h"
 #include "../Rendering/DX12/Texture.h"
 #include "../Rendering/DX12/Material.h"
+#include "../Rendering/DX12/VertexBuffer.h"
+#include <d3d12.h>
 
 namespace Engine
 {
@@ -34,6 +36,15 @@ namespace Engine
 		indexBuffer->_pDevice = _pDevice;
 
 		return indexBuffer;
+	}
+
+	VertexBufferInstance* ResourceFactory::CreateVertexBufferInstance(VertexType vertexType)
+	{
+		VertexBufferInstance* instance = new VertexBufferInstance(vertexType);
+
+		instance->_pDevice = _pDevice;
+
+		return instance;
 	}
 
 	ConstantBuffer* ResourceFactory::CreateConstantBuffer()

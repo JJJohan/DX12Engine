@@ -17,8 +17,8 @@ namespace Engine
 		HeapResource();
 		virtual ~HeapResource();
 
-		void PrepareHeapResource();
-		void PrepareHeapResource(const D3D12_RESOURCE_DESC& resourceDesc);
+		bool PrepareHeapResource();
+		bool PrepareHeapResource(const D3D12_RESOURCE_DESC& resourceDesc);
 		void HeapTask(const std::function<void()>& heapTask);
 		void MarkDynamic();
 
