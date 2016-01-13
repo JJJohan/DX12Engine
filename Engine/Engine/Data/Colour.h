@@ -1,5 +1,11 @@
 #pragma once
 
+namespace DirectX
+{
+	struct XMFLOAT3;
+	struct XMFLOAT4;
+}
+
 namespace Engine
 {
 	class Colour
@@ -24,6 +30,9 @@ namespace Engine
 		void SetGreen(float const& value);
 		void SetBlue(float const& value);
 		void SetAlpha(float const& value);
+
+		operator DirectX::XMFLOAT3() const;
+		operator DirectX::XMFLOAT4() const;
 
 		const static Colour Clear;
 		const static Colour White;

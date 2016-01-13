@@ -1,5 +1,6 @@
 #include "Colour.h"
 #include "..\Utils\Math.h"
+#include <DirectXMath.h>
 
 namespace Engine
 {
@@ -115,6 +116,16 @@ namespace Engine
 	void Colour::SetBlue(float const& value)
 	{
 		_blue = clamp(value, 0.0f, 1.0f);
+	}
+
+	Colour::operator DirectX::XMFLOAT3() const
+	{
+		return DirectX::XMFLOAT3(_red, _green, _blue);
+	}
+
+	Colour::operator DirectX::XMFLOAT4() const
+	{
+		return DirectX::XMFLOAT4(_red, _green, _blue, _alpha);
 	}
 
 	void Colour::SetAlpha(float const& value)
