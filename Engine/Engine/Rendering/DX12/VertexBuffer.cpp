@@ -18,10 +18,10 @@ namespace Engine
 		, _pBuffer(nullptr)
 		, _offset(0)
 		, _size(0)
-		, _vertexSize(0)
 	{
 		std::vector<D3D12_INPUT_ELEMENT_DESC> inputElementDescs;
 
+		vertexType = VERTEX_POS_COL_UV;
 		switch (vertexType)
 		{
 		case VERTEX_POS_COL:
@@ -32,7 +32,6 @@ namespace Engine
 			};
 
 			_inputLayout = inputElementDescs;
-			_vertexSize = sizeof(VertexPosCol);
 			return;
 
 		case VERTEX_POS_COL_UV:
@@ -44,7 +43,6 @@ namespace Engine
 			};
 
 			_inputLayout = inputElementDescs;
-			_vertexSize = sizeof(VertexPosColUv);
 			return;
 
 		case VERTEX_POS_UV:
@@ -55,7 +53,6 @@ namespace Engine
 			};
 
 			_inputLayout = inputElementDescs;
-			_vertexSize = sizeof(VertexPosUv);
 			return;
 
 		default:
@@ -87,16 +84,7 @@ namespace Engine
 	{
 		if (_pBuffer != nullptr)
 		{
-			auto it = _pBuffer->_instances.find(this);
-			if (it != _pBuffer->_instances.end())
-			{
-				_pBuffer->_instances.erase(it);
-			}
-		}
-
-		for (auto it = _vertices.begin(); it != _vertices.end(); ++it)
-		{
-			delete *it;
+			_pBuffer->ReleaseInstance(this);
 		}
 	}
 
@@ -105,9 +93,9 @@ namespace Engine
 		return _inputLayout;
 	}
 
-	size_t VertexBufferInstance::VertexSize() const
+	size_t VertexBufferInstance::VertexSize()
 	{
-		return _vertexSize;
+		return sizeof(Vertex);
 	}
 
 	size_t VertexBufferInstance::Count() const
@@ -115,7 +103,7 @@ namespace Engine
 		return _vertices.size();
 	}
 
-	void VertexBufferInstance::SetVertices(std::vector<void*> vertices)
+	void VertexBufferInstance::SetVertices(std::vector<Vertex> vertices)
 	{
 		if (_pBuffer == nullptr)
 		{
@@ -126,7 +114,7 @@ namespace Engine
 		_pBuffer->RequestBuild();
 	}
 
-	std::vector<void*> VertexBufferInstance::GetVertices() const
+	std::vector<Vertex> VertexBufferInstance::GetVertices() const
 	{
 		return _vertices;
 	}
@@ -156,10 +144,11 @@ namespace Engine
 		size_t offset = 0;
 		//std::unique_ptr<char> memory(new char[size]);
 		char* memory = new char[size];
+		ZeroMemory(memory, size);
 		for (auto it = _instances.begin(); it != _instances.end(); ++it)
 		{
 			VertexBufferInstance* instance = *it;
-			std::vector<void*> vertices = instance->GetVertices();
+			std::vector<Vertex> vertices = instance->GetVertices();
 			size_t copySize = instance->VertexSize() * instance->Count();
 
 			memcpy(memory + offset, &vertices[0], copySize);
@@ -172,16 +161,35 @@ namespace Engine
 		HeapManager::Upload(this, memory, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
 
 		// Initialize the vertex buffer view.
+		_vertexBufferView = {};
 		_vertexBufferView.BufferLocation = _pResource->GetGPUVirtualAddress();
-		_vertexBufferView.StrideInBytes = sizeof(VertexPosUv);
+		_vertexBufferView.StrideInBytes = sizeof(Vertex);
 		_vertexBufferView.SizeInBytes = UINT(_heapSize);
+	}
+
+	void VertexBuffer::ReleaseInstance(VertexBufferInstance* instance)
+	{
+		auto it = _instances.find(instance);
+		if (it != _instances.end())
+		{
+			_instances.erase(it);
+		}
+
+		if (_instances.empty())
+		{
+			delete this;
+		}
 	}
 
 	VertexBuffer* VertexBuffer::PrepareBuffer(VertexBufferInstance* instance, ID3D12Device* device)
 	{
+		size_t instanceSize = instance->Count() * instance->VertexSize();
+
 		for (auto it = _vertexBuffers.begin(); it != _vertexBuffers.end(); ++it)
 		{
-			if ((*it)->_totalSize < 60000) // +10% free space
+			VertexBuffer* buffer = *it;
+
+			if ((*it)->_totalSize < 65536 - instanceSize)
 			{
 				(*it)->_instances.insert(instance);
 				return *it;

@@ -39,34 +39,34 @@ private:
 
 Game::Game()
 	: Renderer(nullptr)
-	  , _pTriangle(nullptr)
-	  , _pTexture(nullptr)
-	  , _pMaterial(nullptr)
-	  , _pTriangle2(nullptr)
-	  , _pTexture2(nullptr)
-	  , _pMaterial2(nullptr)
+	, _pTriangle(nullptr)
+	, _pTexture(nullptr)
+	, _pMaterial(nullptr)
+	, _pTriangle2(nullptr)
+	, _pTexture2(nullptr)
+	, _pMaterial2(nullptr)
 {
 }
 
 void Game::Start()
 {
 	// Create an example triangle object.
-	std::vector<void*> triangleVertices =
-		{
-			new VertexPosUv(XMFLOAT3(0.0f, 0.25f, 0.0f), XMFLOAT2(0.5f, 0.0f)),
-			new VertexPosUv(XMFLOAT3(0.25f, -0.25f, 0.0f), XMFLOAT2(1.0f, 64.0f)),
-			new VertexPosUv(XMFLOAT3(-0.25f, -0.25f, 0.0f), XMFLOAT2(0.0f, 64.0f)),
+	std::vector<Vertex> triangleVertices =
+	{
+		{ { -0.25f, 0.25f, 0.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.0f, 0.0f} },
+		{ { 0.25f, -0.25f, 0.0f },{ 1.0f, 1.0f, 1.0f, 1.0f },{1.0f, 1.0f } },
+		{ { -0.25f, -0.25f, 0.0f},{ 1.0f, 1.0f, 1.0f, 1.0f },{0.0f, 1.0f } },
 
-			new VertexPosUv(XMFLOAT3(-0.25f, -0.25f, 0.0f), XMFLOAT2(0.0f, 64.0f)),
-			new VertexPosUv(XMFLOAT3(0.25f, -0.25f, 0.0f), XMFLOAT2(1.0f, 64.0f)),
-			new VertexPosUv(XMFLOAT3(0.0f, 0.25f, 0.0f), XMFLOAT2(0.5f, 0.0f))
-		};
+		{ { -0.25f, 0.25f, 0.0f },{ 1.0f, 1.0f, 1.0f, 1.0f },{ 0.0f, 0.0f } },
+		{ { 0.25f, 0.25f, 0.0f },{ 1.0f, 1.0f, 1.0f, 1.0f },{ 1.0f, 0.0f } },
+		{ { 0.25f, -0.25f, 0.0f },{ 1.0f, 1.0f, 1.0f, 1.0f },{ 1.0f, 1.0f } }
+	};
 
 	VertexBufferInstance* vertexBuffer = ResourceFactory::CreateVertexBufferInstance(VERTEX_POS_UV);
 	vertexBuffer->SetVertices(triangleVertices);
 
 	_pTexture = ResourceFactory::CreateTexture();
-	_pTexture->Load("C:\\Users\\JJJohan\\Source\\Repos\\DX12Engine\\Engine\\Build\\Textures\\font.dds");
+	_pTexture->Load("C:\\Users\\admin\\Documents\\Repositories\\roamesworld\\Assets\\Resources\\Textures\\success_icon.png");
 
 	_pMaterial = ResourceFactory::CreateMaterial();
 	_pMaterial->SetTexture(_pTexture);
@@ -79,19 +79,19 @@ void Game::Start()
 	_pTriangle->SetMaterial(_pMaterial);
 
 	// Create an example triangle object.
-	/*std::vector<Vertex*> vertices2 =
-		{
-			new VertexPosUv(XMFLOAT3(-0.25f, 0.25f, 0.0f), XMFLOAT2(0.0f, 0.0f)), // bottom left
-			new VertexPosUv(XMFLOAT3(0.25f, -0.25f, 0.0f), XMFLOAT2(1.0f, 1.0f)), // top right
-			new VertexPosUv(XMFLOAT3(0.25f, 0.25f, 0.0f), XMFLOAT2(1.0f, 0.0f)), // bottom right
-			new VertexPosUv(XMFLOAT3(-0.25f, -0.25f, 0.0f), XMFLOAT2(0.0f, 1.0f)) // top left
-		};
+	std::vector<Vertex> vertices2 =
+	{
+		Vertex(XMFLOAT3(-0.25f, 0.25f, 0.0f), XMFLOAT4(1.0f, 1.0f, 1.0f ,1.0f), XMFLOAT2(0.0f, 0.0f)), // bottom left
+		Vertex(XMFLOAT3(0.25f, -0.25f, 0.0f), XMFLOAT4(1.0f, 1.0f, 1.0f ,1.0f), XMFLOAT2(1.0f, 1.0f)), // top right
+		Vertex(XMFLOAT3(0.25f, 0.25f, 0.0f), XMFLOAT4(1.0f, 1.0f, 1.0f ,1.0f), XMFLOAT2(1.0f, 0.0f)), // bottom right
+		Vertex(XMFLOAT3(-0.25f, -0.25f, 0.0f), XMFLOAT4(1.0f, 1.0f, 1.0f ,1.0f), XMFLOAT2(0.0f, 1.0f)) // top left
+	};
 
 	std::vector<int> indices =
-		{
-			1, 0, 2,
-			0, 1, 3
-		};
+	{
+		1, 0, 2,
+		0, 1, 3
+	};
 
 	VertexBufferInstance* vertexBuffer2 = ResourceFactory::CreateVertexBufferInstance(VERTEX_POS_UV);
 	vertexBuffer2->SetVertices(vertices2);
@@ -100,7 +100,7 @@ void Game::Start()
 	indexBuffer->SetIndices(indices);
 
 	_pTexture2 = ResourceFactory::CreateTexture();
-	_pTexture2->Load("C:\\Users\\JJJohan\\Desktop\\test2.png");
+	_pTexture2->Load("C:\\Users\\admin\\Documents\\Repositories\\roamesworld\\Assets\\Resources\\Textures\\success_icon.png");
 
 	_pMaterial2 = ResourceFactory::CreateMaterial();
 	_pMaterial2->SetTexture(_pTexture2);
@@ -111,7 +111,7 @@ void Game::Start()
 	_pTriangle2 = new RenderObject();
 	_pTriangle2->SetIndexBuffer(indexBuffer);
 	_pTriangle2->SetVertexBuffer(vertexBuffer2);
-	_pTriangle2->SetMaterial(_pMaterial2);*/
+	_pTriangle2->SetMaterial(_pMaterial2);
 }
 
 void Game::Update()
@@ -161,9 +161,9 @@ void Game::Destroy()
 }
 
 int WINAPI WinMain(HINSTANCE hInstance,
-                   HINSTANCE hPrevInstance,
-                   LPSTR lpCmdLine,
-                   int nCmdShow)
+	HINSTANCE hPrevInstance,
+	LPSTR lpCmdLine,
+	int nCmdShow)
 {
 #ifdef _DEBUG
 	Engine::Console::InitConsole();
@@ -182,12 +182,12 @@ int WINAPI WinMain(HINSTANCE hInstance,
 	game.Renderer = static_cast<DX12Renderer*>(renderer);
 
 	ENGINE_LINK_DESC engineLink =
-		{
-			std::bind(&Game::Start, &game),
-			std::bind(&Game::Update, &game),
-			std::bind(&Game::Draw, &game),
-			std::bind(&Game::Destroy, &game)
-		};
+	{
+		std::bind(&Game::Start, &game),
+		std::bind(&Game::Update, &game),
+		std::bind(&Game::Draw, &game),
+		std::bind(&Game::Destroy, &game)
+	};
 
 	Engine::Core::Initialise(1024, 768, true, engineLink);
 
