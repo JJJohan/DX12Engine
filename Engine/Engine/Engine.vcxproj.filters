@@ -175,6 +175,12 @@
     <ClCompile Include="Factory\ResourceFactory.cpp">
       <Filter>Source Files\Factory</Filter>
     </ClCompile>
+    <ClCompile Include="Rendering\DX12\BufferBucket.cpp">
+      <Filter>Source Files\Rendering\DX12</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\DX12\BufferInstance.cpp">
+      <Filter>Source Files\Rendering\DX12</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Utils\Console.h">
@@ -287,6 +293,12 @@
     </ClInclude>
     <ClInclude Include="Factory\ResourceFactory.h">
       <Filter>Header Files\Factory</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\DX12\BufferBucket.h">
+      <Filter>Header Files\Rendering\DX12</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\DX12\BufferInstance.h">
+      <Filter>Header Files\Rendering\DX12</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
