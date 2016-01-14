@@ -17,7 +17,7 @@ namespace Engine
 		//size_t letters = text.size();
 
 		// Update vertex buffer
-		std::vector<Vertex> vertices;
+		//std::vector<Vertex> vertices;
 
 		// Updated index buffer
 	}
