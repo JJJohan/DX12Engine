@@ -4,7 +4,6 @@
 #include "CommandQueue.h"
 #include "Material.h"
 #include "HeapManager.h"
-#include "Texture.h"
 #include "../../Utils/Helpers.h"
 #include "../../Factory/ResourceFactory.h"
 #include "RenderObject.h"
@@ -80,7 +79,7 @@ namespace Engine
 		}
 
 		// Create a camera
-		_pCamera = Camera::CreateCamera(_device.Get(), XMFLOAT4(0.0f, 0.0f, float(width), float(height)), 90.0f, 0.0f, 1.0f);
+		_pCamera = Camera::CreateCamera(_device.Get(), XMFLOAT4(0.0f, 0.0f, float(width), float(height)), 90.0f, 0.01f, 100.0f);
 
 		return EXIT_SUCCESS;
 	}

@@ -15,10 +15,10 @@ namespace Engine
 
 	void Logging::LogError(const String& message)
 	{
-		Win32Utils::ShowMessageBox(message, "Error");
-
 		LogLevel = LogPriority::Error;
 		Log(message);
+
+		Win32Utils::ShowMessageBox(message, "Error");
 	}
 
 	void Logging::LogWarning(const String& message)

@@ -7,15 +7,15 @@
 
 namespace Engine
 {
-	std::unordered_map<std::string, Font> FontManager::_fonts;
+	std::unordered_map<std::string, Font*> FontManager::_fonts;
 
-	bool FontManager::LoadFont(std::string fontName, std::string textureFile, std::string fontFile)
+	Font* FontManager::LoadFont(std::string fontName, std::string textureFile, std::string fontFile)
 	{
 		// Check if the font already exists.
-		if (_fonts.find("") != _fonts.end())
+		if (_fonts.find(fontName) != _fonts.end())
 		{
 			Logging::LogError("The font '{0}' has already been loaded.", fontName);
-			return false;
+			return nullptr;
 		}
 
 		// Load the font texture.
@@ -23,16 +23,16 @@ namespace Engine
 		if (!texture->Load(textureFile))
 		{
 			// Textures have their own error handling.
-			return false;
+			return nullptr;
 		}
 
 		// Create the font instance.
-		Font font;
-		font._name = fontName;
-		font._pTexture = texture;
+		Font* font = new Font();
+		font->_name = fontName;
+		font->_pTexture = texture;
 
 		// Load the font layout.
-		if (!LoadLayout(fontFile, font._chars))
+		if (!LoadLayout(fontFile, font->_chars))
 		{
 			Logging::LogError("Failed to load layout for font '{0}'.", fontName);
 		}
@@ -40,14 +40,14 @@ namespace Engine
 		// Store the font.
 		_fonts[fontName] = font;
 
-		return true;
+		return font;
 	}
 
 	const Font* FontManager::GetFont(std::string fontName)
 	{
 		if (_fonts.find(fontName) != _fonts.end())
 		{
-			return &_fonts[fontName];
+			return _fonts[fontName];
 		}
 
 		Logging::LogError("Font '{0}' does not exist.", fontName);

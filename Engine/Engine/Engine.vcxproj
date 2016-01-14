@@ -180,6 +180,8 @@
     <ClCompile Include="Input\Event.cpp" />
     <ClCompile Include="Input\Input.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Rendering\DX12\BufferBucket.cpp" />
+    <ClCompile Include="Rendering\DX12\BufferInstance.cpp" />
     <ClCompile Include="Rendering\DX12\Camera.cpp" />
     <ClCompile Include="Rendering\DX12\CommandQueue.cpp" />
     <ClCompile Include="Rendering\DX12\ConstantBuffer.cpp" />
@@ -217,6 +219,8 @@
     <ClInclude Include="Factory\ResourceFactory.h" />
     <ClInclude Include="Input\Event.h" />
     <ClInclude Include="Input\Input.h" />
+    <ClInclude Include="Rendering\DX12\BufferBucket.h" />
+    <ClInclude Include="Rendering\DX12\BufferInstance.h" />
     <ClInclude Include="Rendering\DX12\Camera.h" />
     <ClInclude Include="Rendering\DX12\CommandQueue.h" />
     <ClInclude Include="Rendering\DX12\ConstantBuffer.h" />

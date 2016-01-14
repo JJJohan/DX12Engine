@@ -39,34 +39,34 @@ private:
 
 Game::Game()
 	: Renderer(nullptr)
-	  , _pTriangle(nullptr)
-	  , _pTexture(nullptr)
-	  , _pMaterial(nullptr)
-	  , _pTriangle2(nullptr)
-	  , _pTexture2(nullptr)
-	  , _pMaterial2(nullptr)
+	, _pTriangle(nullptr)
+	, _pTexture(nullptr)
+	, _pMaterial(nullptr)
+	, _pTriangle2(nullptr)
+	, _pTexture2(nullptr)
+	, _pMaterial2(nullptr)
 {
 }
 
 void Game::Start()
 {
 	// Create an example triangle object.
-	std::vector<VertexPosUv> triangleVertices =
-		{
-			{{0.0f, 0.25f, 0.0f},{0.5f, 0.0f}},
-			{{0.25f, -0.25f, 0.0f},{1.0f, 64.0f}},
-			{{-0.25f, -0.25f, 0.0f},{0.0f, 64.0f}},
+	std::vector<Vertex> triangleVertices =
+	{
+		{ { -0.25f, 0.25f, 0.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.0f, 0.0f} },
+		{ { 0.25f, -0.25f, 0.0f },{ 1.0f, 1.0f, 1.0f, 1.0f },{1.0f, 64.0f } },
+		{ { -0.25f, -0.25f, 0.0f},{ 1.0f, 1.0f, 1.0f, 1.0f },{0.0f, 64.0f } },
 
-			{ { -0.25f, -0.25f, 0.0f },{ 0.0f, 64.0f } },
-			{ { 0.25f, -0.25f, 0.0f },{ 1.0f, 64.0f } },
-			{ { 0.0f, 0.25f, 0.0f },{ 0.5f, 0.0f } }
-		};
+		{ { -0.25f, 0.25f, 0.0f },{ 1.0f, 1.0f, 1.0f, 1.0f },{ 0.0f, 0.0f } },
+		{ { 0.25f, 0.25f, 0.0f },{ 1.0f, 1.0f, 1.0f, 1.0f },{ 1.0f, 0.0f } },
+		{ { 0.25f, -0.25f, 0.0f },{ 1.0f, 1.0f, 1.0f, 1.0f },{ 1.0f, 64.0f } }
+	};
 
-	VertexBuffer<VertexPosUv>* vertexBuffer = ResourceFactory::CreateVertexBuffer<VertexPosUv>();
+	VertexBufferInstance* vertexBuffer = ResourceFactory::CreateVertexBufferInstance(VERTEX_POS_UV);
 	vertexBuffer->SetVertices(triangleVertices);
 
 	_pTexture = ResourceFactory::CreateTexture();
-	_pTexture->Load("C:\\Users\\JJJohan\\Source\\Repos\\DX12Engine\\Engine\\Build\\Textures\\font.dds");
+	_pTexture->Load(GetRelativeFilePath("Textures\\font.dds"));
 
 	_pMaterial = ResourceFactory::CreateMaterial();
 	_pMaterial->SetTexture(_pTexture);
@@ -79,28 +79,28 @@ void Game::Start()
 	_pTriangle->SetMaterial(_pMaterial);
 
 	// Create an example triangle object.
-	std::vector<VertexPosUv> vertices2 =
-		{
-			{{-0.25f, 0.25f, 0.0f},{0.0f, 0.0f}}, // bottom left
-			{{0.25f, -0.25f, 0.0f},{1.0f, 1.0f}}, // top right
-			{{0.25f, 0.25f, 0.0f},{1.0f, 0.0f}}, // bottom right
-			{{-0.25f, -0.25f, 0.0f},{0.0f, 1.0f}} // top left
-		};
+	std::vector<Vertex> vertices2 =
+	{
+		Vertex(XMFLOAT3(-0.25f, 0.25f, 0.0f), XMFLOAT4(1.0f, 1.0f, 1.0f ,1.0f), XMFLOAT2(0.0f, 0.0f)), // bottom left
+		Vertex(XMFLOAT3(0.25f, -0.25f, 0.0f), XMFLOAT4(1.0f, 1.0f, 1.0f ,1.0f), XMFLOAT2(1.0f, 1.0f)), // top right
+		Vertex(XMFLOAT3(0.25f, 0.25f, 0.0f), XMFLOAT4(1.0f, 1.0f, 1.0f ,1.0f), XMFLOAT2(1.0f, 0.0f)), // bottom right
+		Vertex(XMFLOAT3(-0.25f, -0.25f, 0.0f), XMFLOAT4(1.0f, 1.0f, 1.0f ,1.0f), XMFLOAT2(0.0f, 1.0f)) // top left
+	};
 
 	std::vector<int> indices =
-		{
-			1, 0, 2,
-			0, 1, 3
-		};
+	{
+		1, 0, 2,
+		0, 1, 3
+	};
 
-	VertexBuffer<VertexPosUv>* vertexBuffer2 = ResourceFactory::CreateVertexBuffer<VertexPosUv>();
+	VertexBufferInstance* vertexBuffer2 = ResourceFactory::CreateVertexBufferInstance(VERTEX_POS_UV);
 	vertexBuffer2->SetVertices(vertices2);
 
-	IndexBuffer* indexBuffer = ResourceFactory::CreateIndexBuffer();
+	IndexBufferInstance* indexBuffer = ResourceFactory::CreateIndexBufferInstance();
 	indexBuffer->SetIndices(indices);
 
 	_pTexture2 = ResourceFactory::CreateTexture();
-	_pTexture2->Load("C:\\Users\\JJJohan\\Desktop\\test2.png");
+	_pTexture2->Load(GetRelativeFilePath("Textures\\test2.png"));
 
 	_pMaterial2 = ResourceFactory::CreateMaterial();
 	_pMaterial2->SetTexture(_pTexture2);
@@ -161,9 +161,9 @@ void Game::Destroy()
 }
 
 int WINAPI WinMain(HINSTANCE hInstance,
-                   HINSTANCE hPrevInstance,
-                   LPSTR lpCmdLine,
-                   int nCmdShow)
+	HINSTANCE hPrevInstance,
+	LPSTR lpCmdLine,
+	int nCmdShow)
 {
 #ifdef _DEBUG
 	Engine::Console::InitConsole();
@@ -182,12 +182,12 @@ int WINAPI WinMain(HINSTANCE hInstance,
 	game.Renderer = static_cast<DX12Renderer*>(renderer);
 
 	ENGINE_LINK_DESC engineLink =
-		{
-			std::bind(&Game::Start, &game),
-			std::bind(&Game::Update, &game),
-			std::bind(&Game::Draw, &game),
-			std::bind(&Game::Destroy, &game)
-		};
+	{
+		std::bind(&Game::Start, &game),
+		std::bind(&Game::Update, &game),
+		std::bind(&Game::Draw, &game),
+		std::bind(&Game::Destroy, &game)
+	};
 
 	Engine::Core::Initialise(1024, 768, true, engineLink);
 

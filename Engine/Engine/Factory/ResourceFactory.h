@@ -1,13 +1,20 @@
 #pragma once
-#include "../Rendering/DX12/VertexBuffer.h"
+
+#include <vector>
+
+struct ID3D12CommandList;
+struct ID3D12DescriptorHeap;
+struct ID3D12Device;
 
 namespace Engine
 {
+	class VertexBufferInstance;
+	class IndexBufferInstance;
 	class DX12Renderer;
-	class IndexBuffer;
 	class Texture;
 	class Material;
 	class ConstantBuffer;
+	enum VertexType;
 
 	class ResourceFactory
 	{
@@ -15,7 +22,8 @@ namespace Engine
 		static void AssignCommandList(ID3D12CommandList* commandList);
 		static ID3D12CommandList* GetCommandList();
 		static ConstantBuffer* CreateConstantBuffer();
-		static IndexBuffer* CreateIndexBuffer();
+		static VertexBufferInstance* CreateVertexBufferInstance(VertexType vertexType);
+		static IndexBufferInstance* CreateIndexBufferInstance();
 		static Material* CreateMaterial();
 		static Texture* CreateTexture();
 		static ID3D12DescriptorHeap* GetCbvSrvHeap();
@@ -24,16 +32,6 @@ namespace Engine
 		static int GetCBufferSlot();
 		static void FreeTextureSlot(int index);
 		static void FreeCBufferSlot(int index);
-
-		template <typename T>
-		static VertexBuffer<T>* CreateVertexBuffer()
-		{
-			VertexBuffer<T>* vertexBuffer = new VertexBuffer<T>();
-
-			vertexBuffer->_pDevice = _pDevice;
-
-			return vertexBuffer;
-		}
 
 		const static int TextureLimit = 64;
 		const static int CBufferLimit = 8;

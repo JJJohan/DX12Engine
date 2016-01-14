@@ -40,11 +40,11 @@ namespace Engine
 
 		while (!_releaseRequested)
 		{
-			if (commandThread->Task == nullptr)
+			if (commandThread->Available)
 			{
-				std::this_thread::sleep_for(std::chrono::microseconds(1));
 				if (commandThread->TasksCompleted == 0)
 				{
+					std::this_thread::sleep_for(std::chrono::microseconds(1));
 					commandThread->IdleTimer += 0.001f;
 					if (commandThread->IdleTimer > 2000.0f)
 					{

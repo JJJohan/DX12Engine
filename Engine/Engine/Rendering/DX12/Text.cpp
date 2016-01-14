@@ -17,7 +17,7 @@ namespace Engine
 		//size_t letters = text.size();
 
 		// Update vertex buffer
-		std::vector<VertexPosColUv> vertices;
+		//std::vector<Vertex> vertices;
 
 		// Updated index buffer
 	}

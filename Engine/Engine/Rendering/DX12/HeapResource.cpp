@@ -22,28 +22,14 @@ namespace Engine
 		HeapManager::ReleaseHeap(this);
 	}
 
-	void HeapResource::PrepareHeapResource()
+	bool HeapResource::PrepareHeapResource()
 	{
-		if (_pResource == nullptr || _lastHeapSize != _heapSize)
-		{
-			if (_pResource != nullptr && _lastHeapSize != _heapSize)
-			{
-				_pResource->Release();
-			}
-
-			_lastHeapSize = _heapSize;
-			LOGFAILEDCOM(_pDevice->CreateCommittedResource(
-					&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
-				D3D12_HEAP_FLAG_NONE,
-				&CD3DX12_RESOURCE_DESC::Buffer(_heapSize),
-				D3D12_RESOURCE_STATE_COPY_DEST,
-				nullptr,
-				IID_PPV_ARGS(&_pResource)));
-		}
+		return PrepareHeapResource(CD3DX12_RESOURCE_DESC::Buffer(_heapSize));
 	}
 
-	void HeapResource::PrepareHeapResource(const D3D12_RESOURCE_DESC& resourceDesc)
+	bool HeapResource::PrepareHeapResource(const D3D12_RESOURCE_DESC& resourceDesc)
 	{
+		bool newHeap = false;
 		if (_pResource == nullptr || _lastHeapSize != _heapSize)
 		{
 			if (_pResource != nullptr && _lastHeapSize != _heapSize)
@@ -59,7 +45,11 @@ namespace Engine
 				D3D12_RESOURCE_STATE_COPY_DEST,
 				nullptr,
 				IID_PPV_ARGS(&_pResource)));
+
+			newHeap = true;
 		}
+
+		return newHeap;
 	}
 
 	void HeapResource::HeapTask(const std::function<void()>& heapTask)
