@@ -54,19 +54,19 @@ void Game::Start()
 	std::vector<Vertex> triangleVertices =
 	{
 		{ { -0.25f, 0.25f, 0.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.0f, 0.0f} },
-		{ { 0.25f, -0.25f, 0.0f },{ 1.0f, 1.0f, 1.0f, 1.0f },{1.0f, 1.0f } },
-		{ { -0.25f, -0.25f, 0.0f},{ 1.0f, 1.0f, 1.0f, 1.0f },{0.0f, 1.0f } },
+		{ { 0.25f, -0.25f, 0.0f },{ 1.0f, 1.0f, 1.0f, 1.0f },{1.0f, 64.0f } },
+		{ { -0.25f, -0.25f, 0.0f},{ 1.0f, 1.0f, 1.0f, 1.0f },{0.0f, 64.0f } },
 
 		{ { -0.25f, 0.25f, 0.0f },{ 1.0f, 1.0f, 1.0f, 1.0f },{ 0.0f, 0.0f } },
 		{ { 0.25f, 0.25f, 0.0f },{ 1.0f, 1.0f, 1.0f, 1.0f },{ 1.0f, 0.0f } },
-		{ { 0.25f, -0.25f, 0.0f },{ 1.0f, 1.0f, 1.0f, 1.0f },{ 1.0f, 1.0f } }
+		{ { 0.25f, -0.25f, 0.0f },{ 1.0f, 1.0f, 1.0f, 1.0f },{ 1.0f, 64.0f } }
 	};
 
 	VertexBufferInstance* vertexBuffer = ResourceFactory::CreateVertexBufferInstance(VERTEX_POS_UV);
 	vertexBuffer->SetVertices(triangleVertices);
 
 	_pTexture = ResourceFactory::CreateTexture();
-	_pTexture->Load("C:\\Users\\admin\\Documents\\Repositories\\roamesworld\\Assets\\Resources\\Textures\\success_icon.png");
+	_pTexture->Load(GetRelativeFilePath("Textures\\font.dds"));
 
 	_pMaterial = ResourceFactory::CreateMaterial();
 	_pMaterial->SetTexture(_pTexture);
@@ -96,11 +96,11 @@ void Game::Start()
 	VertexBufferInstance* vertexBuffer2 = ResourceFactory::CreateVertexBufferInstance(VERTEX_POS_UV);
 	vertexBuffer2->SetVertices(vertices2);
 
-	IndexBuffer* indexBuffer = ResourceFactory::CreateIndexBuffer();
+	IndexBufferInstance* indexBuffer = ResourceFactory::CreateIndexBufferInstance();
 	indexBuffer->SetIndices(indices);
 
 	_pTexture2 = ResourceFactory::CreateTexture();
-	_pTexture2->Load("C:\\Users\\admin\\Documents\\Repositories\\roamesworld\\Assets\\Resources\\Textures\\success_icon.png");
+	_pTexture2->Load(GetRelativeFilePath("Textures\\test2.png"));
 
 	_pMaterial2 = ResourceFactory::CreateMaterial();
 	_pMaterial2->SetTexture(_pTexture2);
