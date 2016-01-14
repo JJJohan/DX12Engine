@@ -9,8 +9,8 @@ struct ID3D12Device;
 namespace Engine
 {
 	class VertexBufferInstance;
+	class IndexBufferInstance;
 	class DX12Renderer;
-	class IndexBuffer;
 	class Texture;
 	class Material;
 	class ConstantBuffer;
@@ -23,7 +23,7 @@ namespace Engine
 		static ID3D12CommandList* GetCommandList();
 		static ConstantBuffer* CreateConstantBuffer();
 		static VertexBufferInstance* CreateVertexBufferInstance(VertexType vertexType);
-		static IndexBuffer* CreateIndexBuffer();
+		static IndexBufferInstance* CreateIndexBufferInstance();
 		static Material* CreateMaterial();
 		static Texture* CreateTexture();
 		static ID3D12DescriptorHeap* GetCbvSrvHeap();

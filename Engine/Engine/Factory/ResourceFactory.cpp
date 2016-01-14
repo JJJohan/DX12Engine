@@ -29,18 +29,18 @@ namespace Engine
 		return _pCommandList;
 	}
 
-	IndexBuffer* ResourceFactory::CreateIndexBuffer()
+	IndexBufferInstance* ResourceFactory::CreateIndexBufferInstance()
 	{
-		IndexBuffer* indexBuffer = new IndexBuffer();
+		IndexBufferInstance* instance = new IndexBufferInstance();
 
-		indexBuffer->_pDevice = _pDevice;
+		instance->_pDevice = _pDevice;
 
-		return indexBuffer;
+		return instance;
 	}
 
 	VertexBufferInstance* ResourceFactory::CreateVertexBufferInstance(VertexType vertexType)
 	{
-		VertexBufferInstance* instance = new VertexBufferInstance(vertexType);
+		VertexBufferInstance* instance = new VertexBufferInstance();
 
 		instance->_pDevice = _pDevice;
 

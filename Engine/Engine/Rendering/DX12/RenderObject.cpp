@@ -1,5 +1,6 @@
 #include "RenderObject.h"
 #include "IndexBuffer.h"
+#include "VertexBuffer.h"
 #include "Material.h"
 #include "../../Factory/ResourceFactory.h"
 #include "Camera.h"
@@ -31,12 +32,12 @@ namespace Engine
 		delete _pIndexBuffer;
 	}
 
-	void RenderObject::SetIndexBuffer(IndexBuffer* indexBuffer)
+	void RenderObject::SetIndexBuffer(IndexBufferInstance* indexBuffer)
 	{
 		_pIndexBuffer = indexBuffer;
 	}
 
-	IndexBuffer* RenderObject::GetIndexBuffer() const
+	IndexBufferInstance* RenderObject::GetIndexBuffer() const
 	{
 		return _pIndexBuffer;
 	}
@@ -67,11 +68,11 @@ namespace Engine
 		if (_pIndexBuffer != nullptr)
 		{
 			_pIndexBuffer->Bind(commandList);
-			commandList->DrawIndexedInstanced(UINT(_pIndexBuffer->Count()), 1, 0, 0, 0);
+			commandList->DrawIndexedInstanced(UINT(_pIndexBuffer->Count()), 1, 0, UINT(_pVertexBuffer->GetOffset()), 0);
 		}
 		else
 		{
-			commandList->DrawInstanced(UINT(_pVertexBuffer->Count()), 1, 0, 0);
+			commandList->DrawInstanced(UINT(_pVertexBuffer->Count()), 1, UINT(_pVertexBuffer->GetOffset()), 0);
 		}
 	}
 }

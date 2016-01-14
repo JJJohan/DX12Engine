@@ -4,24 +4,17 @@
 
 namespace Engine
 {
-	std::unordered_set<VertexBuffer*> VertexBuffer::_vertexBuffers;
-
-
 	VertexBuffer::VertexBuffer()
-		: _totalSize(0)
-		, _vertexBufferView()
+		: _vertexBufferView()
 	{
 	}
 
-	VertexBufferInstance::VertexBufferInstance(VertexType vertexType)
-		: _pDevice(nullptr)
-		, _pBuffer(nullptr)
-		, _offset(0)
-		, _size(0)
+	VertexBufferInstance::VertexBufferInstance()
+		: _size(0)
 	{
 		std::vector<D3D12_INPUT_ELEMENT_DESC> inputElementDescs;
 
-		vertexType = VERTEX_POS_COL_UV;
+		VertexType vertexType = VERTEX_POS_COL_UV;
 		switch (vertexType)
 		{
 		case VERTEX_POS_COL:
@@ -61,31 +54,9 @@ namespace Engine
 		}
 	}
 
-	void VertexBuffer::Bind(ID3D12GraphicsCommandList* commandList) const
+	void VertexBuffer::Bind(ID3D12GraphicsCommandList* commandList)
 	{
 		commandList->IASetVertexBuffers(0, 1, &_vertexBufferView);
-	}
-
-	void VertexBufferInstance::Bind(ID3D12GraphicsCommandList* commandList) const
-	{
-		_pBuffer->Bind(commandList);
-	}
-
-	VertexBuffer::~VertexBuffer()
-	{
-		auto it = _vertexBuffers.find(this);
-		if (it != _vertexBuffers.end())
-		{
-			_vertexBuffers.erase(it);
-		}
-	}
-
-	VertexBufferInstance::~VertexBufferInstance()
-	{
-		if (_pBuffer != nullptr)
-		{
-			_pBuffer->ReleaseInstance(this);
-		}
 	}
 
 	const std::vector<D3D12_INPUT_ELEMENT_DESC>& VertexBufferInstance::GetInputLayout() const
@@ -103,15 +74,19 @@ namespace Engine
 		return _vertices.size();
 	}
 
+	size_t VertexBufferInstance::GetSize() const
+	{
+		return Count() * VertexSize();
+	}
+
 	void VertexBufferInstance::SetVertices(std::vector<Vertex> vertices)
 	{
+		_vertices = vertices;
+
 		if (_pBuffer == nullptr)
 		{
-			_pBuffer = VertexBuffer::PrepareBuffer(this, _pDevice);
+			_pBuffer = BufferBucket::PrepareBuffer<VertexBuffer>(this);
 		}
-
-		_vertices = vertices;
-		_pBuffer->RequestBuild();
 	}
 
 	std::vector<Vertex> VertexBufferInstance::GetVertices() const
@@ -119,88 +94,40 @@ namespace Engine
 		return _vertices;
 	}
 
-	void VertexBuffer::RequestBuild()
-	{
-		HeapTask(std::bind(&VertexBuffer::Build, this));
-	}
-
 	void VertexBuffer::Build()
 	{
-		// Calculate total size of buffer.
-		size_t size = 0;
-		for (auto it = _instances.begin(); it != _instances.end(); ++it)
+		size_t size;
+		if (!CheckBufferSize(&size))
 		{
-			VertexBufferInstance* instance = *it;
-			size += instance->VertexSize() * instance->Count();
-		}
-
-		if (size >= 65536)
-		{
-			Logging::LogError("Vertex buffer exceeded maximum size of 64KB.");
 			return;
 		}
 
 		// Perform memory copy.
 		size_t offset = 0;
-		//std::unique_ptr<char> memory(new char[size]);
-		char* memory = new char[size];
-		ZeroMemory(memory, size);
+		size_t totalVertices = 0;
+		std::unique_ptr<char> memory(new char[size]);
 		for (auto it = _instances.begin(); it != _instances.end(); ++it)
 		{
-			VertexBufferInstance* instance = *it;
+			VertexBufferInstance* instance = static_cast<VertexBufferInstance*>(*it);
 			std::vector<Vertex> vertices = instance->GetVertices();
-			size_t copySize = instance->VertexSize() * instance->Count();
+			size_t copySize = instance->GetSize();
 
-			memcpy(memory + offset, &vertices[0], copySize);
+			instance->SetOffset(totalVertices);
+			totalVertices += instance->Count();
+			memcpy(memory.get() + offset, &vertices[0], copySize);
 			offset += copySize;
 		}
 
 		_heapSize = size_t(offset);
 		PrepareHeapResource();
 
-		HeapManager::Upload(this, memory, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
+		HeapManager::Upload(this, memory.get(), D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
 
 		// Initialize the vertex buffer view.
 		_vertexBufferView = {};
 		_vertexBufferView.BufferLocation = _pResource->GetGPUVirtualAddress();
 		_vertexBufferView.StrideInBytes = sizeof(Vertex);
 		_vertexBufferView.SizeInBytes = UINT(_heapSize);
-	}
-
-	void VertexBuffer::ReleaseInstance(VertexBufferInstance* instance)
-	{
-		auto it = _instances.find(instance);
-		if (it != _instances.end())
-		{
-			_instances.erase(it);
-		}
-
-		if (_instances.empty())
-		{
-			delete this;
-		}
-	}
-
-	VertexBuffer* VertexBuffer::PrepareBuffer(VertexBufferInstance* instance, ID3D12Device* device)
-	{
-		size_t instanceSize = instance->Count() * instance->VertexSize();
-
-		for (auto it = _vertexBuffers.begin(); it != _vertexBuffers.end(); ++it)
-		{
-			VertexBuffer* buffer = *it;
-
-			if ((*it)->_totalSize < 65536 - instanceSize)
-			{
-				(*it)->_instances.insert(instance);
-				return *it;
-			}
-		}
-
-		VertexBuffer* vertexBuffer = new VertexBuffer();
-		vertexBuffer->_pDevice = device;
-		vertexBuffer->_instances.insert(instance);
-		_vertexBuffers.insert(vertexBuffer);
-		return vertexBuffer;
 	}
 }
 

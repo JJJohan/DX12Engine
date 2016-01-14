@@ -1,11 +1,10 @@
 #pragma once
 
 #include <vector>
-#include <unordered_set>
 #include <d3d12.h>
 #include <DirectXMath.h>
-#include "HeapResource.h"
-#include <set>
+#include "BufferBucket.h"
+#include "BufferInstance.h"
 
 namespace Engine
 {
@@ -32,55 +31,41 @@ namespace Engine
 
 	class VertexBufferInstance;
 
-	class VertexBuffer : protected HeapResource
+	class VertexBuffer : public BufferBucket
 	{
 	public:
-		~VertexBuffer();
-
-		void Bind(ID3D12GraphicsCommandList* commandList) const;
+		VertexBuffer();
 
 	private:
-		VertexBuffer();
-		void RequestBuild();
-		void Build();
-		void ReleaseInstance(VertexBufferInstance* instance);
+		void Build() override;
+		void Bind(ID3D12GraphicsCommandList* commandList) override;
 
-		static VertexBuffer* PrepareBuffer(VertexBufferInstance* instance, ID3D12Device* device);
-		
-		static std::unordered_set<VertexBuffer*> _vertexBuffers;
-		std::set<VertexBufferInstance*> _instances;
-
-		size_t _totalSize;
 		D3D12_VERTEX_BUFFER_VIEW _vertexBufferView;
 
 		friend class VertexBufferInstance;
 	};
 
-	class VertexBufferInstance
+	class VertexBufferInstance : public BufferInstance
 	{
 	public:
-		~VertexBufferInstance();
-
-		void Bind(ID3D12GraphicsCommandList* commandList) const;
+		VertexBufferInstance();
 
 		void SetVertices(std::vector<Vertex> vertices);
 		std::vector<Vertex> GetVertices() const;
 
 		const std::vector<D3D12_INPUT_ELEMENT_DESC>& GetInputLayout() const;
 		size_t Count() const;
+		size_t GetSize() const override;
+
 		static size_t VertexSize();
 
 	private:
-		VertexBufferInstance(VertexType vertexType);
-
-		ID3D12Device* _pDevice;
 		std::vector<Vertex> _vertices;
-		VertexBuffer* _pBuffer;
-		int _offset;
+
 		int _size;
 		std::vector<D3D12_INPUT_ELEMENT_DESC> _inputLayout;
 
-		friend class ResourceFactory;
+		friend class VertexBuffer;
 	};
 }
 
