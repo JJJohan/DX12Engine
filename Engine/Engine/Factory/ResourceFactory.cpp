@@ -47,13 +47,11 @@ namespace Engine
 		return instance;
 	}
 
-	ConstantBuffer* ResourceFactory::CreateConstantBuffer()
+	ConstantBufferInstance* ResourceFactory::CreateConstantBuffer()
 	{
-		ConstantBuffer* constantBuffer = new ConstantBuffer();
+		ConstantBufferInstance* constantBuffer = new ConstantBufferInstance(_pCbvSrvHeap);
 
 		constantBuffer->_pDevice = _pDevice;
-		constantBuffer->_descriptorSize = _pDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-		constantBuffer->_pHeap = _pCbvSrvHeap;
 
 		return constantBuffer;
 	}
@@ -76,11 +74,6 @@ namespace Engine
 		texture->_pSrvHeap = _pCbvSrvHeap;
 
 		return texture;
-	}
-
-	ID3D12DescriptorHeap* ResourceFactory::GetCbvSrvHeap()
-	{
-		return _pCbvSrvHeap;
 	}
 
 	void ResourceFactory::_init(DX12Renderer* renderer, ID3D12DescriptorHeap* cbvSrvHeap)
@@ -107,7 +100,7 @@ namespace Engine
 			if (_textureSlots[i] == false)
 			{
 				_textureSlots[i] = true;
-				return i;
+				return i + CBufferLimit;
 			}
 		}
 
@@ -116,7 +109,7 @@ namespace Engine
 
 	void ResourceFactory::FreeTextureSlot(int index)
 	{
-		_textureSlots[index] = false;
+		_textureSlots[index - CBufferLimit] = false;
 	}
 
 	int ResourceFactory::GetCBufferSlot()
@@ -126,7 +119,7 @@ namespace Engine
 			if (_cbufferSlots[i] == false)
 			{
 				_cbufferSlots[i] = true;
-				return int(i + TextureLimit);
+				return i;
 			}
 		}
 
@@ -135,7 +128,7 @@ namespace Engine
 
 	void ResourceFactory::FreeCBufferSlot(int index)
 	{
-		_cbufferSlots[index - TextureLimit] = false;
+		_cbufferSlots[index] = false;
 	}
 }
 

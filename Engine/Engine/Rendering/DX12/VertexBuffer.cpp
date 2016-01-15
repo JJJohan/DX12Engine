@@ -11,6 +11,7 @@ namespace Engine
 
 	VertexBufferInstance::VertexBufferInstance()
 		: _size(0)
+		, _bufferIndex(0)
 	{
 		std::vector<D3D12_INPUT_ELEMENT_DESC> inputElementDescs;
 
@@ -32,7 +33,7 @@ namespace Engine
 			{
 				{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
 				{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-				{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 28, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
+				{ "TEXCOORD", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 28, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
 			};
 
 			_inputLayout = inputElementDescs;
@@ -72,6 +73,28 @@ namespace Engine
 	size_t VertexBufferInstance::Count() const
 	{
 		return _vertices.size();
+	}
+
+	void VertexBufferInstance::SetBufferIndex(int index)
+	{
+		if (_bufferIndex != index)
+		{
+			_bufferIndex = index;
+
+			size_t count = Count();
+			for (int i = 0; i < count; ++i)
+			{
+				_vertices[i].Uv.z = float(index);
+			}
+
+			VertexBuffer* buffer = static_cast<VertexBuffer*>(_pBuffer);
+			buffer->RequestBuild();
+		}
+	}
+
+	int VertexBufferInstance::GetBufferIndex() const
+	{
+		return _bufferIndex;
 	}
 
 	size_t VertexBufferInstance::GetSize() const

@@ -1,16 +1,16 @@
 Texture2D g_texture : register(t0);
 SamplerState g_sampler : register(s0);
 
-cbuffer cameraData : register(b0)
+cbuffer CBuffer : register(b0)
 {
-	float4x4 mvp;
-}
+	float4x4 mvp[64];
+};
 
 struct VSInput
 {
 	float4 pos : POSITION;
 	float4 col: COLOR;
-	float2 uv:  TEXCOORD;
+	float3 uv:  TEXCOORD;
 };
 
 struct PSInput
@@ -26,10 +26,10 @@ PSInput VSMain(VSInput i)
 
 	i.pos.w = 1.0f;
 	o.pos = i.pos;
-	o.pos = mul(o.pos, mvp);
+	o.pos = mul(o.pos, mvp[i.uv.z]);
 
 	o.col = i.col;
-	o.uv = i.uv;
+	o.uv = i.uv.xy;
 
 	return o;
 }

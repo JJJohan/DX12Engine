@@ -53,13 +53,13 @@ void Game::Start()
 	// Create an example triangle object.
 	std::vector<Vertex> triangleVertices =
 	{
-		{ { -0.25f, 0.25f, 0.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.0f, 0.0f} },
-		{ { 0.25f, -0.25f, 0.0f },{ 1.0f, 1.0f, 1.0f, 1.0f },{1.0f, 64.0f } },
-		{ { -0.25f, -0.25f, 0.0f},{ 1.0f, 1.0f, 1.0f, 1.0f },{0.0f, 64.0f } },
+		{ { -0.25f, 0.25f, 0.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.0f, 0.0f, 0.0f } },
+		{ { 0.25f, -0.25f, 0.0f },{ 1.0f, 1.0f, 1.0f, 1.0f },{1.0f, 64.0f, 0.0f } },
+		{ { -0.25f, -0.25f, 0.0f},{ 1.0f, 1.0f, 1.0f, 1.0f },{0.0f, 64.0f, 0.0f } },
 
-		{ { -0.25f, 0.25f, 0.0f },{ 1.0f, 1.0f, 1.0f, 1.0f },{ 0.0f, 0.0f } },
-		{ { 0.25f, 0.25f, 0.0f },{ 1.0f, 1.0f, 1.0f, 1.0f },{ 1.0f, 0.0f } },
-		{ { 0.25f, -0.25f, 0.0f },{ 1.0f, 1.0f, 1.0f, 1.0f },{ 1.0f, 64.0f } }
+		{ { -0.25f, 0.25f, 0.0f },{ 1.0f, 1.0f, 1.0f, 1.0f },{ 0.0f, 0.0f, 0.0f } },
+		{ { 0.25f, 0.25f, 0.0f },{ 1.0f, 1.0f, 1.0f, 1.0f },{ 1.0f, 0.0f, 0.0f } },
+		{ { 0.25f, -0.25f, 0.0f },{ 1.0f, 1.0f, 1.0f, 1.0f },{ 1.0f, 64.0f, 0.0f } }
 	};
 
 	VertexBufferInstance* vertexBuffer = ResourceFactory::CreateVertexBufferInstance(VERTEX_POS_UV);
@@ -81,10 +81,10 @@ void Game::Start()
 	// Create an example triangle object.
 	std::vector<Vertex> vertices2 =
 	{
-		Vertex(XMFLOAT3(-0.25f, 0.25f, 0.0f), XMFLOAT4(1.0f, 1.0f, 1.0f ,1.0f), XMFLOAT2(0.0f, 0.0f)), // bottom left
-		Vertex(XMFLOAT3(0.25f, -0.25f, 0.0f), XMFLOAT4(1.0f, 1.0f, 1.0f ,1.0f), XMFLOAT2(1.0f, 1.0f)), // top right
-		Vertex(XMFLOAT3(0.25f, 0.25f, 0.0f), XMFLOAT4(1.0f, 1.0f, 1.0f ,1.0f), XMFLOAT2(1.0f, 0.0f)), // bottom right
-		Vertex(XMFLOAT3(-0.25f, -0.25f, 0.0f), XMFLOAT4(1.0f, 1.0f, 1.0f ,1.0f), XMFLOAT2(0.0f, 1.0f)) // top left
+		Vertex(XMFLOAT3(-0.25f, 0.25f, 0.0f), XMFLOAT4(1.0f, 1.0f, 1.0f ,1.0f), XMFLOAT3(0.0f, 0.0f, 0.0f)), // bottom left
+		Vertex(XMFLOAT3(0.25f, -0.25f, 0.0f), XMFLOAT4(1.0f, 1.0f, 1.0f ,1.0f), XMFLOAT3(1.0f, 1.0f, 0.0f)), // top right
+		Vertex(XMFLOAT3(0.25f, 0.25f, 0.0f), XMFLOAT4(1.0f, 1.0f, 1.0f ,1.0f), XMFLOAT3(1.0f, 0.0f, 0.0f)), // bottom right
+		Vertex(XMFLOAT3(-0.25f, -0.25f, 0.0f), XMFLOAT4(1.0f, 1.0f, 1.0f ,1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f)) // top left
 	};
 
 	std::vector<int> indices =
@@ -174,6 +174,7 @@ int WINAPI WinMain(HINSTANCE hInstance,
 	Engine::SystemInfo::PrintSystemInfo();
 
 	Engine::IRenderer* renderer = Engine::Renderer::CreateRenderer(Engine::RenderAPI::Direct3D12);
+	renderer->SetFPSLimit(300);
 
 	Engine::SystemInfo::PrintSystemInfo();
 

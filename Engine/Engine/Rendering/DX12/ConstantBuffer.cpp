@@ -1,152 +1,200 @@
 #include <DirectXMath.h>
 #include <d3d12.h>
 #include <vector>
+#include <memory>
+#include "../../Utils/Logging.h"
 #include "ConstantBuffer.h"
 #include "HeapManager.h"
-#include <memory>
-#include "d3dx12.h"
-#include "../../Factory/ResourceFactory.h"
-#include "../../Utils/Logging.h"
 
 namespace Engine
 {
 	ConstantBuffer::ConstantBuffer()
-		: _pHeap(nullptr)
-		, _descriptorSize(0)
-		, _dirty(false)
-		, _bufferSize(0)
+		: _pDescriptor(nullptr)
 	{
-		_index = ResourceFactory::GetCBufferSlot();
-		if (_index == -1)
+	}
+
+	void ConstantBuffer::Build()
+	{
+		size_t size;
+		if (!CheckBufferSize(&size))
 		{
-			Logging::LogError("Ran out of CBV slots. Consider increasing the CBufferLimit constant.");
+			return;
+		}
+
+		// Perform memory copy.
+		size_t offset = 0;
+		int index = 0;
+		std::unique_ptr<char> memory(new char[size]);
+		for (auto it = _instances.begin(); it != _instances.end(); ++it)
+		{
+			ConstantBufferInstance* instance = static_cast<ConstantBufferInstance*>(*it);
+			instance->_index = index++;
+			const char* data = instance->GetData();
+			memcpy(memory.get() + offset, data, CBUFFER_SLOT_SIZE);
+			delete[] data;
+			offset += CBUFFER_SLOT_SIZE;
+		}
+
+		// Allocate space and upload to the heap.
+		_heapSize = size_t(offset);
+		PrepareHeapResource();
+
+		HeapManager::Upload(this, memory.get(), D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
+
+		// Create the resource view.
+		D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc = {};
+		cbvDesc.BufferLocation = _pResource->GetGPUVirtualAddress();
+		cbvDesc.SizeInBytes = (_heapSize + 255) & ~255;
+		_pDevice->CreateConstantBufferView(&cbvDesc, _pDescriptor->GetCPUDescriptorHandleForHeapStart());
+	}
+
+	void ConstantBuffer::Bind(ID3D12GraphicsCommandList* commandList)
+	{
+		// Bind the constant buffer.
+		if (_pResource != nullptr)
+		{
+			commandList->SetGraphicsRootDescriptorTable(0, _pDescriptor->GetGPUDescriptorHandleForHeapStart());
 		}
 	}
 
-	ConstantBuffer::~ConstantBuffer()
+	ConstantBufferInstance::ConstantBufferInstance(ID3D12DescriptorHeap* descriptorHeap)
+		: _index(-1)
+		, _slotUsage(0)
+		, _pDescriptor(descriptorHeap)
+	{
+	}
+
+	ConstantBufferInstance::~ConstantBufferInstance()
 	{
 		for (auto it = _cbuffer.begin(); it != _cbuffer.end(); ++it)
 		{
 			delete (*it).second.Data;
 		}
+	}
 
-		if (_index != -1)
+	size_t ConstantBufferInstance::GetSize() const
+	{
+		return size_t(CBUFFER_SLOT_SIZE);
+	}
+
+	int ConstantBufferInstance::GetIndex() const
+	{
+		return _index;
+	}
+
+	void ConstantBufferInstance::AssignBuffer()
+	{
+		if (_pBuffer == nullptr)
 		{
-			ResourceFactory::FreeCBufferSlot(_index);
+			ConstantBuffer* buffer = BufferBucket::PrepareBuffer<ConstantBuffer>(this);
+			buffer->_pDescriptor = _pDescriptor;
+			_pBuffer = buffer;
+		}
+		else
+		{
+			ConstantBuffer* buffer = static_cast<ConstantBuffer*>(_pBuffer);
+			buffer->RequestBuild();
 		}
 	}
 
-	void ConstantBuffer::SetFloat(std::string name, float value)
+	void ConstantBufferInstance::SetFloat(std::string name, float value)
 	{
 		if (_cbuffer.find(name) == _cbuffer.end())
 		{
-			_bufferSize += sizeof(float);
-			_cbuffer[name] = {new float(value), sizeof(float)};
+			if (_slotUsage + sizeof(float) > CBUFFER_SLOT_SIZE)
+			{
+				Logging::LogError("Variable '{0}' has exceeded slot size.", name);
+				return;
+			}
+
+			_slotUsage += sizeof(float);
+			_cbuffer[name] = { new float(value), sizeof(float) };
 		}
 		else
 		{
 			*static_cast<float*>(_cbuffer[name].Data) = value;
 		}
 
-		if (!_dirty)
-		{
-			HeapTask(std::bind(&ConstantBuffer::UpdateBuffer, this));
-			_dirty = true;
-		}
+		AssignBuffer();
 	}
 
-	void ConstantBuffer::SetInt(std::string name, int value)
+	void ConstantBufferInstance::SetInt(std::string name, int value)
 	{
 		if (_cbuffer.find(name) == _cbuffer.end())
 		{
-			_bufferSize += sizeof(int);
-			_cbuffer[name] = {new int(value), sizeof(int)};
+			if (_slotUsage + sizeof(int) > CBUFFER_SLOT_SIZE)
+			{
+				Logging::LogError("Variable '{0}' has exceeded slot size.", name);
+				return;
+			}
+
+			_slotUsage += sizeof(int);
+			_cbuffer[name] = { new int(value), sizeof(int) };
 		}
 		else
 		{
 			*static_cast<int*>(_cbuffer[name].Data) = value;
 		}
 
-		if (!_dirty)
-		{
-			HeapTask(std::bind(&ConstantBuffer::UpdateBuffer, this));
-			_dirty = true;
-		}
+		AssignBuffer();
 	}
 
-	void ConstantBuffer::SetVector(std::string name, const DirectX::XMFLOAT4& value)
+	void ConstantBufferInstance::SetVector(std::string name, const DirectX::XMFLOAT4& value)
 	{
 		if (_cbuffer.find(name) == _cbuffer.end())
 		{
-			_bufferSize += sizeof(DirectX::XMFLOAT4);
-			_cbuffer[name] = {new DirectX::XMFLOAT4(value), sizeof(DirectX::XMFLOAT4)};
+			if (_slotUsage + sizeof(DirectX::XMFLOAT4) > CBUFFER_SLOT_SIZE)
+			{
+				Logging::LogError("Variable '{0}' has exceeded slot size.", name);
+				return;
+			}
+
+			_slotUsage += sizeof(DirectX::XMFLOAT4);
+			_cbuffer[name] = { new DirectX::XMFLOAT4(value), sizeof(DirectX::XMFLOAT4) };
 		}
 		else
 		{
 			*static_cast<DirectX::XMFLOAT4*>(_cbuffer[name].Data) = value;
 		}
 
-		if (!_dirty)
-		{
-			HeapTask(std::bind(&ConstantBuffer::UpdateBuffer, this));
-			_dirty = true;
-		}
+		AssignBuffer();
 	}
 
-	void ConstantBuffer::SetMatrix(std::string name, const DirectX::XMFLOAT4X4& value)
+	void ConstantBufferInstance::SetMatrix(std::string name, const DirectX::XMFLOAT4X4& value)
 	{
 		if (_cbuffer.find(name) == _cbuffer.end())
 		{
-			_bufferSize += sizeof(DirectX::XMFLOAT4X4);
-			_cbuffer[name] = {new DirectX::XMFLOAT4X4(value), sizeof(DirectX::XMFLOAT4X4)};
+			if (_slotUsage + sizeof(DirectX::XMFLOAT4X4) > CBUFFER_SLOT_SIZE)
+			{
+				Logging::LogError("Variable '{0}' has exceeded slot size.", name);
+				return;
+			}
+
+			_slotUsage += sizeof(DirectX::XMFLOAT4X4);
+			_cbuffer[name] = { new DirectX::XMFLOAT4X4(value), sizeof(DirectX::XMFLOAT4X4) };
 		}
 		else
 		{
 			*static_cast<DirectX::XMFLOAT4X4*>(_cbuffer[name].Data) = value;
 		}
 
-		if (!_dirty)
-		{
-			HeapTask(std::bind(&ConstantBuffer::UpdateBuffer, this));
-			_dirty = true;
-		}
+		AssignBuffer();
 	}
 
-	void ConstantBuffer::UpdateBuffer()
+	const char* ConstantBufferInstance::GetData() const
 	{
 		// Construct temporary buffer
-		std::unique_ptr<char> data(new char[_bufferSize]);
+		char* data = new char[CBUFFER_SLOT_SIZE];
+		ZeroMemory(data, CBUFFER_SLOT_SIZE);
 		size_t offset = 0;
 		for (auto it = _cbuffer.begin(); it != _cbuffer.end(); ++it)
 		{
 			DataItem item = it->second;
-			memcpy(data.get() + offset, item.Data, item.Size);
+			memcpy(data + offset, item.Data, item.Size);
 			offset += item.Size;
 		}
 
-		// Allocate space and upload to the heap.
-		_heapSize = _bufferSize;
-		PrepareHeapResource();
-		HeapManager::Upload(this, data.get(), D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
-
-		// Create the resource view.
-		CD3DX12_CPU_DESCRIPTOR_HANDLE cbvHandle(_pHeap->GetCPUDescriptorHandleForHeapStart(), _index, _descriptorSize);
-		D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc = {};
-		cbvDesc.BufferLocation = _pResource->GetGPUVirtualAddress();
-		cbvDesc.SizeInBytes = (_bufferSize + 255) & ~255;
-		_pDevice->CreateConstantBufferView(&cbvDesc, cbvHandle);
-
-		_dirty = false;
-	}
-
-	void ConstantBuffer::Bind(ID3D12GraphicsCommandList* commandList) const
-	{
-		// Bind the constant buffer.
-		if (_pResource != nullptr)
-		{
-			CD3DX12_GPU_DESCRIPTOR_HANDLE cbvHandle(_pHeap->GetGPUDescriptorHandleForHeapStart(), _index, _descriptorSize);
-			commandList->SetGraphicsRootDescriptorTable(0, cbvHandle);
-		}
+		return data;
 	}
 }
 

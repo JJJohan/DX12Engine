@@ -55,6 +55,7 @@ namespace Engine
 	void RenderObject::Update() const
 	{
 		Camera::Main()->ApplyTransform(_pCbuffer, Transform);
+		_pVertexBuffer->SetBufferIndex(_pCbuffer->GetIndex());
 	}
 
 	void RenderObject::Draw() const

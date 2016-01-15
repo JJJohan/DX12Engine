@@ -8,6 +8,7 @@ using namespace DirectX;
 
 namespace Engine
 {
+	class ConstantBufferInstance;
 	class ConstantBuffer;
 
 	class Camera
@@ -27,7 +28,7 @@ namespace Engine
 		XMMATRIX GetVPMatrix() const;
 
 		bool Update();
-		void ApplyTransform(ConstantBuffer* buffer, const Transform& transform) const;
+		void ApplyTransform(ConstantBufferInstance* buffer, const Transform& transform) const;
 		void Resize(const XMFLOAT4& screenRect, float fovInDegrees, float nearClip, float farClip);
 
 		Transform Transform;

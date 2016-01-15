@@ -1,14 +1,14 @@
 #pragma once
 
-#include "../../Data/Transform.h"
 #include <unordered_set>
+#include "../../Data/Transform.h"
 
 namespace Engine
 {
 	class Material;
 	class VertexBufferInstance;
 	class IndexBufferInstance;
-	class ConstantBuffer;
+	class ConstantBufferInstance;
 
 	class RenderObject
 	{
@@ -42,8 +42,8 @@ namespace Engine
 
 		VertexBufferInstance* _pVertexBuffer;
 		IndexBufferInstance* _pIndexBuffer;
+		ConstantBufferInstance* _pCbuffer;
 		Material* _pMaterial;
-		ConstantBuffer* _pCbuffer;
 
 		friend class DX12Renderer;
 	};

@@ -10,10 +10,11 @@ namespace Engine
 {
 	class VertexBufferInstance;
 	class IndexBufferInstance;
+	class ConstantBufferInstance;
 	class DX12Renderer;
 	class Texture;
 	class Material;
-	class ConstantBuffer;
+
 	enum VertexType;
 
 	class ResourceFactory
@@ -21,19 +22,18 @@ namespace Engine
 	public:
 		static void AssignCommandList(ID3D12CommandList* commandList);
 		static ID3D12CommandList* GetCommandList();
-		static ConstantBuffer* CreateConstantBuffer();
+		static ConstantBufferInstance* CreateConstantBuffer();
 		static VertexBufferInstance* CreateVertexBufferInstance(VertexType vertexType);
 		static IndexBufferInstance* CreateIndexBufferInstance();
 		static Material* CreateMaterial();
 		static Texture* CreateTexture();
-		static ID3D12DescriptorHeap* GetCbvSrvHeap();
 
 		static int GetTextureSlot();
 		static int GetCBufferSlot();
 		static void FreeTextureSlot(int index);
 		static void FreeCBufferSlot(int index);
 
-		const static int TextureLimit = 64;
+		const static int TextureLimit = 32;
 		const static int CBufferLimit = 8;
 
 	private:

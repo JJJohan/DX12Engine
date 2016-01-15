@@ -129,7 +129,7 @@ namespace Engine
 		Transform.Moved = true;
 	}
 
-	void Camera::ApplyTransform(ConstantBuffer* buffer, const Engine::Transform& transform) const
+	void Camera::ApplyTransform(ConstantBufferInstance* buffer, const Engine::Transform& transform) const
 	{
 		XMMATRIX mvp = XMMatrixTranspose(transform.GetMatrix() * _vp);
 		XMFLOAT4X4 mvpT;

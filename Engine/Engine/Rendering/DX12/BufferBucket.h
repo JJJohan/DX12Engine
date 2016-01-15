@@ -11,7 +11,7 @@ namespace Engine
 {
 	class BufferInstance;
 
-	class BufferBucket : protected HeapResource
+	class BufferBucket : public HeapResource
 	{
 	public:
 		virtual ~BufferBucket();

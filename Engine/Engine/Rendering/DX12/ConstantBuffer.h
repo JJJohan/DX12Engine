@@ -1,7 +1,10 @@
 #pragma once
 
+#define CBUFFER_SLOT_SIZE 64
+
 #include <map>
-#include "HeapResource.h"
+#include "BufferBucket.h"
+#include "BufferInstance.h"
 
 namespace DirectX
 {
@@ -13,21 +16,36 @@ struct ID3D12GraphicsCommandList;
 
 namespace Engine
 {
-	class ConstantBuffer : public HeapResource
+	class ConstantBuffer : public BufferBucket
 	{
 	public:
-		~ConstantBuffer();
+		ConstantBuffer();
+		void Build() override;
+		void Bind(ID3D12GraphicsCommandList* commandList) override;
+
+	private:
+		ID3D12DescriptorHeap* _pDescriptor;
+
+		friend class ConstantBufferInstance;
+	};
+
+	class ConstantBufferInstance : public BufferInstance
+	{
+	public:
+		~ConstantBufferInstance();
 
 		void SetFloat(std::string name, float value);
 		void SetInt(std::string name, int value);
 		void SetVector(std::string name, const DirectX::XMFLOAT4& value);
 		void SetMatrix(std::string name, const DirectX::XMFLOAT4X4& value);
-
-		void Bind(ID3D12GraphicsCommandList* commandList) const;
+		const char* GetData() const;
+		size_t GetSize() const override;
+		int GetIndex() const;
 
 	private:
-		ConstantBuffer();
-		void UpdateBuffer();
+		ConstantBufferInstance(ID3D12DescriptorHeap* descriptorHeap);
+
+		void AssignBuffer();
 
 		struct DataItem
 		{
@@ -35,14 +53,12 @@ namespace Engine
 			size_t Size;
 		};
 
-		ID3D12DescriptorHeap* _pHeap;
 		int _index;
-		int _descriptorSize;
+		size_t _slotUsage;
 		std::map<std::string, DataItem> _cbuffer;
-		bool _dirty;
-		size_t _bufferSize;
+		ID3D12DescriptorHeap* _pDescriptor;
 
-
+		friend class ConstantBuffer;
 		friend class ResourceFactory;
 	};
 }
