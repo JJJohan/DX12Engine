@@ -91,6 +91,7 @@ namespace Engine
 
 	bool DX12Renderer::Render()
 	{
+		_previousTime = std::chrono::high_resolution_clock::now();
 		_renderFinished = false;
 
 		// Command list allocators can only be reset when the associated 
@@ -260,13 +261,13 @@ namespace Engine
 			_device->CreateDescriptorHeap(&rtvHeapDesc, IID_PPV_ARGS(&_rtvHeap)),
 			EXIT_FAILURE);
 
-		// Describe and create a shader resource view (SRV) heap for the texture.
-		D3D12_DESCRIPTOR_HEAP_DESC srvHeapDesc = {};
-		srvHeapDesc.NumDescriptors = ResourceFactory::TextureLimit + ResourceFactory::CBufferLimit;
-		srvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
-		srvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
+		// Describe and create a CBV/SRV heap for constants and textures.
+		D3D12_DESCRIPTOR_HEAP_DESC cbvSrvHeapDesc = {};
+		cbvSrvHeapDesc.NumDescriptors = ResourceFactory::CBufferLimit + ResourceFactory::TextureLimit;
+		cbvSrvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
+		cbvSrvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
 		LOGFAILEDCOMRETURN(
-			_device->CreateDescriptorHeap(&srvHeapDesc, IID_PPV_ARGS(&_cbvSrvHeap)),
+			_device->CreateDescriptorHeap(&cbvSrvHeapDesc, IID_PPV_ARGS(&_cbvSrvHeap)),
 			EXIT_FAILURE);
 
 		_rtvDescriptorSize = _device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
@@ -364,7 +365,10 @@ namespace Engine
 		// Point to CBVs and SRVs.
 		ID3D12DescriptorHeap* ppHeaps[] = { _cbvSrvHeap.Get() };
 		_commandList->SetDescriptorHeaps(_countof(ppHeaps), ppHeaps);
-		_commandList->SetGraphicsRootDescriptorTable(1, _cbvSrvHeap->GetGPUDescriptorHandleForHeapStart());
+		CD3DX12_GPU_DESCRIPTOR_HANDLE cbvHandle(_cbvSrvHeap->GetGPUDescriptorHandleForHeapStart(), 0, _cbvSrvDescriptorSize);
+		CD3DX12_GPU_DESCRIPTOR_HANDLE srvHandle(_cbvSrvHeap->GetGPUDescriptorHandleForHeapStart(), ResourceFactory::CBufferLimit, _cbvSrvDescriptorSize);
+		_commandList->SetGraphicsRootDescriptorTable(0, cbvHandle);
+		_commandList->SetGraphicsRootDescriptorTable(1, srvHandle);
 
 		_commandList->RSSetViewports(1, &_pCamera->GetViewPort());
 		_commandList->RSSetScissorRects(1, &_scissorRect);
@@ -448,7 +452,18 @@ namespace Engine
 			WaitForSingleObject(_fenceEvent, INFINITE);
 		}
 
-		std::this_thread::sleep_for(std::chrono::milliseconds(1));
+		// Wait for FPS target if we're rendering too fast.
+		if (_fpsLimit > 0.0f)
+		{
+			std::chrono::steady_clock::time_point currentTime = std::chrono::high_resolution_clock::now();
+			std::chrono::duration<float> diff = currentTime - _previousTime;
+			float time = diff.count();
+			if (time < _fpsLimit)
+			{
+				size_t timeLeft = size_t((_fpsLimit - time) * 1e3f);
+				std::this_thread::sleep_for(std::chrono::milliseconds(timeLeft));
+			}
+		}
 
 		_frameIndex = _swapChain->GetCurrentBackBufferIndex();
 		_renderFinished = true;

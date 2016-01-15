@@ -28,6 +28,7 @@ namespace Engine
 		  , _deviceMemoryFree(0)
 		  , _vsync(true)
 		  , _renderFinished(true)
+		  , _fpsLimit(-1.0f)
 	{
 		_windowClosed = nullptr;
 		IRenderer::SetClearColour(Colour::Blue);
@@ -160,6 +161,16 @@ namespace Engine
 		}
 
 		return EXIT_SUCCESS;
+	}
+
+	void IRenderer::SetFPSLimit(int limit)
+	{
+		_fpsLimit = 1.0f / float(limit);
+	}
+
+	int IRenderer::GetFPSLimit() const
+	{
+		return int(1.0f / _fpsLimit);
 	}
 
 	void IRenderer::AssignCreateMethod(const std::function<void()>& createMethod)

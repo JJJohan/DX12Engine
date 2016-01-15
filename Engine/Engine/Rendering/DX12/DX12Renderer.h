@@ -4,7 +4,6 @@
 #include "FeatureSupport.h"
 #include <dxgi1_5.h>
 #include <wrl/client.h>
-#include <DirectXMath.h>
 #include "Camera.h"
 #include <mutex>
 
@@ -61,6 +60,7 @@ namespace Engine
 		ComPtr<ID3D12Fence> _fence;
 		UINT64 _fenceValue;
 		std::mutex _syncMutex;
+		std::chrono::steady_clock::time_point _previousTime;
 
 		bool LoadPipeline();
 		bool LoadAssets();

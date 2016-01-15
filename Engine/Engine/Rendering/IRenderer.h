@@ -27,8 +27,11 @@ namespace Engine
 		bool RenderFinished() const;
 		void AssignDrawLoop(const std::function<void()>& drawLoop);
 		void AssignCreateMethod(const std::function<void()>& createMethod);
+		void SetFPSLimit(int limit);
+		int GetFPSLimit() const;
 
 	protected:
+		float _fpsLimit;
 		int _screenWidth;
 		int _screenHeight;
 		float _aspectRatio;

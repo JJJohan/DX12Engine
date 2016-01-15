@@ -19,6 +19,7 @@ namespace Engine
 		std::function<void()> Task;
 		float IdleTimer;
 		bool IdleTimeOut;
+		std::chrono::steady_clock::time_point LastTime;
 	};
 
 	class CommandQueue

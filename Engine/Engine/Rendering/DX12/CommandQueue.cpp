@@ -44,8 +44,9 @@ namespace Engine
 			{
 				if (commandThread->TasksCompleted == 0)
 				{
-					std::this_thread::sleep_for(std::chrono::microseconds(1));
-					commandThread->IdleTimer += 0.001f;
+					std::chrono::steady_clock::time_point currentTime = std::chrono::high_resolution_clock::now();
+					std::chrono::duration<float> diff = currentTime - commandThread->LastTime;
+					commandThread->IdleTimer += diff.count();
 					if (commandThread->IdleTimer > 2000.0f)
 					{
 						break;
@@ -62,6 +63,7 @@ namespace Engine
 				commandThread->Task = nullptr;
 				commandThread->Mutex.unlock();
 				commandThread->IdleTimer = 0.0f;
+				commandThread->LastTime = std::chrono::high_resolution_clock::now();
 			}
 		}
 
@@ -87,6 +89,31 @@ namespace Engine
 	std::vector<ID3D12CommandList*> CommandQueue::Process(ID3D12Device* device)
 	{
 		std::vector<ID3D12CommandList*> commandLists;
+
+		// Cleanup idle threads.
+		bool idleFound = true;
+		while (idleFound)
+		{
+			idleFound = false;
+			for (auto it = _commandThreads.begin(); it != _commandThreads.end(); ++it)
+			{
+				if ((*it)->IdleTimeOut)
+				{
+					std::stringstream ss;
+					ss << " Reduced command threads from " << _commandThreads.size() << " to " << _commandThreads.size() - 1 << ".";
+					Logging::Log(ss.str());
+
+					CommandThread* commandThread = *it;
+					commandThread->Thread.join();
+					commandThread->CommandList->Release();
+					commandThread->CommandAllocator->Release();
+					delete commandThread;
+					idleFound = true;
+					_commandThreads.erase(it);
+					break;
+				}
+			}
+		}
 
 		// Begin work load.
 		int taskCount = int(_tasks.size());
@@ -117,10 +144,6 @@ namespace Engine
 					commandThread->Thread = std::thread(RunTask, commandThread);
 
 					_commandThreads.push_back(commandThread);
-				}
-				else
-				{
-					std::this_thread::sleep_for(std::chrono::milliseconds(1));
 				}
 			}
 			else
@@ -170,25 +193,6 @@ namespace Engine
 				graphicsCmdList->Close();
 				commandLists.push_back(commandThread->CommandList);
 				_releaseMutex.unlock();
-			}
-		}
-
-		// Cleanup idle threads.
-		for (auto it = _commandThreads.begin(); it != _commandThreads.end(); ++it)
-		{
-			if ((*it)->IdleTimeOut)
-			{
-				std::stringstream ss;
-				ss << " Reduced command threads from " << _commandThreads.size() << " to " << _commandThreads.size() - 1 << ".";
-				Logging::Log(ss.str());
-
-				CommandThread* commandThread = *it;
-				commandThread->Thread.join();
-				commandThread->CommandList->Release();
-				commandThread->CommandAllocator->Release();
-				delete commandThread;
-				_commandThreads.erase(it);
-				break; // One at a time is fine.
 			}
 		}
 
