@@ -16,6 +16,8 @@ struct ID3D12GraphicsCommandList;
 
 namespace Engine
 {
+	class VertexBufferInstance;
+
 	class ConstantBuffer : public BufferBucket
 	{
 	public:
@@ -41,6 +43,8 @@ namespace Engine
 		const char* GetData() const;
 		size_t GetSize() const override;
 		int GetIndex() const;
+		void SetIndex(int index);
+		void SetVertexBuffer(VertexBufferInstance* vertexBuffer);
 
 	private:
 		ConstantBufferInstance(ID3D12DescriptorHeap* descriptorHeap);
@@ -57,6 +61,7 @@ namespace Engine
 		size_t _slotUsage;
 		std::map<std::string, DataItem> _cbuffer;
 		ID3D12DescriptorHeap* _pDescriptor;
+		VertexBufferInstance* _pVertexBuffer;
 
 		friend class ConstantBuffer;
 		friend class ResourceFactory;

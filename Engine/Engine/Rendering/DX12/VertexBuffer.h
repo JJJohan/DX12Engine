@@ -17,11 +17,12 @@ namespace Engine
 
 	struct Vertex
 	{
-		Vertex(DirectX::XMFLOAT3 pos, DirectX::XMFLOAT4 col, DirectX::XMFLOAT3 uv)
+		Vertex() {}
+		Vertex(DirectX::XMFLOAT3 pos, DirectX::XMFLOAT4 col, DirectX::XMFLOAT2 uv)
 		{
 			Pos = pos;
 			Col = col;
-			Uv = uv;
+			Uv = DirectX::XMFLOAT3(uv.x, uv.y, 0.0f);
 		}
 
 		DirectX::XMFLOAT3 Pos;

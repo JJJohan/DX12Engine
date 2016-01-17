@@ -11,7 +11,7 @@ namespace Engine
 
 	VertexBufferInstance::VertexBufferInstance()
 		: _size(0)
-		, _bufferIndex(0)
+		, _bufferIndex(-1)
 	{
 		std::vector<D3D12_INPUT_ELEMENT_DESC> inputElementDescs;
 
@@ -105,10 +105,23 @@ namespace Engine
 	void VertexBufferInstance::SetVertices(std::vector<Vertex> vertices)
 	{
 		_vertices = vertices;
+		size_t count = Count();
+		if (_bufferIndex != -1)
+		{
+			for (int i = 0; i < count; ++i)
+			{
+				_vertices[i].Uv.z = float(_bufferIndex);
+			}
+		}
 
 		if (_pBuffer == nullptr)
 		{
 			_pBuffer = BufferBucket::PrepareBuffer<VertexBuffer>(this);
+		}
+		else
+		{
+			VertexBuffer* buffer = static_cast<VertexBuffer*>(_pBuffer);
+			buffer->RequestBuild();
 		}
 	}
 

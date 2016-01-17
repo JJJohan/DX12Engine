@@ -5,6 +5,7 @@
 #include "../../Utils/Logging.h"
 #include "ConstantBuffer.h"
 #include "HeapManager.h"
+#include "VertexBuffer.h"
 
 namespace Engine
 {
@@ -28,7 +29,12 @@ namespace Engine
 		for (auto it = _instances.begin(); it != _instances.end(); ++it)
 		{
 			ConstantBufferInstance* instance = static_cast<ConstantBufferInstance*>(*it);
-			instance->_index = index++;
+			if (instance->_index != index)
+			{
+				instance->SetIndex(index);
+			}
+			index++;
+
 			const char* data = instance->GetData();
 			memcpy(memory.get() + offset, data, CBUFFER_SLOT_SIZE);
 			delete[] data;
@@ -61,6 +67,7 @@ namespace Engine
 		: _index(-1)
 		, _slotUsage(0)
 		, _pDescriptor(descriptorHeap)
+		, _pVertexBuffer(nullptr)
 	{
 	}
 
@@ -75,6 +82,21 @@ namespace Engine
 	size_t ConstantBufferInstance::GetSize() const
 	{
 		return size_t(CBUFFER_SLOT_SIZE);
+	}
+
+	void ConstantBufferInstance::SetIndex(int index)
+	{
+		_index = index;
+
+		if (_pVertexBuffer != nullptr)
+		{
+			_pVertexBuffer->SetBufferIndex(index);
+		}
+	}
+
+	void ConstantBufferInstance::SetVertexBuffer(VertexBufferInstance* vertexBuffer)
+	{
+		_pVertexBuffer = vertexBuffer;
 	}
 
 	int ConstantBufferInstance::GetIndex() const
