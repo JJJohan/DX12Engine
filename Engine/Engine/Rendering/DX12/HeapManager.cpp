@@ -67,7 +67,7 @@ namespace Engine
 				heapResource->_pHeap = nullptr;
 			}
 		}
-		_staticUploadHeaps.clear();	
+		_staticUploadHeaps.clear();
 		_mutex.unlock();
 
 		for (auto it = _dynamicUploadHeaps.begin(); it != _dynamicUploadHeaps.end(); ++it)

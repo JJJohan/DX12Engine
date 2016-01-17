@@ -27,11 +27,11 @@ namespace Engine
 		  , _rtvDescriptorSize(0)
 		  , _cbvSrvDescriptorSize(0)
 		  , _useWarpDevice(false)
+		  , _resize(false)
 		  , _frameIndex(0)
 		  , _fenceEvent(nullptr)
 		  , _fence(nullptr)
 		  , _fenceValue(0)
-		  , _resize(false)
 	{
 		_instance = this;
 	}
@@ -379,7 +379,7 @@ namespace Engine
 		_commandList->SetGraphicsRootSignature(_rootSignature.Get());
 
 		// Point to CBVs and SRVs.
-		ID3D12DescriptorHeap* ppHeaps[] = { _cbvSrvHeap.Get() };
+		ID3D12DescriptorHeap* ppHeaps[] = {_cbvSrvHeap.Get()};
 		_commandList->SetDescriptorHeaps(_countof(ppHeaps), ppHeaps);
 		CD3DX12_GPU_DESCRIPTOR_HANDLE cbvHandle(_cbvSrvHeap->GetGPUDescriptorHandleForHeapStart(), 0, _cbvSrvDescriptorSize);
 		CD3DX12_GPU_DESCRIPTOR_HANDLE srvHandle(_cbvSrvHeap->GetGPUDescriptorHandleForHeapStart(), ResourceFactory::CBufferLimit, _cbvSrvDescriptorSize);

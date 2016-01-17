@@ -68,6 +68,12 @@
     <Filter Include="Header Files\Utils\CPU">
       <UniqueIdentifier>{1008a912-2932-42e3-b93c-3aca8c5afb4c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Rendering\DX12\Buffers">
+      <UniqueIdentifier>{e430f40a-8749-4949-8150-73636720443e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Rendering\DX12\Buffers">
+      <UniqueIdentifier>{c2dbd443-d3c6-47f6-903d-a485999e6052}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\Core.cpp">
@@ -133,13 +139,7 @@
     <ClCompile Include="Rendering\DX12\RenderObject.cpp">
       <Filter>Source Files\Rendering\DX12</Filter>
     </ClCompile>
-    <ClCompile Include="Rendering\DX12\VertexBuffer.cpp">
-      <Filter>Source Files\Rendering\DX12</Filter>
-    </ClCompile>
     <ClCompile Include="Rendering\DX12\Font.cpp">
-      <Filter>Source Files\Rendering\DX12</Filter>
-    </ClCompile>
-    <ClCompile Include="Rendering\DX12\IndexBuffer.cpp">
       <Filter>Source Files\Rendering\DX12</Filter>
     </ClCompile>
     <ClCompile Include="Rendering\DX12\Texture.cpp">
@@ -169,17 +169,23 @@
     <ClCompile Include="Rendering\DX12\FontManager.cpp">
       <Filter>Source Files\Rendering\DX12</Filter>
     </ClCompile>
-    <ClCompile Include="Rendering\DX12\ConstantBuffer.cpp">
-      <Filter>Source Files\Rendering\DX12</Filter>
-    </ClCompile>
     <ClCompile Include="Factory\ResourceFactory.cpp">
       <Filter>Source Files\Factory</Filter>
     </ClCompile>
-    <ClCompile Include="Rendering\DX12\BufferBucket.cpp">
-      <Filter>Source Files\Rendering\DX12</Filter>
-    </ClCompile>
     <ClCompile Include="Rendering\DX12\BufferInstance.cpp">
-      <Filter>Source Files\Rendering\DX12</Filter>
+      <Filter>Source Files\Rendering\DX12\Buffers</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\DX12\BufferBucket.cpp">
+      <Filter>Source Files\Rendering\DX12\Buffers</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\DX12\ConstantBuffer.cpp">
+      <Filter>Source Files\Rendering\DX12\Buffers</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\DX12\IndexBuffer.cpp">
+      <Filter>Source Files\Rendering\DX12\Buffers</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\DX12\VertexBuffer.cpp">
+      <Filter>Source Files\Rendering\DX12\Buffers</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -243,9 +249,6 @@
     <ClInclude Include="Rendering\DX12\HeapResource.h">
       <Filter>Header Files\Rendering\DX12</Filter>
     </ClInclude>
-    <ClInclude Include="Rendering\DX12\IndexBuffer.h">
-      <Filter>Header Files\Rendering\DX12</Filter>
-    </ClInclude>
     <ClInclude Include="Rendering\DX12\Material.h">
       <Filter>Header Files\Rendering\DX12</Filter>
     </ClInclude>
@@ -256,9 +259,6 @@
       <Filter>Header Files\Rendering\DX12</Filter>
     </ClInclude>
     <ClInclude Include="Rendering\DX12\Texture.h">
-      <Filter>Header Files\Rendering\DX12</Filter>
-    </ClInclude>
-    <ClInclude Include="Rendering\DX12\VertexBuffer.h">
       <Filter>Header Files\Rendering\DX12</Filter>
     </ClInclude>
     <ClInclude Include="Rendering\Renderer.h">
@@ -288,17 +288,23 @@
     <ClInclude Include="Rendering\DX12\FontManager.h">
       <Filter>Header Files\Rendering\DX12</Filter>
     </ClInclude>
-    <ClInclude Include="Rendering\DX12\ConstantBuffer.h">
-      <Filter>Header Files\Rendering\DX12</Filter>
-    </ClInclude>
     <ClInclude Include="Factory\ResourceFactory.h">
       <Filter>Header Files\Factory</Filter>
     </ClInclude>
     <ClInclude Include="Rendering\DX12\BufferBucket.h">
-      <Filter>Header Files\Rendering\DX12</Filter>
+      <Filter>Header Files\Rendering\DX12\Buffers</Filter>
     </ClInclude>
     <ClInclude Include="Rendering\DX12\BufferInstance.h">
-      <Filter>Header Files\Rendering\DX12</Filter>
+      <Filter>Header Files\Rendering\DX12\Buffers</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\DX12\ConstantBuffer.h">
+      <Filter>Header Files\Rendering\DX12\Buffers</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\DX12\IndexBuffer.h">
+      <Filter>Header Files\Rendering\DX12\Buffers</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\DX12\VertexBuffer.h">
+      <Filter>Header Files\Rendering\DX12\Buffers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

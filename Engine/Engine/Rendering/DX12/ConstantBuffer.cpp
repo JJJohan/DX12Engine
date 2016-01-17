@@ -65,9 +65,9 @@ namespace Engine
 
 	ConstantBufferInstance::ConstantBufferInstance(ID3D12DescriptorHeap* descriptorHeap)
 		: _index(-1)
-		, _slotUsage(0)
-		, _pDescriptor(descriptorHeap)
-		, _pVertexBuffer(nullptr)
+		  , _slotUsage(0)
+		  , _pDescriptor(descriptorHeap)
+		  , _pVertexBuffer(nullptr)
 	{
 	}
 
@@ -130,7 +130,7 @@ namespace Engine
 			}
 
 			_slotUsage += sizeof(float);
-			_cbuffer[name] = { new float(value), sizeof(float) };
+			_cbuffer[name] = {new float(value), sizeof(float)};
 		}
 		else
 		{
@@ -151,7 +151,7 @@ namespace Engine
 			}
 
 			_slotUsage += sizeof(int);
-			_cbuffer[name] = { new int(value), sizeof(int) };
+			_cbuffer[name] = {new int(value), sizeof(int)};
 		}
 		else
 		{
@@ -172,7 +172,7 @@ namespace Engine
 			}
 
 			_slotUsage += sizeof(DirectX::XMFLOAT4);
-			_cbuffer[name] = { new DirectX::XMFLOAT4(value), sizeof(DirectX::XMFLOAT4) };
+			_cbuffer[name] = {new DirectX::XMFLOAT4(value), sizeof(DirectX::XMFLOAT4)};
 		}
 		else
 		{
@@ -193,7 +193,7 @@ namespace Engine
 			}
 
 			_slotUsage += sizeof(DirectX::XMFLOAT4X4);
-			_cbuffer[name] = { new DirectX::XMFLOAT4X4(value), sizeof(DirectX::XMFLOAT4X4) };
+			_cbuffer[name] = {new DirectX::XMFLOAT4X4(value), sizeof(DirectX::XMFLOAT4X4)};
 		}
 		else
 		{

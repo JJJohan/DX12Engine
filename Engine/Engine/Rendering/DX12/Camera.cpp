@@ -28,7 +28,7 @@ namespace Engine
 
 	Camera::Camera(ID3D12Device* device)
 		: _fov(90.0f)
-		, _pDevice(device)
+		  , _pDevice(device)
 	{
 		Transform.SetPosition(0.0f, 0.0f, -1.0f);
 
@@ -64,7 +64,6 @@ namespace Engine
 
 	Camera::~Camera()
 	{
-		
 	}
 
 	bool Camera::Update()

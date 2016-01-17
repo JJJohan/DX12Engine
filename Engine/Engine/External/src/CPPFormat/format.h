@@ -75,6 +75,7 @@ typedef __int64          intmax_t;
 # include <intrin.h> // _BitScanReverse, _BitScanReverse64
 
 
+
 namespace fmt
 {
 	namespace internal
@@ -184,8 +185,9 @@ namespace fmt
 # endif
 #endif
 
-#if FMT_USE_RVALUE_REFERENCES  
+#if FMT_USE_RVALUE_REFERENCES   
 # include <utility> // for std::move
+
 
 #endif
 
@@ -373,7 +375,7 @@ namespace fmt
 	FMT_GCC_EXTENSION typedef long long LongLong;
 	FMT_GCC_EXTENSION typedef unsigned long long ULongLong;
 
-#if FMT_USE_RVALUE_REFERENCES  
+#if FMT_USE_RVALUE_REFERENCES   
 	using std::move;
 #endif
 
@@ -730,7 +732,7 @@ inline T *make_ptr(T *ptr, std::size_t) { return ptr; }
 				deallocate();
 			}
 
-#if FMT_USE_RVALUE_REFERENCES  
+#if FMT_USE_RVALUE_REFERENCES   
 		private:
 			// Move data from other to this buffer.
 			void move(MemoryBuffer& other)
@@ -2457,7 +2459,7 @@ inline IntFormatSpec<TYPE, AlignTypeSpec<0>, Char> pad( \
 			return MakeValue<BasicFormatter<char>>::type(arg);
 		}
 
-		template <unsigned N, bool/*IsPacked*/ = (N < ArgList::MAX_PACKED_ARGS)>
+		template <unsigned N, bool/*IsPacked*/  = (N < ArgList::MAX_PACKED_ARGS)>
 		struct ArgArray;
 
 		template <unsigned N>
@@ -2484,7 +2486,7 @@ inline IntFormatSpec<TYPE, AlignTypeSpec<0>, Char> pad( \
 			}
 		};
 
-#if FMT_USE_VARIADIC_TEMPLATES  
+#if FMT_USE_VARIADIC_TEMPLATES   
 		template <typename Arg, typename... Args>
 		inline uint64_t make_type(const Arg& first, const Args& ... tail)
 		{
@@ -2558,7 +2560,7 @@ inline uint64_t make_type(FMT_GEN15(FMT_ARG_TYPE_DEFAULT)) {
 # define FMT_ASSIGN_wchar_t(n) \
   arr[n] = fmt::internal::MakeValue< fmt::BasicFormatter<wchar_t> >(v##n)
 
-#if FMT_USE_VARIADIC_TEMPLATES  
+#if FMT_USE_VARIADIC_TEMPLATES   
 	// Defines a variadic function returning void.
 # define FMT_VARIADIC_VOID(func, arg_type) \
   template <typename... Args> \
@@ -3497,7 +3499,7 @@ inline uint64_t make_type(FMT_GEN15(FMT_ARG_TYPE_DEFAULT)) {
 		{
 		}
 
-#if FMT_USE_RVALUE_REFERENCES  
+#if FMT_USE_RVALUE_REFERENCES   
 		/**
 		  \rst
 		  Constructs a :class:`fmt::BasicMemoryWriter` object moving the content
@@ -3952,7 +3954,7 @@ inline uint64_t make_type(FMT_GEN15(FMT_ARG_TYPE_DEFAULT)) {
 #define FMT_ADD_ARG_NAME(type, index) type arg##index
 #define FMT_GET_ARG_NAME(type, index) arg##index
 
-#if FMT_USE_VARIADIC_TEMPLATES  
+#if FMT_USE_VARIADIC_TEMPLATES   
 # define FMT_VARIADIC_(Char, ReturnType, func, call, ...) \
   template <typename... Args> \
   ReturnType func(FMT_FOR_EACH(FMT_ADD_ARG_NAME, __VA_ARGS__), \
@@ -3996,6 +3998,7 @@ inline uint64_t make_type(FMT_GEN15(FMT_ARG_TYPE_DEFAULT)) {
   FMT_WRAP(Char, ReturnType, func, call, 14, __VA_ARGS__) \
   FMT_WRAP(Char, ReturnType, func, call, 15, __VA_ARGS__)
 #endif // FMT_USE_VARIADIC_TEMPLATES
+
 
 
 /**
@@ -4414,7 +4417,7 @@ namespace fmt
 	}
 } // namespace fmt
 
-#if FMT_USE_USER_DEFINED_LITERALS      
+#if FMT_USE_USER_DEFINED_LITERALS       
 namespace fmt
 {
 	namespace internal
@@ -4446,6 +4449,7 @@ namespace fmt
 	} // namespace internal
 } // namespace fmt
 #endif // FMT_USE_USER_DEFINED_LITERALS
+
 
 
 // Restore warnings.

@@ -26,13 +26,13 @@ namespace Engine
 
 		static const Quaternion& Identity;
 
-	private:
-		DirectX::XMVECTOR _dxQuaternion;
-
 		float& X;
 		float& Y;
 		float& Z;
 		float& W;
+
+	private:
+		DirectX::XMVECTOR _dxQuaternion;
 	};
 }
 

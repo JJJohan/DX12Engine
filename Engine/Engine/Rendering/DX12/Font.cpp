@@ -7,10 +7,10 @@ namespace Engine
 {
 	Font::Font()
 		: _pTexture(nullptr)
-		, _topUv(0)
-		, _bottomUv(1)
-		, _widthScale(1)
-		, _heightScale(1)
+		  , _topUv(0)
+		  , _bottomUv(1)
+		  , _widthScale(1)
+		  , _heightScale(1)
 	{
 	}
 

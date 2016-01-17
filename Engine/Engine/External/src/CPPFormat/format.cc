@@ -33,6 +33,7 @@
 #include <cstddef> // for std::ptrdiff_t
 
 
+
 #if defined(_WIN32) && defined(__MINGW32__)
 # include <cstring>
 #endif
@@ -67,7 +68,9 @@ using fmt::internal::Arg;
 # pragma warning(push)
 # pragma warning(disable: 4127) // conditional expression is constant
 
+
 # pragma warning(disable: 4702) // unreachable code
+
 
 // Disable deprecation warning for strerror. The latter is not called but
 // MSVC fails to detect it.
@@ -94,6 +97,7 @@ namespace fmt
 # define FMT_SNPRINTF snprintf
 #else // _MSC_VER
 
+
 		inline int fmt_snprintf(char* buffer, size_t size, const char* format, ...)
 		{
 			va_list args;
@@ -107,11 +111,13 @@ namespace fmt
 #endif // _MSC_VER
 
 
+
 #if defined(_WIN32) && defined(__MINGW32__) && !defined(__NO_ISOCEXT)
 # define FMT_SWPRINTF snwprintf
 #else
 # define FMT_SWPRINTF swprintf
 #endif // defined(_WIN32) && defined(__MINGW32__) && !defined(__NO_ISOCEXT)
+
 
 
 		// Checks if a value fits in int - used to avoid warnings about comparing
@@ -692,6 +698,7 @@ FMT_FUNC void fmt::internal::format_windows_error(
 #endif // FMT_USE_WINDOWS_H
 
 
+
 FMT_FUNC void fmt::internal::format_system_error(
 	fmt::Writer& out, int error_code,
 	fmt::StringRef message) FMT_NOEXCEPT
@@ -1089,6 +1096,7 @@ template int fmt::internal::CharTraits<wchar_t>::format_float(
 	unsigned width, int precision, long double value);
 
 #endif // FMT_HEADER_ONLY
+
 
 
 #ifdef _MSC_VER

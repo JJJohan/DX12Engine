@@ -37,6 +37,7 @@
 #include <wchar.h> // needed for UNICODE functions
 
 
+
 #if defined(FREEIMAGE_LIB)
 	#define DLL_API
 	#define DLL_CALLCONV
@@ -55,6 +56,7 @@
 #define DLL_API __declspec(dllimport)
 #endif // FREEIMAGE_EXPORTS
 
+
 #else 
 // try the gcc visibility support (see http://gcc.gnu.org/wiki/Visibility)
 #if defined(__GNUC__) && ((__GNUC__ >= 4) || (__GNUC__ == 3 && __GNUC_MINOR__ >= 4))
@@ -62,6 +64,7 @@
 				#define GCC_HASCLASSVISIBILITY
 #endif
 #endif // __GNUC__
+
 
 		#define DLL_CALLCONV
 #if defined(GCC_HASCLASSVISIBILITY)
@@ -71,7 +74,9 @@
 #endif 
 #endif // WIN32 / !WIN32
 
+
 #endif // FREEIMAGE_LIB
+
 
 
 // Endianness:
@@ -84,7 +89,9 @@
 		#define FREEIMAGE_BIGENDIAN
 #endif // BYTE_ORDER
 
+
 #endif // !FREEIMAGE_[BIG|LITTLE]ENDIAN
+
 
 
 // Color-Order:
@@ -106,7 +113,9 @@
 #define FREEIMAGE_COLORORDER FREEIMAGE_COLORORDER_BGR
 #endif // FREEIMAGE_BIGENDIAN
 
+
 #endif // FREEIMAGE_COLORORDER
+
 
 
 // Ensure 4-byte enums if we're using Borland C++ compilers
@@ -143,6 +152,7 @@ FI_STRUCT (FIMULTIBITMAP)
 #if defined(__MINGW32__) && defined(_WINDOWS_H)
 #define _WINDOWS_	// prevent a bug in MinGW32
 #endif // __MINGW32__
+
 
 
 #ifndef _WINDOWS_
@@ -186,11 +196,13 @@ typedef unsigned __int64 UINT64;
 #endif // _MSC_VER
 
 
+
 #if (defined(_WIN32) || defined(__WIN32__))
 #pragma pack(push, 1)
 #else
 #pragma pack(1)
 #endif // WIN32
+
 
 
 typedef struct tagRGBQUAD {
@@ -203,6 +215,7 @@ typedef struct tagRGBQUAD {
   BYTE rgbGreen;
   BYTE rgbBlue;
 #endif // FREEIMAGE_COLORORDER
+
 
   BYTE rgbReserved;
 } RGBQUAD;
@@ -218,6 +231,7 @@ typedef struct tagRGBTRIPLE {
   BYTE rgbtBlue;
 #endif // FREEIMAGE_COLORORDER
 
+
 } RGBTRIPLE;
 
 #if (defined(_WIN32) || defined(__WIN32__))
@@ -225,6 +239,7 @@ typedef struct tagRGBTRIPLE {
 #else
 #pragma pack()
 #endif // WIN32
+
 
 
 typedef struct tagBITMAPINFOHEADER{
@@ -249,6 +264,7 @@ typedef struct tagBITMAPINFO {
 #endif // _WINDOWS_
 
 
+
 // Types used in the library (specific to FreeImage) ------------------------
 
 #if (defined(_WIN32) || defined(__WIN32__))
@@ -256,6 +272,7 @@ typedef struct tagBITMAPINFO {
 #else
 #pragma pack(1)
 #endif // WIN32
+
 
 
 /** 48-bit RGB 
@@ -313,6 +330,7 @@ typedef struct tagFICOMPLEX
 #endif // WIN32
 
 
+
 // Indexes for byte arrays, masks and shifts for treating pixels as words ---
 // These coincide with the order of RGBQUAD and RGBTRIPLE -------------------
 
@@ -347,6 +365,7 @@ typedef struct tagFICOMPLEX
 #define FI_RGBA_ALPHA_SHIFT		24
 #endif // FREEIMAGE_COLORORDER
 
+
 #else
 #if FREEIMAGE_COLORORDER == FREEIMAGE_COLORORDER_BGR
 // Big Endian (PPC / none) : BGR(A) order
@@ -378,7 +397,9 @@ typedef struct tagFICOMPLEX
 #define FI_RGBA_ALPHA_SHIFT		0
 #endif // FREEIMAGE_COLORORDER
 
+
 #endif // FREEIMAGE_BIGENDIAN
+
 
 
 #define FI_RGBA_RGB_MASK		(FI_RGBA_RED_MASK|FI_RGBA_GREEN_MASK|FI_RGBA_BLUE_MASK)
@@ -650,6 +671,7 @@ typedef long (DLL_CALLCONV *FI_TellProc)(fi_handle handle);
 #endif // WIN32
 
 
+
 FI_STRUCT(FreeImageIO)
 {
 	FI_ReadProc read_proc; //! pointer to the function used to read data
@@ -665,6 +687,7 @@ FI_STRUCT(FreeImageIO)
 #endif // WIN32
 
 
+
 /**
 Handle to a memory I/O stream
 */
@@ -674,6 +697,7 @@ FI_STRUCT (FIMEMORY)
 };
 
 #endif // FREEIMAGE_IO
+
 
 
 // Plugin routines ----------------------------------------------------------

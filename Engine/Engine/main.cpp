@@ -8,7 +8,6 @@
 #include "Utils/Helpers.h"
 #include "Core/Time.h"
 #include "Utils/Console.h"
-#include "Utils/SystemInfo.h"
 #include "Rendering/DX12/Text.h"
 #include "Rendering/DX12/FontManager.h"
 #include "Rendering/DX12/Font.h"
@@ -24,9 +23,9 @@ public:
 	Game();
 
 	void Start();
-	void Update();
-	void Draw();
-	void Destroy();
+	void Update() const;
+	void Draw() const;
+	void Destroy() const;
 
 	DX12Renderer* Renderer;
 
@@ -46,15 +45,15 @@ private:
 
 Game::Game()
 	: Renderer(nullptr)
-	, _pTriangle(nullptr)
-	, _pTexture(nullptr)
-	, _pMaterial(nullptr)
-	, _pTriangle2(nullptr)
-	, _pTexture2(nullptr)
-	, _pMaterial2(nullptr)
-	, _pText(nullptr)
-	, _pText2(nullptr)
-	, _pFont(nullptr)
+	  , _pTriangle(nullptr)
+	  , _pTexture(nullptr)
+	  , _pMaterial(nullptr)
+	  , _pTriangle2(nullptr)
+	  , _pTexture2(nullptr)
+	  , _pMaterial2(nullptr)
+	  , _pFont(nullptr)
+	  , _pText(nullptr)
+	  , _pText2(nullptr)
 {
 }
 
@@ -62,15 +61,15 @@ void Game::Start()
 {
 	// Create an example triangle object.
 	std::vector<Vertex> triangleVertices =
-	{
-		{ { -0.25f, 0.25f, 0.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.0f, 0.0f } },
-		{ { 0.25f, -0.25f, 0.0f },{ 1.0f, 1.0f, 1.0f, 1.0f },{1.0f, 64.0f } },
-		{ { -0.25f, -0.25f, 0.0f},{ 1.0f, 1.0f, 1.0f, 1.0f },{0.0f, 64.0f } },
+		{
+			{{-0.25f, 0.25f, 0.0f},{1.0f, 1.0f, 1.0f, 1.0f},{0.0f, 0.0f}},
+			{{0.25f, -0.25f, 0.0f},{1.0f, 1.0f, 1.0f, 1.0f},{1.0f, 64.0f}},
+			{{-0.25f, -0.25f, 0.0f},{1.0f, 1.0f, 1.0f, 1.0f},{0.0f, 64.0f}},
 
-		{ { -0.25f, 0.25f, 0.0f },{ 1.0f, 1.0f, 1.0f, 1.0f },{ 0.0f, 0.0f } },
-		{ { 0.25f, 0.25f, 0.0f },{ 1.0f, 1.0f, 1.0f, 1.0f },{ 1.0f, 0.0f } },
-		{ { 0.25f, -0.25f, 0.0f },{ 1.0f, 1.0f, 1.0f, 1.0f },{ 1.0f, 64.0f } }
-	};
+			{{-0.25f, 0.25f, 0.0f},{1.0f, 1.0f, 1.0f, 1.0f},{0.0f, 0.0f}},
+			{{0.25f, 0.25f, 0.0f},{1.0f, 1.0f, 1.0f, 1.0f},{1.0f, 0.0f}},
+			{{0.25f, -0.25f, 0.0f},{1.0f, 1.0f, 1.0f, 1.0f},{1.0f, 64.0f}}
+		};
 
 	VertexBufferInstance* vertexBuffer = ResourceFactory::CreateVertexBufferInstance(VERTEX_POS_UV);
 	vertexBuffer->SetVertices(triangleVertices);
@@ -90,18 +89,18 @@ void Game::Start()
 
 	// Create an example triangle object.
 	std::vector<Vertex> vertices2 =
-	{
-		Vertex(XMFLOAT3(-0.25f, 0.25f, 0.0f), XMFLOAT4(1.0f, 1.0f, 1.0f ,1.0f), XMFLOAT2(0.0f, 0.0f)), // bottom left
-		Vertex(XMFLOAT3(0.25f, -0.25f, 0.0f), XMFLOAT4(1.0f, 1.0f, 1.0f ,1.0f), XMFLOAT2(1.0f, 1.0f)), // top right
-		Vertex(XMFLOAT3(0.25f, 0.25f, 0.0f), XMFLOAT4(1.0f, 1.0f, 1.0f ,1.0f), XMFLOAT2(1.0f, 0.0f)), // bottom right
-		Vertex(XMFLOAT3(-0.25f, -0.25f, 0.0f), XMFLOAT4(1.0f, 1.0f, 1.0f ,1.0f), XMFLOAT2(0.0f, 1.0f)) // top left
-	};
+		{
+			Vertex(XMFLOAT3(-0.25f, 0.25f, 0.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), XMFLOAT2(0.0f, 0.0f)), // bottom left
+			Vertex(XMFLOAT3(0.25f, -0.25f, 0.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), XMFLOAT2(1.0f, 1.0f)), // top right
+			Vertex(XMFLOAT3(0.25f, 0.25f, 0.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), XMFLOAT2(1.0f, 0.0f)), // bottom right
+			Vertex(XMFLOAT3(-0.25f, -0.25f, 0.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), XMFLOAT2(0.0f, 1.0f)) // top left
+		};
 
 	std::vector<int> indices =
-	{
-		1, 0, 2,
-		0, 1, 3
-	};
+		{
+			1, 0, 2,
+			0, 1, 3
+		};
 
 	VertexBufferInstance* vertexBuffer2 = ResourceFactory::CreateVertexBufferInstance(VERTEX_POS_UV);
 	vertexBuffer2->SetVertices(vertices2);
@@ -133,7 +132,7 @@ void Game::Start()
 	_pText2->EnableWorldSpace(true);
 }
 
-void Game::Update()
+void Game::Update() const
 {
 	static float timer = 0.0f;
 	static bool done = false;
@@ -168,7 +167,7 @@ void Game::Update()
 	}
 }
 
-void Game::Draw()
+void Game::Draw() const
 {
 	if (_pTriangle != nullptr)
 	{
@@ -191,7 +190,7 @@ void Game::Draw()
 	}
 }
 
-void Game::Destroy()
+void Game::Destroy() const
 {
 	delete _pMaterial;
 	delete _pTriangle;
@@ -207,9 +206,9 @@ void Game::Destroy()
 }
 
 int WINAPI WinMain(HINSTANCE hInstance,
-	HINSTANCE hPrevInstance,
-	LPSTR lpCmdLine,
-	int nCmdShow)
+                   HINSTANCE hPrevInstance,
+                   LPSTR lpCmdLine,
+                   int nCmdShow)
 {
 #ifdef _DEBUG
 	Engine::Console::InitConsole();
@@ -225,14 +224,14 @@ int WINAPI WinMain(HINSTANCE hInstance,
 	game.Renderer = static_cast<DX12Renderer*>(renderer);
 
 	ENGINE_LINK_DESC engineLink =
-	{
-		std::bind(&Game::Start, &game),
-		std::bind(&Game::Update, &game),
-		std::bind(&Game::Draw, &game),
-		std::bind(&Game::Destroy, &game)
-	};
+		{
+			std::bind(&Game::Start, &game),
+			std::bind(&Game::Update, &game),
+			std::bind(&Game::Draw, &game),
+			std::bind(&Game::Destroy, &game)
+		};
 
-	Engine::Core::Initialise(320, 240, true, engineLink);
+	Engine::Core::Initialise(1024, 768, true, engineLink);
 
 	while (Engine::Core::Running())
 	{

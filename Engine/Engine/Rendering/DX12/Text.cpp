@@ -16,8 +16,8 @@ namespace Engine
 {
 	Text::Text(std::string fontName)
 		: _worldSpace(false)
-		, _textDirty(false)
-		, _colDirty(false)
+		  , _textDirty(false)
+		  , _colDirty(false)
 	{
 		_pFont = FontManager::GetFont(fontName);
 		RegisterTransform();
@@ -25,8 +25,8 @@ namespace Engine
 
 	Text::Text(Font* font)
 		: _worldSpace(false)
-		, _textDirty(false)
-		, _colDirty(false)
+		  , _textDirty(false)
+		  , _colDirty(false)
 	{
 		_pFont = font;
 		RegisterTransform();
@@ -82,7 +82,7 @@ namespace Engine
 			XMStoreFloat4x4(&worldT, world);
 			_pCbuffer->SetMatrix("world", worldT);
 			_pVertexBuffer->SetBufferIndex(_pCbuffer->GetIndex());
-		}		
+		}
 	}
 
 	void Text::SetText(std::string text)
@@ -163,7 +163,7 @@ namespace Engine
 		_pIndexBuffer->SetIndices(indices);
 		_pVertexBuffer->SetVertices(vertices);
 	}
-	
+
 	void Text::SetColour(Colour colour)
 	{
 		_colour = colour;

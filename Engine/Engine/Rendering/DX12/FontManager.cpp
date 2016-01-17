@@ -120,7 +120,7 @@ namespace Engine
 		}
 
 		// Add space.
-		font->_chars[' '] = Font::Letter{ 0.99f, 0.999f, 4 };
+		font->_chars[' '] = Font::Letter{0.99f, 0.999f, 4};
 
 		return true;
 	}

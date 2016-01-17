@@ -29,3 +29,4 @@ namespace Engine
 		friend class ResourceFactory;
 	};
 }
+

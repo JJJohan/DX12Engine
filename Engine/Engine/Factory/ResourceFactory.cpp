@@ -12,7 +12,7 @@ namespace Engine
 	DX12Renderer* ResourceFactory::_pRenderer = nullptr;
 	ID3D12Device* ResourceFactory::_pDevice = nullptr;
 	ID3D12DescriptorHeap* ResourceFactory::_pCbvSrvHeap = nullptr;
-	thread_local ID3D12CommandList* ResourceFactory::_pCommandList = nullptr;	
+	thread_local ID3D12CommandList* ResourceFactory::_pCommandList = nullptr;
 
 	int ResourceFactory::_cbufferIndex = 0;
 	int ResourceFactory::_textureIndex = 0;

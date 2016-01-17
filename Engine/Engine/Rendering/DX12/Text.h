@@ -31,7 +31,7 @@ namespace Engine
 		Vector3 SetPosition(float x, float y, float z) const;
 
 		Vector3 GetPosition(float x, float y, float z) const;
-		Vector3 GetScale(float x, float y, float z) const;	
+		Vector3 GetScale(float x, float y, float z) const;
 
 		bool _worldSpace;
 		std::string _text;

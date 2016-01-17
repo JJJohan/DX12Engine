@@ -1,5 +1,4 @@
 #include <thread>
-#include <sstream>
 #include "CommandQueue.h"
 #include "../../Utils/Logging.h"
 #include "../../Factory/ResourceFactory.h"
@@ -223,3 +222,4 @@ namespace Engine
 		return commandLists;
 	}
 }
+
