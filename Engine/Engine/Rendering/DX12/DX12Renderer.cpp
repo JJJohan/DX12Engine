@@ -7,6 +7,7 @@
 #include "../../Utils/Helpers.h"
 #include "../../Factory/ResourceFactory.h"
 #include "RenderObject.h"
+#include "../../Utils/SystemInfo.h"
 
 namespace Engine
 {
@@ -30,6 +31,7 @@ namespace Engine
 		  , _fenceEvent(nullptr)
 		  , _fence(nullptr)
 		  , _fenceValue(0)
+		  , _resize(false)
 	{
 		_instance = this;
 	}
@@ -79,7 +81,7 @@ namespace Engine
 		}
 
 		// Create a camera
-		_pCamera = Camera::CreateCamera(_device.Get(), XMFLOAT4(0.0f, 0.0f, float(width), float(height)), 90.0f, 0.01f, 100.0f);
+		_pCamera = Camera::CreateCamera(_device.Get(), float(width), float(height), 90.0f, 0.01f, 100.0f);
 
 		return EXIT_SUCCESS;
 	}
@@ -125,6 +127,13 @@ namespace Engine
 		// Present the frame.
 		LOGFAILEDCOMRETURN(_swapChain->Present(_vsync, 0), EXIT_FAILURE);
 
+		// Resize if neccessary.
+		if (_resize)
+		{
+			ResizeRenderer();
+			_resize = false;
+		}
+
 		WaitForPreviousFrame();
 
 		// Clear static upload buffers.
@@ -164,6 +173,12 @@ namespace Engine
 		}
 
 		*ppAdapter = static_cast<IDXGIAdapter3*>(adapter.Detach());
+	}
+
+	void DX12Renderer::Resize(float width, float height)
+	{
+		IRenderer::Resize(width, height);
+		_resize = true;
 	}
 
 	bool DX12Renderer::LoadPipeline()
@@ -213,6 +228,7 @@ namespace Engine
 			_deviceMemoryTotal = adapterInfo.DedicatedMemory;
 			_deviceMemoryFree = (videoMemInfo.Budget - videoMemInfo.CurrentUsage) / 1024 / 1024;
 
+			SystemInfo::PrintSystemInfo();
 			Logging::Log("Creating Direct3D12 device using adapter '" + adapterInfo.Name + "'.");
 		}
 
@@ -385,6 +401,7 @@ namespace Engine
 		_commandList->ClearRenderTargetView(rtvHandle, _clearColour, 0, nullptr);
 
 		// Execute the draw loop function.
+		_commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		_drawLoop();
 
 		// Indicate that the back buffer will now be used to present.
@@ -469,6 +486,40 @@ namespace Engine
 		_renderFinished = true;
 
 		return EXIT_SUCCESS;
+	}
+
+	void DX12Renderer::ResizeRenderer()
+	{
+		_pCamera->Resize(float(_screenWidth), float(_screenHeight));
+		_scissorRect.right = LONG(_screenWidth);
+		_scissorRect.bottom = LONG(_screenHeight);
+
+		for (int i = 0; i < _frameCount; ++i)
+		{
+			_renderTargets[i].Reset();
+		}
+		_rtvHeap.Reset();
+		_swapChain->ResizeBuffers(_frameCount, UINT(_screenWidth), UINT(_screenHeight), DXGI_FORMAT_R8G8B8A8_UNORM, 0);
+
+		// Create descriptor heaps.
+		// Describe and create a render target view (RTV) descriptor heap.
+		D3D12_DESCRIPTOR_HEAP_DESC rtvHeapDesc = {};
+		rtvHeapDesc.NumDescriptors = _frameCount;
+		rtvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
+		rtvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
+		LOGFAILEDCOM(_device->CreateDescriptorHeap(&rtvHeapDesc, IID_PPV_ARGS(&_rtvHeap)));
+
+		// Create frame resources.
+		CD3DX12_CPU_DESCRIPTOR_HANDLE rtvHandle(_rtvHeap->GetCPUDescriptorHandleForHeapStart());
+
+		// Create a RTV for each frame.
+		for (UINT n = 0; n < _frameCount; n++)
+		{
+			LOGFAILEDCOM(_swapChain->GetBuffer(n, IID_PPV_ARGS(&_renderTargets[n])));
+
+			_device->CreateRenderTargetView(_renderTargets[n].Get(), nullptr, rtvHandle);
+			rtvHandle.Offset(1, _rtvDescriptorSize);
+		}
 	}
 }
 

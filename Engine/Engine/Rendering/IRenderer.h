@@ -29,6 +29,8 @@ namespace Engine
 		void AssignCreateMethod(const std::function<void()>& createMethod);
 		void SetFPSLimit(int limit);
 		int GetFPSLimit() const;
+		int ScreenWidth() const;
+		int ScreenHeight() const;
 
 	protected:
 		float _fpsLimit;
@@ -46,6 +48,7 @@ namespace Engine
 		bool _vsync;
 		volatile bool _renderFinished;
 
+		virtual void Resize(float width, float height);
 		std::function<void()> _createMethod;
 		std::function<void()> _drawLoop;
 
@@ -55,6 +58,7 @@ namespace Engine
 
 		static LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 		static HWND _windowClosed;
+		static bool _maximized;
 	};
 }
 

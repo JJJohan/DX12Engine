@@ -2,6 +2,7 @@
 #include "../Utils/Logging.h"
 #include "../Input/Input.h"
 #include <memory>
+#include "Renderer.h"
 
 #ifndef HID_USAGE_PAGE_GENERIC
 #define HID_USAGE_PAGE_GENERIC         ((USHORT) 0x01)
@@ -16,9 +17,11 @@
 namespace Engine
 {
 	HWND IRenderer::_windowClosed = nullptr;
+	bool IRenderer::_maximized = false;
 
 	IRenderer::IRenderer()
-		: _screenWidth(0)
+		: _fpsLimit(-1.0f)
+		  , _screenWidth(0)
 		  , _screenHeight(0)
 		  , _aspectRatio(1.0f)
 		  , _windowed(false)
@@ -28,7 +31,6 @@ namespace Engine
 		  , _deviceMemoryFree(0)
 		  , _vsync(true)
 		  , _renderFinished(true)
-		  , _fpsLimit(-1.0f)
 	{
 		_windowClosed = nullptr;
 		IRenderer::SetClearColour(Colour::Blue);
@@ -93,6 +95,20 @@ namespace Engine
 		case WM_CLOSE:
 			DestroyWindow(hwnd);
 			_windowClosed = hwnd;
+			break;
+
+		case WM_SIZE:
+			Renderer::GetRenderer()->_screenWidth = LOWORD(lParam);
+			Renderer::GetRenderer()->_screenHeight = HIWORD(lParam);
+			if (wParam == SIZE_MAXIMIZED || _maximized)
+			{
+				_maximized = (wParam == SIZE_MAXIMIZED);
+				Renderer::GetRenderer()->Resize(LOWORD(lParam), HIWORD(lParam));
+			}
+			break;
+
+		case WM_EXITSIZEMOVE:
+			Renderer::GetRenderer()->Resize(LOWORD(lParam), HIWORD(lParam));
 			break;
 
 		case WM_INPUT:
@@ -163,6 +179,10 @@ namespace Engine
 		return EXIT_SUCCESS;
 	}
 
+	void IRenderer::Resize(float width, float height)
+	{
+	}
+
 	void IRenderer::SetFPSLimit(int limit)
 	{
 		_fpsLimit = 1.0f / float(limit);
@@ -220,6 +240,17 @@ namespace Engine
 	HWND IRenderer::GetWindowHandle() const
 	{
 		return _windowHandle;
+	}
+
+	int IRenderer::ScreenHeight() const
+	{
+		return _screenHeight;
+	}
+
+
+	int IRenderer::ScreenWidth() const
+	{
+		return _screenWidth;
 	}
 
 	bool IRenderer::RegisterInstance() const

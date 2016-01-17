@@ -30,6 +30,7 @@ namespace Engine
 
 	private:
 		void GetHardwareAdapter(IDXGIFactory2* pFactory, IDXGIAdapter3** ppAdapter);
+		void Resize(float width, float height) override;
 
 		static DX12Renderer* _instance;
 		const static int _frameCount = 2;
@@ -53,6 +54,7 @@ namespace Engine
 		int _rtvDescriptorSize;
 		int _cbvSrvDescriptorSize;
 		bool _useWarpDevice;
+		bool _resize;
 
 		// Synchronization objects
 		UINT _frameIndex;
@@ -66,6 +68,7 @@ namespace Engine
 		bool LoadAssets();
 		void PopulateCommandList() const;
 		bool WaitForPreviousFrame();
+		void ResizeRenderer();
 
 		friend class ResourceFactory;
 	};
