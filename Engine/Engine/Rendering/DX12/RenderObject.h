@@ -16,15 +16,8 @@ namespace Engine
 		RenderObject();
 		virtual ~RenderObject();
 
-		void RenderObject::SetVertexBuffer(VertexBufferInstance* vertexBuffer)
-		{
-			_pVertexBuffer = vertexBuffer;
-		}
-
-		VertexBufferInstance* RenderObject::GetVertexBuffer() const
-		{
-			return _pVertexBuffer;
-		}
+		void RenderObject::SetVertexBuffer(VertexBufferInstance* vertexBuffer);
+		VertexBufferInstance* RenderObject::GetVertexBuffer() const;
 
 		void SetIndexBuffer(IndexBufferInstance* indexBuffer);
 		IndexBufferInstance* GetIndexBuffer() const;
@@ -32,18 +25,19 @@ namespace Engine
 		void SetMaterial(Material* material);
 		Material* GetMaterial() const;
 
-		virtual void Update() const;
-		virtual void Draw() const;
+		virtual void Update();
+		virtual void Draw();
 
 		Transform Transform;
 
-	private:
-		static std::unordered_set<RenderObject*> _renderObjects;
-
+	protected:
 		VertexBufferInstance* _pVertexBuffer;
 		IndexBufferInstance* _pIndexBuffer;
 		ConstantBufferInstance* _pCbuffer;
 		Material* _pMaterial;
+
+	private:
+		static std::unordered_set<RenderObject*> _renderObjects;
 
 		friend class DX12Renderer;
 	};

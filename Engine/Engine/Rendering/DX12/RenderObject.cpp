@@ -32,6 +32,16 @@ namespace Engine
 		delete _pIndexBuffer;
 	}
 
+	void RenderObject::SetVertexBuffer(VertexBufferInstance* vertexBuffer)
+	{
+		_pVertexBuffer = vertexBuffer;
+	}
+
+	VertexBufferInstance* RenderObject::GetVertexBuffer() const
+	{
+		return _pVertexBuffer;
+	}
+
 	void RenderObject::SetIndexBuffer(IndexBufferInstance* indexBuffer)
 	{
 		_pIndexBuffer = indexBuffer;
@@ -52,16 +62,15 @@ namespace Engine
 		return _pMaterial;
 	}
 
-	void RenderObject::Update() const
+	void RenderObject::Update()
 	{
 		Camera::Main()->ApplyTransform(_pCbuffer, Transform);
 		_pVertexBuffer->SetBufferIndex(_pCbuffer->GetIndex());
 	}
 
-	void RenderObject::Draw() const
+	void RenderObject::Draw()
 	{
 		ID3D12GraphicsCommandList* commandList = static_cast<ID3D12GraphicsCommandList*>(ResourceFactory::GetCommandList());
-		commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		_pMaterial->Bind(commandList);
 		_pVertexBuffer->Bind(commandList);
 		_pCbuffer->Bind(commandList);
@@ -69,7 +78,7 @@ namespace Engine
 		if (_pIndexBuffer != nullptr)
 		{
 			_pIndexBuffer->Bind(commandList);
-			commandList->DrawIndexedInstanced(UINT(_pIndexBuffer->Count()), 1, 0, UINT(_pVertexBuffer->GetOffset()), 0);
+			commandList->DrawIndexedInstanced(UINT(_pIndexBuffer->Count()), 1, UINT(_pIndexBuffer->GetOffset()), UINT(_pVertexBuffer->GetOffset()), 0);
 		}
 		else
 		{
