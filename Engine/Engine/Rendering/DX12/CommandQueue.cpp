@@ -5,6 +5,7 @@
 #include "../../Factory/ResourceFactory.h"
 #include "../../Utils/SystemInfo.h"
 
+//#define SINGLE_THREADED
 
 namespace Engine
 {
@@ -12,6 +13,11 @@ namespace Engine
 	std::mutex CommandQueue::_releaseMutex;
 	bool CommandQueue::_releaseRequested = false;
 	std::vector<CommandThread*> CommandQueue::_commandThreads;
+
+#ifdef SINGLE_THREADED
+	ID3D12CommandAllocator* commandAllocator;
+	ID3D12GraphicsCommandList* commandList;
+#endif
 
 	void CommandQueue::Enqueue(const std::function<void()>& task)
 	{
@@ -90,6 +96,28 @@ namespace Engine
 	{
 		std::vector<ID3D12CommandList*> commandLists;
 
+#ifdef SINGLE_THREADED
+		if (commandList == nullptr)
+		{
+			LOGFAILEDCOM(device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&commandAllocator)));
+			LOGFAILEDCOM(device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, commandAllocator, nullptr, IID_PPV_ARGS(&commandList)));
+		}
+		else
+		{
+			commandAllocator->Reset();
+			commandList->Reset(commandAllocator, nullptr);			
+		}
+
+		ResourceFactory::AssignCommandList(commandList);
+		while (!_tasks.empty())
+		{
+			std::function<void()> task = _tasks.front();
+			task();
+			_tasks.pop();
+		}
+		commandList->Close();
+		commandLists.push_back(commandList);
+#else
 		// Cleanup idle threads.
 		bool idleFound = true;
 		while (idleFound)
@@ -99,10 +127,6 @@ namespace Engine
 			{
 				if ((*it)->IdleTimeOut)
 				{
-					std::stringstream ss;
-					ss << " Reduced command threads from " << _commandThreads.size() << " to " << _commandThreads.size() - 1 << ".";
-					Logging::Log(ss.str());
-
 					CommandThread* commandThread = *it;
 					commandThread->Thread.join();
 					commandThread->CommandList->Release();
@@ -195,8 +219,7 @@ namespace Engine
 				_releaseMutex.unlock();
 			}
 		}
-
+#endif
 		return commandLists;
 	}
 }
-
