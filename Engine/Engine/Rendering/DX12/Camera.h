@@ -14,7 +14,7 @@ namespace Engine
 	class Camera
 	{
 	public:
-		static Camera* CreateCamera(ID3D12Device* device, const XMFLOAT4& screenRect, float fovInDegrees, float nearClip, float farClip);
+		static Camera* CreateCamera(ID3D12Device* device, float width, float height, float fovInDegrees, float nearClip, float farClip);
 		static Camera* Main();
 
 		~Camera();
@@ -29,8 +29,7 @@ namespace Engine
 
 		bool Update();
 		void ApplyTransform(ConstantBufferInstance* buffer, const Transform& transform) const;
-		void Resize(const XMFLOAT4& screenRect, float fovInDegrees, float nearClip, float farClip);
-
+		void Resize(float width, float height);
 		Transform Transform;
 
 	private:
@@ -41,7 +40,6 @@ namespace Engine
 		D3D12_VIEWPORT _viewport;
 		float _fov;
 		ID3D12Device* _pDevice;
-		bool _resized;
 
 		XMMATRIX _view;
 		XMMATRIX _projection;

@@ -8,10 +8,13 @@ namespace Engine
 {
 	Camera* Camera::_pMainCamera = nullptr;
 
-	Camera* Camera::CreateCamera(ID3D12Device* device, const XMFLOAT4& screenRect, float fovInDegrees, float nearClip, float farClip)
+	Camera* Camera::CreateCamera(ID3D12Device* device, float width, float height, float fovInDegrees, float nearClip, float farClip)
 	{
 		Camera* camera = new Camera(device);
-		camera->Resize(screenRect, fovInDegrees, nearClip, farClip);
+		camera->_viewport.MinDepth = nearClip;
+		camera->_viewport.MaxDepth = farClip;
+		camera->Resize(width, height);
+		camera->SetFOV(fovInDegrees);
 
 		_pMainCamera = camera;
 
@@ -26,7 +29,6 @@ namespace Engine
 	Camera::Camera(ID3D12Device* device)
 		: _fov(90.0f)
 		, _pDevice(device)
-		, _resized(false)
 	{
 		Transform.SetPosition(0.0f, 0.0f, -1.0f);
 
@@ -69,13 +71,6 @@ namespace Engine
 	{
 		bool transformed = Transform.Moved;
 
-		// Calculate projection matrix
-		if (_resized)
-		{
-			_projection = XMMatrixPerspectiveFovLH(_fov, _viewport.Width / _viewport.Height, _viewport.MinDepth, _viewport.MaxDepth);
-			_resized = false;
-		}
-
 		if (Transform.Moved)
 		{
 			Transform.SetRotation(XMQuaternionNormalize(Transform.GetRotation()));
@@ -91,16 +86,14 @@ namespace Engine
 		return transformed;
 	}
 
-	void Camera::Resize(const XMFLOAT4& screenRect, float fovInDegrees, float nearClip, float farClip)
+	void Camera::Resize(float width, float height)
 	{
-		SetFOV(fovInDegrees);
-		_viewport.TopLeftX = screenRect.x;
-		_viewport.TopLeftY = screenRect.y;
-		_viewport.Width = screenRect.z - screenRect.x;
-		_viewport.Height = screenRect.w - screenRect.y;
-		_viewport.MinDepth = nearClip;
-		_viewport.MaxDepth = farClip;
-		_resized = true;
+		_viewport.TopLeftX = 0.0f;
+		_viewport.TopLeftY = 0.0f;
+		_viewport.Width = width;
+		_viewport.Height = height;
+		_projection = XMMatrixPerspectiveFovLH(_fov, _viewport.Width / _viewport.Height, _viewport.MinDepth, _viewport.MaxDepth);
+		Transform.Moved = true;
 	}
 
 	XMMATRIX Camera::GetViewMatrix() const
@@ -126,6 +119,7 @@ namespace Engine
 	void Camera::SetFOV(float fov)
 	{
 		_fov = XMConvertToRadians(fov);
+		_projection = XMMatrixPerspectiveFovLH(_fov, _viewport.Width / _viewport.Height, _viewport.MinDepth, _viewport.MaxDepth);
 		Transform.Moved = true;
 	}
 
