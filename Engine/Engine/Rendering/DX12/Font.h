@@ -20,12 +20,17 @@ namespace Engine
 			int Width;
 		};
 
+		Letter GetLetter(char letter) const;
 		const std::string& GetName() const;
 
 	private:
 		std::string _name;
 		std::unordered_map<char, Letter> _chars;
 		Texture* _pTexture;
+		float _topUv;
+		float _bottomUv;
+		float _widthScale;
+		float _heightScale;
 
 		friend class Text;
 		friend class FontManager;

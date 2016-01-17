@@ -1,10 +1,11 @@
 #pragma once
 
 #include <unordered_map>
-#include "Font.h"
 
 namespace Engine
 {
+	class Font;
+
 	class FontManager
 	{
 	public:
@@ -12,7 +13,7 @@ namespace Engine
 		static const Font* GetFont(std::string fontName);
 
 	private:
-		static bool LoadLayout(std::string fontFile, std::unordered_map<char, Font::Letter>& characters);
+		static bool LoadLayout(std::string fontFile, Font* font);
 		static std::unordered_map<std::string, Font*> _fonts;
 	};
 }

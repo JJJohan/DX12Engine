@@ -4,6 +4,7 @@
 #include "../../Data/String.h"
 #include "../../Utils/Logging.h"
 #include "../../Factory/ResourceFactory.h"
+#include "Font.h"
 
 namespace Engine
 {
@@ -32,7 +33,7 @@ namespace Engine
 		font->_pTexture = texture;
 
 		// Load the font layout.
-		if (!LoadLayout(fontFile, font->_chars))
+		if (!LoadLayout(fontFile, font))
 		{
 			Logging::LogError("Failed to load layout for font '{0}'.", fontName);
 		}
@@ -54,10 +55,10 @@ namespace Engine
 		return nullptr;
 	}
 
-	bool FontManager::LoadLayout(std::string fontFile, std::unordered_map<char, Font::Letter>& characters)
+	bool FontManager::LoadLayout(std::string fontFile, Font* font)
 	{
 		// Open the file.
-		std::fstream layout = std::fstream(fontFile, std::ios_base::ate);
+		std::ifstream layout = std::ifstream(fontFile, std::ios_base::ate);
 		if (!layout.is_open())
 		{
 			return false;
@@ -76,11 +77,34 @@ namespace Engine
 		delete buffer;
 
 		// Populate character map.
+		bool heightInfo = false;
 		size_t size = lines.size();
 		for (int i = 0; i < size; ++i)
 		{
+			// Ignore comments.
+			if (lines[i][0] == '/' && lines[i][1] == '/')
+			{
+				continue;
+			}
+
 			// Split by spaces.
-			std::vector<String> bits = text.Split(' ');
+			std::vector<String> bits = lines[i].Split('\t');
+
+			// Get height info.
+			if (!heightInfo)
+			{
+				if (bits.size() == 4)
+				{
+					font->_topUv = bits[0].ToFloat();
+					font->_bottomUv = bits[1].ToFloat();
+					font->_widthScale = bits[2].ToFloat();
+					font->_heightScale = bits[3].ToFloat();
+					heightInfo = true;
+					continue;
+				}
+			}
+
+			// Get character info.
 			if (bits.size() != 4)
 			{
 				continue;
@@ -92,8 +116,11 @@ namespace Engine
 			float right = bits[2].ToFloat();
 			int width = bits[3].ToInt();
 
-			characters[letter] = Font::Letter{left, right, width};
+			font->_chars[letter] = Font::Letter{left, right, width};
 		}
+
+		// Add space.
+		font->_chars[' '] = Font::Letter{ 0.99f, 0.999f, 4 };
 
 		return true;
 	}
