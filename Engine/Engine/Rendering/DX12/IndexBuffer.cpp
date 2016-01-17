@@ -1,5 +1,6 @@
 #include "IndexBuffer.h"
 #include "HeapManager.h"
+#include "../../Utils/Logging.h"
 
 namespace Engine
 {
@@ -50,6 +51,11 @@ namespace Engine
 		if (_pBuffer == nullptr)
 		{
 			_pBuffer = BufferBucket::PrepareBuffer<IndexBuffer>(this);
+		}
+		else
+		{
+			IndexBuffer* buffer = static_cast<IndexBuffer*>(_pBuffer);
+			buffer->RequestBuild();
 		}
 	}
 
