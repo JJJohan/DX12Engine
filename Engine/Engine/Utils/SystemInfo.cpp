@@ -142,7 +142,6 @@ namespace Engine
 
 		std::stringstream ss;
 		ss << "CPU: " << _processor.GetName() << "\n";
-		ss << "  Estimated Clock Speed: " << _processor.GetClockSpeed() << "Mhz\n";
 		ss << "  Features: " << _processor.GetFeatures() << "\n";
 		ss << "  Logical Cores: " << _processor.GetLogicalCores();
 		return ss.str();
