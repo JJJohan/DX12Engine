@@ -1,57 +1,42 @@
-cbuffer cameraData : register(b0)
+Texture2D g_texture : register(t0);
+SamplerState g_sampler : register(s0);
+
+cbuffer CBuffer : register(b0)
 {
-	float4x4 view;
-	float4x4 proj;
-	float4x4 vp;
-}
+	float4x4 world[64];
+};
 
 struct VSInput
 {
-	float4 position : POSITION;
-	float4 color: COLOR;
-	float2 tex : TEXCOORD0;
+	float4 pos : POSITION;
+	float4 col: COLOR;
+	float3 uv:  TEXCOORD;
 };
 
 struct PSInput
 {
-	float4 position : SV_POSITION;
-	float4 color: COLOR;
-	float2 tex : TEXCOORD0;
+	float4 pos : SV_POSITION;
+	float4 col : COLOR;
+	float2 uv : TEXCOORD;
 };
 
-Texture2D fontTexture;
-SamplerState SampleType;
-
-PSInput VSMain(VSInput input)
+PSInput VSMain(VSInput i)
 {
-	PSInput output;
+	PSInput o;
 
-	output.position = input.position;
-	output.color = input.color;
-	output.tex = input.tex;
+	i.pos.w = 1.0f;
+	o.pos = i.pos;
+	o.pos = mul(o.pos, world[i.uv.z]);
 
-	return output;
+	o.col = i.col;
+	o.uv = i.uv.xy;
+
+	return o;
 }
 
-float4 PSMain(PSInput input) : SV_TARGET
+float4 PSMain(PSInput i) : SV_TARGET
 {
-	float4 color;
-
-	// Sample the texture pixel at this location.
-	color = fontTexture.Sample(SampleType, input.tex);
-
-	// If the color is black on the texture then treat this pixel as transparent.
-	if (color.r == 0.0f)
-	{
-		color.a = 0.0f;
-	}
-
-	// If the color is other than black on the texture then this is a pixel in the font so draw it using the font pixel color.
-	else
-	{
-		color.a = 1.0f;
-		color = color * input.color;
-	}
-
-	return color;
+	float4 tex = g_texture.Sample(g_sampler, i.uv);
+	tex.a = tex.r;
+	return tex * i.col;
 }

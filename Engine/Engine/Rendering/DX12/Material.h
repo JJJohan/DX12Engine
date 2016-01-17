@@ -15,6 +15,7 @@ namespace Engine
 		ID3DBlob* PixelShader;
 		const void* VertexByteCode;
 		const void* PixelByteCode;
+		bool Alpha;
 	};
 
 	class Texture;
@@ -29,7 +30,7 @@ namespace Engine
 
 		ID3D12PipelineState* GetPipelineState() const;
 
-		void Finalise(std::vector<D3D12_INPUT_ELEMENT_DESC> inputLayout);
+		void Finalise(std::vector<D3D12_INPUT_ELEMENT_DESC> inputLayout, bool alpha = false);
 
 		void Bind(ID3D12GraphicsCommandList* commandList) const;
 		static void ClearPSOHistory();
@@ -44,7 +45,7 @@ namespace Engine
 		static ID3D12PipelineState* _pLastPipelineState;
 		static std::vector<PSOCacheItem> _psoCache;
 
-		static ID3D12PipelineState* GetPSO(const void* vertexByteCode, const void* pixelByteCode);
+		static ID3D12PipelineState* GetPSO(const void* vertexByteCode, const void* pixelByteCode, bool alpha);
 
 		ID3D12PipelineState* _pPipelineState;
 		ID3DBlob* _pVertexShader;
