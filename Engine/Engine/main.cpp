@@ -4,14 +4,17 @@
 #include "Rendering/DX12/Material.h"
 #include "Rendering/DX12/Texture.h"
 #include "Rendering/DX12/RenderObject.h"
-#include "Rendering/DX12/VertexBuffer.h"
-#include "Rendering/DX12/IndexBuffer.h"
 #include "Rendering/DX12/DX12Renderer.h"
-#include "Factory/ResourceFactory.h"
 #include "Utils/Helpers.h"
 #include "Core/Time.h"
 #include "Utils/Console.h"
 #include "Utils/SystemInfo.h"
+#include "Rendering/DX12/Text.h"
+#include "Rendering/DX12/FontManager.h"
+#include "Rendering/DX12/Font.h"
+#include "Rendering/DX12/VertexBuffer.h"
+#include "Rendering/DX12/IndexBuffer.h"
+#include "Factory/ResourceFactory.h"
 
 using namespace Engine;
 
@@ -35,6 +38,10 @@ private:
 	RenderObject* _pTriangle2;
 	Texture* _pTexture2;
 	Material* _pMaterial2;
+
+	Engine::Font* _pFont;
+	Text* _pText;
+	Text* _pText2;
 };
 
 Game::Game()
@@ -45,6 +52,9 @@ Game::Game()
 	, _pTriangle2(nullptr)
 	, _pTexture2(nullptr)
 	, _pMaterial2(nullptr)
+	, _pText(nullptr)
+	, _pText2(nullptr)
+	, _pFont(nullptr)
 {
 }
 
@@ -53,13 +63,13 @@ void Game::Start()
 	// Create an example triangle object.
 	std::vector<Vertex> triangleVertices =
 	{
-		{ { -0.25f, 0.25f, 0.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.0f, 0.0f, 0.0f } },
-		{ { 0.25f, -0.25f, 0.0f },{ 1.0f, 1.0f, 1.0f, 1.0f },{1.0f, 64.0f, 0.0f } },
-		{ { -0.25f, -0.25f, 0.0f},{ 1.0f, 1.0f, 1.0f, 1.0f },{0.0f, 64.0f, 0.0f } },
+		{ { -0.25f, 0.25f, 0.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.0f, 0.0f } },
+		{ { 0.25f, -0.25f, 0.0f },{ 1.0f, 1.0f, 1.0f, 1.0f },{1.0f, 64.0f } },
+		{ { -0.25f, -0.25f, 0.0f},{ 1.0f, 1.0f, 1.0f, 1.0f },{0.0f, 64.0f } },
 
-		{ { -0.25f, 0.25f, 0.0f },{ 1.0f, 1.0f, 1.0f, 1.0f },{ 0.0f, 0.0f, 0.0f } },
-		{ { 0.25f, 0.25f, 0.0f },{ 1.0f, 1.0f, 1.0f, 1.0f },{ 1.0f, 0.0f, 0.0f } },
-		{ { 0.25f, -0.25f, 0.0f },{ 1.0f, 1.0f, 1.0f, 1.0f },{ 1.0f, 64.0f, 0.0f } }
+		{ { -0.25f, 0.25f, 0.0f },{ 1.0f, 1.0f, 1.0f, 1.0f },{ 0.0f, 0.0f } },
+		{ { 0.25f, 0.25f, 0.0f },{ 1.0f, 1.0f, 1.0f, 1.0f },{ 1.0f, 0.0f } },
+		{ { 0.25f, -0.25f, 0.0f },{ 1.0f, 1.0f, 1.0f, 1.0f },{ 1.0f, 64.0f } }
 	};
 
 	VertexBufferInstance* vertexBuffer = ResourceFactory::CreateVertexBufferInstance(VERTEX_POS_UV);
@@ -81,10 +91,10 @@ void Game::Start()
 	// Create an example triangle object.
 	std::vector<Vertex> vertices2 =
 	{
-		Vertex(XMFLOAT3(-0.25f, 0.25f, 0.0f), XMFLOAT4(1.0f, 1.0f, 1.0f ,1.0f), XMFLOAT3(0.0f, 0.0f, 0.0f)), // bottom left
-		Vertex(XMFLOAT3(0.25f, -0.25f, 0.0f), XMFLOAT4(1.0f, 1.0f, 1.0f ,1.0f), XMFLOAT3(1.0f, 1.0f, 0.0f)), // top right
-		Vertex(XMFLOAT3(0.25f, 0.25f, 0.0f), XMFLOAT4(1.0f, 1.0f, 1.0f ,1.0f), XMFLOAT3(1.0f, 0.0f, 0.0f)), // bottom right
-		Vertex(XMFLOAT3(-0.25f, -0.25f, 0.0f), XMFLOAT4(1.0f, 1.0f, 1.0f ,1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f)) // top left
+		Vertex(XMFLOAT3(-0.25f, 0.25f, 0.0f), XMFLOAT4(1.0f, 1.0f, 1.0f ,1.0f), XMFLOAT2(0.0f, 0.0f)), // bottom left
+		Vertex(XMFLOAT3(0.25f, -0.25f, 0.0f), XMFLOAT4(1.0f, 1.0f, 1.0f ,1.0f), XMFLOAT2(1.0f, 1.0f)), // top right
+		Vertex(XMFLOAT3(0.25f, 0.25f, 0.0f), XMFLOAT4(1.0f, 1.0f, 1.0f ,1.0f), XMFLOAT2(1.0f, 0.0f)), // bottom right
+		Vertex(XMFLOAT3(-0.25f, -0.25f, 0.0f), XMFLOAT4(1.0f, 1.0f, 1.0f ,1.0f), XMFLOAT2(0.0f, 1.0f)) // top left
 	};
 
 	std::vector<int> indices =
@@ -112,6 +122,15 @@ void Game::Start()
 	_pTriangle2->SetIndexBuffer(indexBuffer);
 	_pTriangle2->SetVertexBuffer(vertexBuffer2);
 	_pTriangle2->SetMaterial(_pMaterial2);
+
+	_pFont = FontManager::LoadFont("Myriad", GetRelativeFilePath("Textures\\myriad.dds"), GetRelativeFilePath("Textures\\myriad.txt"));
+	_pText = new Text(_pFont);
+	_pText->SetColour(Colour::Yellow);
+	_pText->Transform.SetPosition(0.0f, 0.0f, 0.0f);
+	_pText2 = new Text(_pFont);
+	_pText2->SetText("Hello world!");
+	_pText2->Transform.SetPosition(0.0f, 20.0f, 0.0f);
+	_pText2->EnableWorldSpace(true);
 }
 
 void Game::Update()
@@ -132,7 +151,20 @@ void Game::Update()
 
 	if (_pTriangle2 != nullptr)
 	{
-		_pTriangle2->Transform.SetPosition(cos(timer + sin(timer)), sin(timer), 0.0f);
+		_pTriangle2->Transform.SetPosition(cos(timer), sin(timer), 0.0f);
+	}
+
+	if (_pText != nullptr)
+	{
+		String text = String::Format("The frame rate is: {0} FPS", int(1.0f / Time::GPUTime()));
+		_pText->SetText(text);
+	}
+
+	if (_pText2 != nullptr)
+	{
+		_pText2->Transform.SetPosition(cos(-timer + sin(timer)) / 2, sin(-timer) / 2, 0.0f);
+		_pText2->Transform.Rotate(XMQuaternionRotationRollPitchYaw(0.0f, 0.0f, 100.0f * Time::DeltaTime()));
+		_pText2->Transform.SetScale(1.0f + cos(-timer) / 2, 1.0f + cos(-timer) / 2, 1.0f);
 	}
 }
 
@@ -147,6 +179,16 @@ void Game::Draw()
 	{
 		_pTriangle2->Draw();
 	}
+
+	if (_pText != nullptr)
+	{
+		_pText->Draw();
+	}
+
+	if (_pText2 != nullptr)
+	{
+		_pText2->Draw();
+	}
 }
 
 void Game::Destroy()
@@ -158,6 +200,10 @@ void Game::Destroy()
 	delete _pMaterial2;
 	delete _pTriangle2;
 	delete _pTexture2;
+
+	delete _pFont;
+	delete _pText;
+	delete _pText2;
 }
 
 int WINAPI WinMain(HINSTANCE hInstance,
@@ -171,12 +217,8 @@ int WINAPI WinMain(HINSTANCE hInstance,
 
 	Engine::Logging::Log("Starting engine...\n");
 
-	Engine::SystemInfo::PrintSystemInfo();
-
 	Engine::IRenderer* renderer = Engine::Renderer::CreateRenderer(Engine::RenderAPI::Direct3D12);
-	renderer->SetFPSLimit(300);
-
-	Engine::SystemInfo::PrintSystemInfo();
+	//renderer->SetFPSLimit(300);
 
 	float timer = 0.0f;
 	Game game;
@@ -190,7 +232,7 @@ int WINAPI WinMain(HINSTANCE hInstance,
 		std::bind(&Game::Destroy, &game)
 	};
 
-	Engine::Core::Initialise(1024, 768, true, engineLink);
+	Engine::Core::Initialise(320, 240, true, engineLink);
 
 	while (Engine::Core::Running())
 	{
