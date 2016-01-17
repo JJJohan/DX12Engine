@@ -76,7 +76,7 @@ namespace Engine
 
 		if (_renderer->InitWindow(width, height, windowed) != EXIT_FAILURE)
 		{
-			_renderer->SetClearColour(Engine::Colour::Blue);
+			_renderer->SetClearColour(Colour(0.1f, 0.1f, 0.1f));
 			_renderer->SetVsync(false);
 		}
 
