@@ -130,7 +130,10 @@ namespace Engine
 		std::string item;
 		while (getline(ss, item, delim))
 		{
-			elems.push_back(item);
+			if (!item.empty())
+			{
+				elems.push_back(item);
+			}
 		}
 		return elems;
 	}
