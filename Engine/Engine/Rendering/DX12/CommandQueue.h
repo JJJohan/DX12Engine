@@ -2,8 +2,12 @@
 
 #include <queue>
 #include <functional>
-#include <d3d12.h>
 #include <mutex>
+
+struct ID3D12CommandList;
+struct ID3D12CommandAllocator;
+struct ID3D12Device;
+struct ID3D12GraphicsCommandList;
 
 namespace Engine
 {
@@ -19,7 +23,6 @@ namespace Engine
 		std::function<void()> Task;
 		float IdleTimer;
 		bool IdleTimeOut;
-		std::chrono::steady_clock::time_point LastTime;
 	};
 
 	class CommandQueue
@@ -38,6 +41,9 @@ namespace Engine
 		static std::vector<CommandThread*> _commandThreads;
 		static std::mutex _releaseMutex;
 		static bool _releaseRequested;
+
+		static ID3D12CommandAllocator* _commandAllocator;
+		static ID3D12GraphicsCommandList* _commandList;
 	};
 }
 

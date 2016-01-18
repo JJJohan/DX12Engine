@@ -1,8 +1,10 @@
 #include <thread>
+#include <d3d12.h>
 #include "CommandQueue.h"
 #include "../../Utils/Logging.h"
 #include "../../Factory/ResourceFactory.h"
 #include "../../Utils/SystemInfo.h"
+#include "../../Core/Time.h"
 
 //#define SINGLE_THREADED
 
@@ -12,11 +14,8 @@ namespace Engine
 	std::mutex CommandQueue::_releaseMutex;
 	bool CommandQueue::_releaseRequested = false;
 	std::vector<CommandThread*> CommandQueue::_commandThreads;
-
-#ifdef SINGLE_THREADED
-	ID3D12CommandAllocator* commandAllocator;
-	ID3D12GraphicsCommandList* commandList;
-#endif
+	ID3D12CommandAllocator* CommandQueue::_commandAllocator;
+	ID3D12GraphicsCommandList* CommandQueue::_commandList;
 
 	void CommandQueue::Enqueue(const std::function<void()>& task)
 	{
@@ -28,6 +27,9 @@ namespace Engine
 		_releaseMutex.lock();
 		_releaseRequested = true;
 		_releaseMutex.unlock();
+
+		_commandAllocator->Release();
+		_commandList->Release();
 
 		for (auto it = _commandThreads.begin(); it != _commandThreads.end(); ++it)
 		{
@@ -49,10 +51,7 @@ namespace Engine
 			{
 				if (commandThread->TasksCompleted == 0)
 				{
-					std::chrono::steady_clock::time_point currentTime = std::chrono::high_resolution_clock::now();
-					std::chrono::duration<float> diff = currentTime - commandThread->LastTime;
-					commandThread->IdleTimer += diff.count();
-					if (commandThread->IdleTimer > 2000.0f)
+					if (Time::RunningTime() - commandThread->IdleTimer > 2.0f)
 					{
 						break;
 					}
@@ -67,8 +66,7 @@ namespace Engine
 				commandThread->Available = true;
 				commandThread->Task = nullptr;
 				commandThread->Mutex.unlock();
-				commandThread->IdleTimer = 0.0f;
-				commandThread->LastTime = std::chrono::high_resolution_clock::now();
+				commandThread->IdleTimer = Time::RunningTime();
 			}
 		}
 
@@ -138,14 +136,22 @@ namespace Engine
 			}
 		}
 
+		// Create resources for main thread.
+		if (_commandList == nullptr)
+		{
+			LOGFAILEDCOM(device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&_commandAllocator)));
+			LOGFAILEDCOM(device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, _commandAllocator, nullptr, IID_PPV_ARGS(&_commandList)));
+			_commandList->Close();
+		}
+
 		// Begin work load.
-		int taskCount = int(_tasks.size());
-		while (!_tasks.empty())
+		int taskCount = int(_tasks.size() - 1);
+		while (_tasks.size() > 1)
 		{
 			CommandThread* commandThread = GetAvailableThread();
 			if (commandThread == nullptr)
 			{
-				if (_commandThreads.size() < SystemInfo::GetCPUCores())
+				if (_commandThreads.size() < 2)
 				{
 					std::function<void()> task = _tasks.front();
 					_tasks.pop();
@@ -189,6 +195,16 @@ namespace Engine
 				_releaseMutex.unlock();
 			}
 		}
+
+		// Perform the remaining task on this thread.
+		_commandAllocator->Reset();
+		_commandList->Reset(_commandAllocator, nullptr);
+		ResourceFactory::AssignCommandList(_commandList);
+		std::function<void()> task = _tasks.front();
+		_tasks.pop();
+		task();
+		_commandList->Close();
+		commandLists.push_back(_commandList);
 
 		// Wait for all tasks to complete.
 		int complete = 0;
