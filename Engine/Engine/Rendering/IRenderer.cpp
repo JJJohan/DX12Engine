@@ -20,17 +20,16 @@ namespace Engine
 	bool IRenderer::_maximized = false;
 
 	IRenderer::IRenderer()
-		: _fpsLimit(-1.0f)
-		  , _screenWidth(0)
-		  , _screenHeight(0)
-		  , _aspectRatio(1.0f)
-		  , _windowed(false)
-		  , _windowHandle(nullptr)
-		  , _windowInstance(HINSTANCE(GetModuleHandle(nullptr)))
-		  , _deviceMemoryTotal(0)
-		  , _deviceMemoryFree(0)
-		  , _vsync(true)
-		  , _renderFinished(true)
+		: _screenWidth(0)
+		, _screenHeight(0)
+		, _aspectRatio(1.0f)
+		, _windowed(false)
+		, _windowHandle(nullptr)
+		, _windowInstance(HINSTANCE(GetModuleHandle(nullptr)))
+		, _deviceMemoryTotal(0)
+		, _deviceMemoryFree(0)
+		, _vsync(true)
+		, _renderFinished(true)
 	{
 		_windowClosed = nullptr;
 		IRenderer::SetClearColour(Colour::Blue);
@@ -112,65 +111,65 @@ namespace Engine
 			break;
 
 		case WM_INPUT:
+		{
+			UINT dwSize;
+
+			GetRawInputData(HRAWINPUT(lParam), RID_INPUT, nullptr, &dwSize,
+				sizeof(RAWINPUTHEADER));
+			std::unique_ptr<BYTE[]> lpb(new BYTE[size_t(dwSize)], std::default_delete<BYTE[]>());
+
+			if (GetRawInputData(HRAWINPUT(lParam), RID_INPUT, lpb.get(), &dwSize, sizeof(RAWINPUTHEADER)) != dwSize)
 			{
-				UINT dwSize;
-
-				GetRawInputData(HRAWINPUT(lParam), RID_INPUT, nullptr, &dwSize,
-				                sizeof(RAWINPUTHEADER));
-				std::unique_ptr<BYTE[]> lpb(new BYTE[size_t(dwSize)], std::default_delete<BYTE[]>());
-
-				if (GetRawInputData(HRAWINPUT(lParam), RID_INPUT, lpb.get(), &dwSize, sizeof(RAWINPUTHEADER)) != dwSize)
-				{
-					OutputDebugString(TEXT("GetRawInputData does not return correct size !\n"));
-				}
-
-				RAWINPUT* raw = reinterpret_cast<RAWINPUT*>(lpb.get());
-
-				if (raw->header.dwType == RIM_TYPEKEYBOARD)
-				{
-					if (raw->data.keyboard.Flags == RI_KEY_BREAK)
-					{
-						Input::KeyUpEvent(raw->data.keyboard.VKey);
-					}
-					else if (raw->data.keyboard.Flags == RI_KEY_MAKE)
-					{
-						Input::KeyDownEvent(raw->data.keyboard.VKey);
-					}
-				}
-				else if (raw->header.dwType == RIM_TYPEMOUSE)
-				{
-					// Check if mouse has moved.
-					if (raw->data.mouse.usFlags == MOUSE_MOVE_RELATIVE)
-					{
-						Input::MouseMoveEvent(raw->data.mouse.lLastX, raw->data.mouse.lLastY);
-					}
-
-					// Check if mouse buttons were clicked.
-					switch (raw->data.mouse.usButtonFlags)
-					{
-					case RI_MOUSE_LEFT_BUTTON_DOWN:
-						Input::MouseButtonDownEvent(0);
-						break;
-					case RI_MOUSE_LEFT_BUTTON_UP:
-						Input::MouseButtonUpEvent(0);
-						break;
-					case RI_MOUSE_MIDDLE_BUTTON_DOWN:
-						Input::MouseButtonDownEvent(1);
-						break;
-					case RI_MOUSE_MIDDLE_BUTTON_UP:
-						Input::MouseButtonUpEvent(2);
-						break;
-					case RI_MOUSE_RIGHT_BUTTON_DOWN:
-						Input::MouseButtonDownEvent(2);
-						break;
-					case RI_MOUSE_RIGHT_BUTTON_UP:
-						Input::MouseButtonUpEvent(2);
-						break;
-					}
-				}
-
-				break;
+				OutputDebugString(TEXT("GetRawInputData does not return correct size !\n"));
 			}
+
+			RAWINPUT* raw = reinterpret_cast<RAWINPUT*>(lpb.get());
+
+			if (raw->header.dwType == RIM_TYPEKEYBOARD)
+			{
+				if (raw->data.keyboard.Flags == RI_KEY_BREAK)
+				{
+					Input::KeyUpEvent(raw->data.keyboard.VKey);
+				}
+				else if (raw->data.keyboard.Flags == RI_KEY_MAKE)
+				{
+					Input::KeyDownEvent(raw->data.keyboard.VKey);
+				}
+			}
+			else if (raw->header.dwType == RIM_TYPEMOUSE)
+			{
+				// Check if mouse has moved.
+				if (raw->data.mouse.usFlags == MOUSE_MOVE_RELATIVE)
+				{
+					Input::MouseMoveEvent(raw->data.mouse.lLastX, raw->data.mouse.lLastY);
+				}
+
+				// Check if mouse buttons were clicked.
+				switch (raw->data.mouse.usButtonFlags)
+				{
+				case RI_MOUSE_LEFT_BUTTON_DOWN:
+					Input::MouseButtonDownEvent(0);
+					break;
+				case RI_MOUSE_LEFT_BUTTON_UP:
+					Input::MouseButtonUpEvent(0);
+					break;
+				case RI_MOUSE_MIDDLE_BUTTON_DOWN:
+					Input::MouseButtonDownEvent(1);
+					break;
+				case RI_MOUSE_MIDDLE_BUTTON_UP:
+					Input::MouseButtonUpEvent(2);
+					break;
+				case RI_MOUSE_RIGHT_BUTTON_DOWN:
+					Input::MouseButtonDownEvent(2);
+					break;
+				case RI_MOUSE_RIGHT_BUTTON_UP:
+					Input::MouseButtonUpEvent(2);
+					break;
+				}
+			}
+
+			break;
+		}
 
 		default:
 			return DefWindowProc(hwnd, msg, wParam, lParam);
@@ -181,16 +180,6 @@ namespace Engine
 
 	void IRenderer::Resize(float width, float height)
 	{
-	}
-
-	void IRenderer::SetFPSLimit(int limit)
-	{
-		_fpsLimit = 1.0f / float(limit);
-	}
-
-	int IRenderer::GetFPSLimit() const
-	{
-		return int(1.0f / _fpsLimit);
 	}
 
 	void IRenderer::AssignCreateMethod(const std::function<void()>& createMethod)
@@ -268,11 +257,11 @@ namespace Engine
 		wcx.lpszMenuName = nullptr; // name of menu resource 
 		wcx.lpszClassName = L"EngineProcess"; // name of window class 
 		wcx.hIconSm = HICON(LoadImage(_windowInstance, // small class icon 
-		                              MAKEINTRESOURCE(5),
-		                              IMAGE_ICON,
-		                              GetSystemMetrics(SM_CXSMICON),
-		                              GetSystemMetrics(SM_CYSMICON),
-		                              LR_DEFAULTCOLOR));
+			MAKEINTRESOURCE(5),
+			IMAGE_ICON,
+			GetSystemMetrics(SM_CXSMICON),
+			GetSystemMetrics(SM_CYSMICON),
+			LR_DEFAULTCOLOR));
 
 		return RegisterClassEx(&wcx) != 0;
 	}
