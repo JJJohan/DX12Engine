@@ -62,7 +62,7 @@ namespace Engine
 		Input::RegisterKey(VK_ESCAPE, KeyDown, []
 		                            {
 			                            Exit();
-		                            });
+		                            }, "__exit");
 
 		_renderer = Renderer::GetRenderer();
 		if (_renderer == nullptr)

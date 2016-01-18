@@ -1,4 +1,5 @@
 #include "Input.h"
+#include "../Utils/Logging.h"
 
 namespace Engine
 {
@@ -6,7 +7,9 @@ namespace Engine
 	std::map<int, std::vector<Input::MouseEvent>> Input::_mouseEvents;
 	std::map<int, bool> Input::_activeKeys;
 	std::map<int, bool> Input::_activeMouseButtons;
-	std::vector<std::function<void(long x, long y)>> Input::_mouseMoveEvents;
+	std::map<Input::DeleteType, std::vector<std::string>> Input::_deleteQueue;
+	std::vector<Input::MMoveEvent> Input::_mouseMoveEvents;
+	bool Input::_deletionQueued = false;
 
 	void Input::KeyUpEvent(unsigned short keyCode)
 	{
@@ -40,7 +43,7 @@ namespace Engine
 	{
 		for (auto it = _mouseMoveEvents.begin(); it != _mouseMoveEvents.end(); ++it)
 		{
-			(*it)(deltaX, deltaY);
+			it->Event(deltaX, deltaY);
 		}
 	}
 
@@ -109,13 +112,41 @@ namespace Engine
 				}
 			}
 		}
+
+		// Cleanup
+		if (_deletionQueued)
+		{
+			for (auto it = _deleteQueue[Delete_Key].begin(); it != _deleteQueue[Delete_Key].end(); ++it)
+			{
+				DeleteKey(*it);
+			}
+
+			for (auto it = _deleteQueue[Delete_Mouse].begin(); it != _deleteQueue[Delete_Mouse].end(); ++it)
+			{
+				DeleteMouseButton(*it);
+			}
+
+			for (auto it = _deleteQueue[Delete_MMove].begin(); it != _deleteQueue[Delete_MMove].end(); ++it)
+			{
+				DeleteMouseMoveEvent(*it);
+			}
+
+			_deletionQueued = false;
+		}
 	}
 
-	void Input::RegisterKey(int keyCode, KeyState keyState, const std::function<void()>& event)
+	void Input::RegisterKey(int keyCode, KeyState keyState, const std::function<void()>& event, std::string eventName)
 	{
+		if (KeyEventExists(eventName))
+		{
+			Logging::LogWarning("Tried to register a key event ({0}) which already exists.", eventName);
+			return;
+		}
+
 		KeyEvent keyEvent;
 		keyEvent.Event = event;
 		keyEvent.KeyState = keyState;
+		keyEvent.EventName = eventName;
 
 		auto it = _keyEvents.find(keyCode);
 		if (it == _keyEvents.end())
@@ -126,11 +157,18 @@ namespace Engine
 		_keyEvents[keyCode].push_back(keyEvent);
 	}
 
-	void Input::RegisterMouseButton(int mouseButton, MouseState mouseState, const std::function<void()>& event)
+	void Input::RegisterMouseButton(int mouseButton, MouseState mouseState, const std::function<void()>& event, std::string eventName)
 	{
+		if (MouseEventExists(eventName))
+		{
+			Logging::LogWarning("Tried to register a mouse button event ({0}) which already exists.", eventName);
+			return;
+		}
+
 		MouseEvent mouseEvent;
 		mouseEvent.Event = event;
 		mouseEvent.MouseState = mouseState;
+		mouseEvent.EventName = eventName;
 
 		auto it = _mouseEvents.find(mouseButton);
 		if (it == _mouseEvents.end())
@@ -141,53 +179,169 @@ namespace Engine
 		_mouseEvents[mouseButton].push_back(mouseEvent);
 	}
 
-	void Input::UnregisterMouseButton(int mouseButton, MouseState mouseState, const std::function<void()>& event)
+	void Input::RegisterMouseMoveEvent(const std::function<void(long x, long y)>& event, std::string eventName)
 	{
-		auto it = _mouseEvents.find(mouseButton);
-		if (it != _mouseEvents.end())
+		if (MouseMoveEventExists(eventName))
 		{
-			for (auto eventIter = _mouseEvents[mouseButton].begin(); eventIter != _mouseEvents[mouseButton].end(); ++eventIter)
+			Logging::LogWarning("Tried to register a mouse move event ({0}) which already exists.", eventName);
+			return;
+		}
+
+		MMoveEvent moveEvent;
+		moveEvent.Event = event;
+		moveEvent.EventName = eventName;
+
+		_mouseMoveEvents.push_back(moveEvent);
+	}
+
+	bool Input::KeyEventExists(std::string eventName)
+	{
+		for (auto it = _keyEvents.begin(); it != _keyEvents.end(); ++it)
+		{
+			std::vector<KeyEvent>& events = it->second;
+			for (auto eventIter = events.begin(); eventIter != events.end(); ++eventIter)
 			{
-				if (eventIter->MouseState == mouseButton && eventIter->Event.target<void>() == event.target<void>())
+				if (eventIter->EventName == eventName)
 				{
-					_mouseEvents[mouseButton].erase(eventIter);
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+
+	bool Input::MouseEventExists(std::string eventName)
+	{
+		for (auto it = _mouseEvents.begin(); it != _mouseEvents.end(); ++it)
+		{
+			std::vector<MouseEvent>& events = it->second;
+			for (auto eventIter = events.begin(); eventIter != events.end(); ++eventIter)
+			{
+				if (eventIter->EventName == eventName)
+				{
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+
+	bool Input::MouseMoveEventExists(std::string eventName)
+	{
+		for (auto it = _mouseMoveEvents.begin(); it != _mouseMoveEvents.end(); ++it)
+		{
+			if (it->EventName == eventName)
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	void Input::UnregisterKey(std::string eventName)
+	{
+		for (auto it = _deleteQueue[Delete_Key].begin(); it != _deleteQueue[Delete_Key].end(); ++it)
+		{
+			if (*it == eventName)
+			{
+				Logging::LogWarning("Tried to unregister a key event ({0}) that has already been queued for removal.", eventName);
+				return;
+			}
+		}
+
+		_deleteQueue[Delete_Key].push_back(eventName);
+		_deletionQueued = true;
+	}
+
+	void Input::UnregisterMouseButton(std::string eventName)
+	{
+		for (auto it = _deleteQueue[Delete_Mouse].begin(); it != _deleteQueue[Delete_Mouse].end(); ++it)
+		{
+			if (*it == eventName)
+			{
+				Logging::LogWarning("Tried to unregister a mouse button event ({0}) that has already been queued for removal.", eventName);
+				return;
+			}
+		}
+
+		_deleteQueue[Delete_Mouse].push_back(eventName);
+		_deletionQueued = true;
+	}
+
+	void Input::UnregisterMouseMoveEvent(std::string eventName)
+	{
+		for (auto it = _deleteQueue[Delete_MMove].begin(); it != _deleteQueue[Delete_MMove].end(); ++it)
+		{
+			if (*it == eventName)
+			{
+				Logging::LogWarning("Tried to unregister a mouse move event ({0}) that has already been queued for removal.", eventName);
+				return;
+			}
+		}
+
+		_deleteQueue[Delete_MMove].push_back(eventName);
+		_deletionQueued = true;
+	}
+
+	void Input::DeleteKey(std::string eventName)
+	{
+		for (auto it = _keyEvents.begin(); it != _keyEvents.end(); ++it)
+		{
+			std::vector<KeyEvent>& events = it->second;
+			for (auto eventIter = events.begin(); eventIter != events.end(); ++eventIter)
+			{
+				if (eventIter->EventName == eventName)
+				{
+					events.erase(eventIter);
+					if (events.empty())
+					{
+						_keyEvents.erase(it);
+					}
 					return;
 				}
 			}
 		}
+
+		Logging::LogWarning("Could not find key event named '{0}'.", eventName);
 	}
 
-	void Input::RegisterMouseMoveEvent(const std::function<void(long x, long y)>& event)
+	void Input::DeleteMouseButton(std::string eventName)
 	{
-		_mouseMoveEvents.push_back(event);
+		for (auto it = _mouseEvents.begin(); it != _mouseEvents.end(); ++it)
+		{
+			std::vector<MouseEvent>& events = it->second;
+			for (auto eventIter = events.begin(); eventIter != events.end(); ++eventIter)
+			{
+				if (eventIter->EventName == eventName)
+				{
+					events.erase(eventIter);
+					if (events.empty())
+					{
+						_mouseEvents.erase(it);
+					}
+					return;
+				}
+			}
+		}
+
+		Logging::LogWarning("Could not find mouse button event named '{0}'.", eventName);
 	}
 
-	void Input::UnregisterMouseMoveEvent(const std::function<void(long x, long y)>& event)
+	void Input::DeleteMouseMoveEvent(std::string eventName)
 	{
 		for (auto it = _mouseMoveEvents.begin(); it != _mouseMoveEvents.end(); ++it)
 		{
-			if (it->target<void>() == event.target<void>())
+			if (it->EventName == eventName)
 			{
 				_mouseMoveEvents.erase(it);
 				return;
 			}
 		}
-	}
 
-	void Input::UnregisterKey(int keyCode, KeyState keyState, const std::function<void()>& event)
-	{
-		auto it = _keyEvents.find(keyCode);
-		if (it != _keyEvents.end())
-		{
-			for (auto eventIter = _keyEvents[keyCode].begin(); eventIter != _keyEvents[keyCode].end(); ++eventIter)
-			{
-				if (eventIter->KeyState == keyState && eventIter->Event.target<void>() == event.target<void>())
-				{
-					_keyEvents[keyCode].erase(eventIter);
-					return;
-				}
-			}
-		}
+		Logging::LogWarning("Could not find mouse move event named '{0}'.", eventName);
 	}
 }
 

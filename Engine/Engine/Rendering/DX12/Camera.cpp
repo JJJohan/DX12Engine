@@ -36,34 +36,39 @@ namespace Engine
 		                   {
 			                   float dt = Time::DeltaTime();
 			                   this->Transform.Move(Vector3(0.0f, 0.0f, 1.0f * dt), Local);
-		                   });
+		                   }, "__cameraForward");
 
 		Input::RegisterKey('S', KeyHeld, [&]
 		                   {
 			                   float dt = Time::DeltaTime();
 			                   this->Transform.Move(Vector3(0.0f, 0.0f, -1.0f * dt), Local);
-		                   });
+		                   }, "__cameraBackward");
 
 		Input::RegisterKey('A', KeyHeld, [&]
 		                   {
 			                   float dt = Time::DeltaTime();
 			                   this->Transform.Move(Vector3(-1.0f * dt, 0.0f, 0.0f), Local);
-		                   });
+		                   }, "__cameraLeft");
 
 		Input::RegisterKey('D', KeyHeld, [&]
 		                   {
 			                   float dt = Time::DeltaTime();
 			                   this->Transform.Move(Vector3(1.0f * dt, 0.0f, 0.0f), Local);
-		                   });
+		                   }, "__cameraRight");
 
 		Input::RegisterMouseMoveEvent([&](long x, long y)
 			{
 				this->Transform.Rotate(float(y) / 10, float(x) / 10, 0.0f);
-			});
+			}, "__cameraRotate");
 	}
 
 	Camera::~Camera()
 	{
+		Input::UnregisterKey("__cameraForward");
+		Input::UnregisterKey("__cameraBackward");
+		Input::UnregisterKey("__cameraLeft");
+		Input::UnregisterKey("__cameraRight");
+		Input::UnregisterMouseMoveEvent("__cameraRotate");
 	}
 
 	bool Camera::Update()
