@@ -88,17 +88,6 @@ namespace Engine
 			}
 		}
 		_staticUploadHeaps.clear();
-
-		for (auto it = _dynamicUploadHeaps.begin(); it != _dynamicUploadHeaps.end(); ++it)
-		{
-			HeapResource* heapResource = *it;
-			if (heapResource->_pHeap != nullptr)
-			{
-				heapResource->_pHeap->Release();
-				heapResource->_pHeap = nullptr;
-			}
-		}
-		_dynamicUploadHeaps.clear();
 	}
 
 	void HeapManager::Upload(HeapResource* heap, void* data, enum D3D12_RESOURCE_STATES destState)
@@ -119,21 +108,27 @@ namespace Engine
 			RequestHeap(heap, true);
 		}
 
+		ID3D12GraphicsCommandList* commandList = static_cast<ID3D12GraphicsCommandList*>(ResourceFactory::GetCommandList());
+
 		if (!heap->_dynamic)
 		{
-			ID3D12GraphicsCommandList* commandList = static_cast<ID3D12GraphicsCommandList*>(ResourceFactory::GetCommandList());
-
 			D3D12_SUBRESOURCE_DATA subresourceData = {};
 			subresourceData.pData = data;
 			subresourceData.RowPitch = LONG_PTR(rowPitch);
 			subresourceData.SlicePitch = LONG_PTR(slicePitch);
 
 			UpdateSubresources(commandList, heap->_pResource, heap->_pHeap, 0, 0, 1, &subresourceData);
+
 			commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(heap->_pResource, D3D12_RESOURCE_STATE_COPY_DEST, destState));
 		}
 		else
 		{
-			Logging::LogError("Dynamic heaps not implemented.");
+			UINT8* dest;
+			heap->_pResource = heap->_pHeap;
+			CD3DX12_RANGE readRange(0, 0);
+			LOGFAILEDCOM(heap->_pResource->Map(0, &readRange, reinterpret_cast<void**>(&dest)));
+			memcpy(dest, data, rowPitch);
+			heap->_pHeap->Unmap(0, nullptr);
 		}
 	}
 

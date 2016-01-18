@@ -30,9 +30,9 @@ namespace Engine
 	bool HeapResource::PrepareHeapResource(const D3D12_RESOURCE_DESC& resourceDesc)
 	{
 		bool newHeap = false;
-		if (_pResource == nullptr || _lastHeapSize != _heapSize)
+		if (_pResource == nullptr || _lastHeapSize < _heapSize)
 		{
-			if (_pResource != nullptr && _lastHeapSize != _heapSize)
+			if (_pResource != nullptr && _lastHeapSize < _heapSize)
 			{
 				_pResource->Release();
 			}
@@ -63,12 +63,6 @@ namespace Engine
 
 	void HeapResource::MarkDynamic()
 	{
-		if (_pHeap != nullptr)
-		{
-			Logging::LogError("Tried to mark a heap dynamic when it was already in use.");
-			return;
-		}
-
 		_dynamic = true;
 	}
 
