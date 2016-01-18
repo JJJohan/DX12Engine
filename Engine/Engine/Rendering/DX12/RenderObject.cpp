@@ -66,6 +66,13 @@ namespace Engine
 	{
 		Camera::Main()->ApplyTransform(_pCbuffer, Transform);
 		_pVertexBuffer->SetBufferIndex(_pCbuffer->GetIndex());
+
+		_pVertexBuffer->Unbind();
+		_pCbuffer->Unbind();
+		if (_pIndexBuffer != nullptr)
+		{
+			_pIndexBuffer->Unbind();
+		}
 	}
 
 	void RenderObject::Draw()
