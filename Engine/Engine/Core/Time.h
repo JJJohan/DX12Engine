@@ -1,9 +1,8 @@
 #pragma once
 
-#include <chrono>
-
 namespace Engine
 {
+	class DX12Renderer;
 	class Core;
 
 	class Time
@@ -14,16 +13,20 @@ namespace Engine
 		static float GPUTime();
 
 	private:
+		static void Initialise();
+		static void ResetCPUCounter();
+
 		static void Update();
-		static void UpdateGPU();
+		static void SetGPUDelta(float delta);
 
 		static float _deltaTime;
 		static float _runningTime;
 		static float _gpuTime;
-		static std::chrono::steady_clock::time_point _previousTime;
-		static std::chrono::steady_clock::time_point _previousTimeGPU;
+		static float _frequency;
+		static __int64 _cpuCounter;
 
 		friend Core;
+		friend DX12Renderer;
 	};
 }
 

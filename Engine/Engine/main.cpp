@@ -234,7 +234,6 @@ int WINAPI WinMain(HINSTANCE hInstance,
 	Engine::Logging::Log("Starting engine...\n");
 
 	Engine::IRenderer* renderer = Engine::Renderer::CreateRenderer(Engine::RenderAPI::Direct3D12);
-	//renderer->SetFPSLimit(300);
 
 	float timer = 0.0f;
 	Game game;
@@ -261,9 +260,8 @@ int WINAPI WinMain(HINSTANCE hInstance,
 		timer += Engine::Time::DeltaTime();
 		if (timer > 1.0f)
 		{
-			std::stringstream fps;
-			fps << "Engine - CPU: " << int(1 / Engine::Time::DeltaTime()) << " FPS | GPU: " << int(1 / Engine::Time::GPUTime()) << " FPS";
-			renderer->SetWindowTitle(fps.str());
+			String title = String::Format("Engine - CPU: {0} FPS | GPU: {1} FPS", int(1 / Time::DeltaTime()), int(1 / Time::GPUTime()));
+			renderer->SetWindowTitle(title);
 			timer -= 1.0f;
 		}
 	}

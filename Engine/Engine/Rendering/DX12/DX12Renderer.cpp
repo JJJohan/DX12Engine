@@ -8,6 +8,7 @@
 #include "../../Factory/ResourceFactory.h"
 #include "RenderObject.h"
 #include "../../Utils/SystemInfo.h"
+#include "../../Core/Time.h"
 
 namespace Engine
 {
@@ -93,7 +94,7 @@ namespace Engine
 
 	bool DX12Renderer::Render()
 	{
-		_previousTime = std::chrono::high_resolution_clock::now();
+		//_previousTime = std::chrono::high_resolution_clock::now();
 		_renderFinished = false;
 
 		// Command list allocators can only be reset when the associated 
@@ -168,6 +169,7 @@ namespace Engine
 			// actual device yet.
 			if (SUCCEEDED(D3D12CreateDevice(adapter.Get(), D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(&_device))))
 			{
+				_device->SetStablePowerState(true);
 				break;
 			}
 		}
@@ -453,6 +455,15 @@ namespace Engine
 			return EXIT_FAILURE;
 		}
 
+		// Calculate FPS.
+		UINT64 gpu, cpu, freq;
+		_commandQueue->GetTimestampFrequency(&freq);
+		_commandQueue->GetClockCalibration(&gpu, &cpu);
+		UINT64 fps = freq / (gpu - _gpuTimestep);
+		float fpsInvert = 1.0f / float(fps);
+		Time::SetGPUDelta(fpsInvert);
+		_gpuTimestep = gpu;
+
 		// Signal and increment the fence value.
 		const UINT64 fence = _fenceValue;
 		LOGFAILEDCOMRETURN(
@@ -467,19 +478,6 @@ namespace Engine
 				_fence->SetEventOnCompletion(fence, _fenceEvent),
 				EXIT_FAILURE);
 			WaitForSingleObject(_fenceEvent, INFINITE);
-		}
-
-		// Wait for FPS target if we're rendering too fast.
-		if (_fpsLimit > 0.0f)
-		{
-			std::chrono::steady_clock::time_point currentTime = std::chrono::high_resolution_clock::now();
-			std::chrono::duration<float> diff = currentTime - _previousTime;
-			float time = diff.count();
-			if (time < _fpsLimit)
-			{
-				size_t timeLeft = size_t((_fpsLimit - time) * 1e3f);
-				std::this_thread::sleep_for(std::chrono::milliseconds(timeLeft));
-			}
 		}
 
 		_frameIndex = _swapChain->GetCurrentBackBufferIndex();

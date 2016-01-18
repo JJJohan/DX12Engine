@@ -44,8 +44,6 @@ namespace Engine
 		{
 			if (_renderer->RenderFinished())
 			{
-				Time::UpdateGPU();
-
 				if (_renderer->Render())
 				{
 					_running = false;
@@ -56,6 +54,8 @@ namespace Engine
 
 	void Core::Initialise(int width, int height, bool windowed, ENGINE_LINK_DESC engineLink)
 	{
+		Time::Initialise();
+
 		_updateLoop = engineLink.UpdateLoop;
 		_destroyMethod = engineLink.DestroyMethod;
 

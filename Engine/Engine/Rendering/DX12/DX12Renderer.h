@@ -62,7 +62,7 @@ namespace Engine
 		ComPtr<ID3D12Fence> _fence;
 		UINT64 _fenceValue;
 		std::mutex _syncMutex;
-		std::chrono::steady_clock::time_point _previousTime;
+		UINT64 _gpuTimestep;
 
 		bool LoadPipeline();
 		bool LoadAssets();
