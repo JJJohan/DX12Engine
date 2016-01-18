@@ -76,7 +76,11 @@ namespace Engine
 
 	void IndexBuffer::Bind(ID3D12GraphicsCommandList* commandList)
 	{
-		commandList->IASetIndexBuffer(&_indexBufferView);
+		if (!_bound)
+		{
+			commandList->IASetIndexBuffer(&_indexBufferView);
+			_bound = true;
+		}
 	}
 }
 

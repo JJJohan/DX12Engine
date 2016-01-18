@@ -33,5 +33,10 @@ namespace Engine
 	{
 		return _offset;
 	}
+
+	void BufferInstance::Unbind() const
+	{
+		_pBuffer->Unbind();
+	}
 }
 

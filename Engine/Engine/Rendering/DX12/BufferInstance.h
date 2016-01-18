@@ -16,6 +16,7 @@ namespace Engine
 		void Bind(ID3D12GraphicsCommandList* commandList) const;
 		size_t GetOffset() const;
 		virtual size_t GetSize() const = 0;
+		void Unbind() const;
 
 	protected:
 		BufferBucket* _pBuffer;

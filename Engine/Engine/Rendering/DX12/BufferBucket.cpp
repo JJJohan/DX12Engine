@@ -8,6 +8,7 @@ namespace Engine
 
 	BufferBucket::BufferBucket()
 		: _totalSize(0)
+		, _bound(false)
 	{
 	}
 
@@ -62,6 +63,11 @@ namespace Engine
 	void BufferBucket::RequestBuild()
 	{
 		HeapTask(std::bind(&BufferBucket::Build, this));
+	}
+
+	void BufferBucket::Unbind()
+	{
+		_bound = false;
 	}
 }
 

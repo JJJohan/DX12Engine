@@ -57,7 +57,11 @@ namespace Engine
 
 	void VertexBuffer::Bind(ID3D12GraphicsCommandList* commandList)
 	{
-		commandList->IASetVertexBuffers(0, 1, &_vertexBufferView);
+		if (!_bound)
+		{
+			commandList->IASetVertexBuffers(0, 1, &_vertexBufferView);
+			_bound = true;
+		}	
 	}
 
 	const std::vector<D3D12_INPUT_ELEMENT_DESC>& VertexBufferInstance::GetInputLayout() const

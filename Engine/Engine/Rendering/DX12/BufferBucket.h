@@ -25,11 +25,13 @@ namespace Engine
 		void ReleaseInstance(BufferInstance* instance);
 		void RequestBuild();
 		bool CheckBufferSize(size_t* outSize);
+		void Unbind();
 
 		virtual void Bind(ID3D12GraphicsCommandList* commandList) = 0;
 		virtual void Build() = 0;
 
 		std::set<BufferInstance*> _instances;
+		bool _bound;
 
 	private:
 		static std::unordered_set<BufferBucket*> _buffers;
