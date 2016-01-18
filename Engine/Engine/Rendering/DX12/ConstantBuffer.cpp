@@ -43,7 +43,7 @@ namespace Engine
 
 		// Allocate space and upload to the heap.
 		_heapSize = size_t(offset);
-		PrepareHeapResource();
+		MarkDynamic();
 
 		HeapManager::Upload(this, memory.get(), D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
 
@@ -56,10 +56,11 @@ namespace Engine
 
 	void ConstantBuffer::Bind(ID3D12GraphicsCommandList* commandList)
 	{
-		// Bind the constant buffer.
-		if (_pResource != nullptr)
+		if (!_bound)
 		{
+			// Bind the constant buffer.
 			commandList->SetGraphicsRootDescriptorTable(0, _pDescriptor->GetGPUDescriptorHandleForHeapStart());
+			_bound = true;
 		}
 	}
 
