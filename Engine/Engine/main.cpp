@@ -7,13 +7,16 @@
 #include "Rendering/DX12/DX12Renderer.h"
 #include "Utils/Helpers.h"
 #include "Core/Time.h"
-#include "Utils/Console.h"
+#include "Input/Input.h"
 #include "Rendering/DX12/Text.h"
 #include "Rendering/DX12/FontManager.h"
 #include "Rendering/DX12/Font.h"
 #include "Rendering/DX12/VertexBuffer.h"
 #include "Rendering/DX12/IndexBuffer.h"
 #include "Factory/ResourceFactory.h"
+#if _DEBUG
+#include "Utils/Console.h"
+#endif
 
 using namespace Engine;
 
@@ -30,6 +33,8 @@ public:
 	DX12Renderer* Renderer;
 
 private:
+	void RemoveTriangles();
+
 	RenderObject* _pTriangle;
 	Texture* _pTexture;
 	Material* _pMaterial;
@@ -55,6 +60,16 @@ Game::Game()
 	  , _pText(nullptr)
 	  , _pText2(nullptr)
 {
+}
+
+void Game::RemoveTriangles()
+{
+	delete _pTriangle;
+	delete _pTriangle2;
+	_pTriangle = nullptr;
+	_pTriangle2 = nullptr;
+	Logging::Log("Deleted triangles.");
+	Input::UnregisterKey("deleteTriangles");
 }
 
 void Game::Start()
@@ -86,6 +101,8 @@ void Game::Start()
 	_pTriangle = new RenderObject();
 	_pTriangle->SetVertexBuffer(vertexBuffer);
 	_pTriangle->SetMaterial(_pMaterial);
+
+	Engine::Input::RegisterKey('F', KeyDown, std::bind(&Game::RemoveTriangles, this), "deleteTriangles");
 
 	// Create an example triangle object.
 	std::vector<Vertex> vertices2 =
