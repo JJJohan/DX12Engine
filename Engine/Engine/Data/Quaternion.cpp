@@ -35,7 +35,7 @@ namespace Engine
 		  , Z(_dxQuaternion.m128_f32[2])
 		  , W(_dxQuaternion.m128_f32[3])
 	{
-		_dxQuaternion = XMQuaternionIdentity() * quaternion._dxQuaternion;
+		_dxQuaternion = quaternion._dxQuaternion;
 	}
 
 	Quaternion::Quaternion(const XMVECTOR& quaternion)
