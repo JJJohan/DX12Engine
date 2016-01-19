@@ -77,8 +77,8 @@ namespace Engine
 
 		if (Transform.Moved)
 		{
-			Transform.SetRotation(XMQuaternionNormalize(Transform.GetRotation()));
-			XMVECTOR direction = XMVector3Rotate(Vector3::Forward, Transform.GetRotation());
+			XMVECTOR rotation = Transform.GetRotation();
+			XMVECTOR direction = XMVector3Rotate(Vector3::Forward, rotation);
 
 			// Calculate view matrix
 			_view = XMMatrixLookToLH(Transform.GetPosition(), direction, Vector3::Up);
