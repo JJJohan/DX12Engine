@@ -45,10 +45,13 @@ namespace Engine
 			heapResource->_pHeap = nullptr;
 		}
 
-		if (heapResource->_pResource != nullptr)
+		if (!heapResource->_dynamic)
 		{
-			heapResource->_pResource->Release();
-			heapResource->_pResource = nullptr;
+			if (heapResource->_pResource != nullptr)
+			{
+				heapResource->_pResource->Release();
+				heapResource->_pResource = nullptr;
+			}
 		}
 	}
 
