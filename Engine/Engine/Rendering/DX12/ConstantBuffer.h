@@ -22,17 +22,26 @@ namespace Engine
 	{
 	public:
 		ConstantBuffer();
+		~ConstantBuffer();
 		void Build() override;
 		void Bind(ID3D12GraphicsCommandList* commandList) override;
 
 	private:
 		ID3D12DescriptorHeap* _pDescriptor;
+		char* _pCopyBuffer;
+		size_t _copyBufferSize;
 
 		friend class ConstantBufferInstance;
 	};
 
 	class ConstantBufferInstance : public BufferInstance
 	{
+		struct DataItem
+		{
+			void* Data;
+			size_t Size;
+		};
+
 	public:
 		~ConstantBufferInstance();
 
@@ -40,7 +49,7 @@ namespace Engine
 		void SetInt(std::string name, int value);
 		void SetVector(std::string name, const DirectX::XMFLOAT4& value);
 		void SetMatrix(std::string name, const DirectX::XMFLOAT4X4& value);
-		const char* GetData() const;
+		std::vector<DataItem> GetData() const;
 		size_t GetSize() const override;
 		int GetIndex() const;
 		void SetIndex(int index);
@@ -50,12 +59,6 @@ namespace Engine
 		ConstantBufferInstance(ID3D12DescriptorHeap* descriptorHeap);
 
 		void AssignBuffer();
-
-		struct DataItem
-		{
-			void* Data;
-			size_t Size;
-		};
 
 		int _index;
 		size_t _slotUsage;

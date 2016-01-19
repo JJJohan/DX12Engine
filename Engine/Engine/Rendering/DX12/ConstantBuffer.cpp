@@ -11,7 +11,14 @@ namespace Engine
 {
 	ConstantBuffer::ConstantBuffer()
 		: _pDescriptor(nullptr)
+		, _pCopyBuffer(nullptr)
+		, _copyBufferSize(0)
 	{
+	}
+
+	ConstantBuffer::~ConstantBuffer()
+	{
+		delete[] _pCopyBuffer;
 	}
 
 	void ConstantBuffer::Build()
@@ -22,10 +29,17 @@ namespace Engine
 			return;
 		}
 
+		if (_pCopyBuffer == nullptr || _copyBufferSize < size)
+		{
+			delete[] _pCopyBuffer;
+			_pCopyBuffer = new char[size];
+			_copyBufferSize = size;
+		}
+		ZeroMemory(_pCopyBuffer, _copyBufferSize);
+
 		// Perform memory copy.
 		size_t offset = 0;
 		int index = 0;
-		std::unique_ptr<char> memory(new char[size]);
 		for (auto it = _instances.begin(); it != _instances.end(); ++it)
 		{
 			ConstantBufferInstance* instance = static_cast<ConstantBufferInstance*>(*it);
@@ -35,9 +49,11 @@ namespace Engine
 			}
 			index++;
 
-			const char* data = instance->GetData();
-			memcpy(memory.get() + offset, data, CBUFFER_SLOT_SIZE);
-			delete[] data;
+			std::vector<ConstantBufferInstance::DataItem> data = instance->GetData();
+			for (int i = 0; i < data.size(); ++i)
+			{
+				memcpy(_pCopyBuffer + offset, data[i].Data, data[i].Size);
+			}
 			offset += CBUFFER_SLOT_SIZE;
 		}
 
@@ -45,7 +61,7 @@ namespace Engine
 		_heapSize = size_t(offset);
 		MarkDynamic();
 
-		HeapManager::Upload(this, memory.get(), D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
+		HeapManager::Upload(this, _pCopyBuffer, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
 
 		// Create the resource view.
 		D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc = {};
@@ -204,17 +220,15 @@ namespace Engine
 		AssignBuffer();
 	}
 
-	const char* ConstantBufferInstance::GetData() const
+	std::vector<ConstantBufferInstance::DataItem> ConstantBufferInstance::GetData() const
 	{
 		// Construct temporary buffer
-		char* data = new char[CBUFFER_SLOT_SIZE];
-		ZeroMemory(data, CBUFFER_SLOT_SIZE);
+		std::vector<DataItem> data;
 		size_t offset = 0;
 		for (auto it = _cbuffer.begin(); it != _cbuffer.end(); ++it)
 		{
 			DataItem item = it->second;
-			memcpy(data + offset, item.Data, item.Size);
-			offset += item.Size;
+			data.push_back({ item.Data, item.Size });
 		}
 
 		return data;
