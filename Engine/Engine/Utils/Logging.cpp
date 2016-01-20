@@ -1,11 +1,5 @@
-#include <iostream>
-#include <windows.h>
-#include "Logging.h"
 #include "Win32Utils.h"
 #include "Helpers.h"
-#ifdef _DEBUG
-#include "Console.h"
-#endif
 
 namespace Engine
 {

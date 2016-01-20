@@ -1,4 +1,3 @@
-#include <d3d12.h>
 #include "BufferInstance.h"
 #include "BufferBucket.h"
 

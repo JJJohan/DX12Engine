@@ -1,7 +1,5 @@
-#include <fstream>
 #include "Font.h"
 #include "Texture.h"
-#include "../../Utils/Logging.h"
 
 namespace Engine
 {

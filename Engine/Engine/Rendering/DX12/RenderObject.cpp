@@ -2,7 +2,6 @@
 #include "IndexBuffer.h"
 #include "VertexBuffer.h"
 #include "Material.h"
-#include "../../Factory/ResourceFactory.h"
 #include "Camera.h"
 #include "ConstantBuffer.h"
 

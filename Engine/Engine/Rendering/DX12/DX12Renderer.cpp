@@ -1,14 +1,8 @@
-#include <D3Dcompiler.h>
 #include "DX12Renderer.h"
-#include "d3dx12.h"
 #include "CommandQueue.h"
 #include "Material.h"
 #include "HeapManager.h"
-#include "../../Utils/Helpers.h"
-#include "../../Factory/ResourceFactory.h"
 #include "RenderObject.h"
-#include "../../Utils/SystemInfo.h"
-#include "../../Core/Time.h"
 
 namespace Engine
 {

@@ -1,8 +1,8 @@
 #pragma once
-#include <string>
-#include <d3d12.h>
+
 #include <wrl/client.h>
 #include <vector>
+#include <d3d12.h>
 
 using namespace Microsoft::WRL;
 
@@ -23,21 +23,21 @@ namespace Engine
 	class Material
 	{
 	public:
-		void LoadVertexShader(const std::string& shaderPath, const std::string& entryPoint, const std::string& shaderVersion);
-		void LoadPixelShader(const std::string& shaderPath, const std::string& entryPoint, const std::string& shaderVersion);
+		ENGINE_API void LoadVertexShader(const std::string& shaderPath, const std::string& entryPoint, const std::string& shaderVersion);
+		ENGINE_API void LoadPixelShader(const std::string& shaderPath, const std::string& entryPoint, const std::string& shaderVersion);
 		ID3DBlob* GetVertexShader() const;
 		ID3DBlob* GetPixelShader() const;
 
 		ID3D12PipelineState* GetPipelineState() const;
 
-		void Finalise(std::vector<D3D12_INPUT_ELEMENT_DESC> inputLayout, bool alpha = false);
+		ENGINE_API void Finalise(std::vector<D3D12_INPUT_ELEMENT_DESC> inputLayout, bool alpha = false);
 
 		void Bind(ID3D12GraphicsCommandList* commandList) const;
 		static void ClearPSOHistory();
 		static void ReleasePSOCache();
 
-		void SetTexture(Texture* texture);
-		Texture* GetTexture() const;
+		ENGINE_API void SetTexture(Texture* texture);
+		ENGINE_API Texture* GetTexture() const;
 
 	private:
 		Material();

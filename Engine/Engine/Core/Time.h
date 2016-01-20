@@ -8,9 +8,9 @@ namespace Engine
 	class Time
 	{
 	public:
-		static float DeltaTime();
-		static float RunningTime();
-		static float GPUTime();
+		static ENGINE_API float DeltaTime();
+		static ENGINE_API float RunningTime();
+		static ENGINE_API float GPUTime();
 
 	private:
 		static void Initialise();

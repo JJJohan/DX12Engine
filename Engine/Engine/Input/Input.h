@@ -22,20 +22,20 @@ namespace Engine
 	class Input
 	{
 	public:
-		static void KeyUpEvent(unsigned short keyCode);
-		static void KeyDownEvent(unsigned short keyCode);
+		static ENGINE_API void KeyUpEvent(unsigned short keyCode);
+		static ENGINE_API void KeyDownEvent(unsigned short keyCode);
 
-		static void MouseButtonUpEvent(unsigned short mouseButton);
-		static void MouseButtonDownEvent(unsigned short mouseButton);
-		static void MouseMoveEvent(long deltaX, long deltaY);
+		static ENGINE_API void MouseButtonUpEvent(unsigned short mouseButton);
+		static ENGINE_API void MouseButtonDownEvent(unsigned short mouseButton);
+		static ENGINE_API void MouseMoveEvent(long deltaX, long deltaY);
 
-		static void RegisterKey(int keyCode, KeyState keyState, const std::function<void()>& event, std::string eventName);
-		static void RegisterMouseButton(int mouseButton, MouseState mouseState, const std::function<void()>& event, std::string eventName);
-		static void RegisterMouseMoveEvent(const std::function<void(long x, long y)>& event, std::string eventName);
+		static ENGINE_API void RegisterKey(int keyCode, KeyState keyState, const std::function<void()>& event, std::string eventName);
+		static ENGINE_API void RegisterMouseButton(int mouseButton, MouseState mouseState, const std::function<void()>& event, std::string eventName);
+		static ENGINE_API void RegisterMouseMoveEvent(const std::function<void(long x, long y)>& event, std::string eventName);
 
-		static void UnregisterKey(std::string eventName);
-		static void UnregisterMouseButton(std::string eventName);
-		static void UnregisterMouseMoveEvent(std::string eventName);
+		static ENGINE_API void UnregisterKey(std::string eventName);
+		static ENGINE_API void UnregisterMouseButton(std::string eventName);
+		static ENGINE_API void UnregisterMouseMoveEvent(std::string eventName);
 
 		static void Update();
 

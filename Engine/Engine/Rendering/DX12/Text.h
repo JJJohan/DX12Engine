@@ -1,5 +1,6 @@
 #pragma once
-#include <string>
+
+#include <mutex>
 #include "RenderObject.h"
 #include "../../Data/Colour.h"
 
@@ -10,18 +11,18 @@ namespace Engine
 	class Text : public RenderObject
 	{
 	public:
-		Text(std::string fontName);
-		Text(Font* font);
-		~Text();
+		ENGINE_API Text(std::string fontName);
+		ENGINE_API Text(Font* font);
+		ENGINE_API ~Text();
 
-		void Draw() override;
+		ENGINE_API void Draw() override;
 		void Update() override;
 
-		void SetText(std::string text);
-		std::string GetText() const;
-		void SetColour(Colour colour);
-		const Colour& GetColour() const;
-		void EnableWorldSpace(bool flag);
+		ENGINE_API void SetText(std::string text);
+		ENGINE_API std::string GetText() const;
+		ENGINE_API void SetColour(Colour colour);
+		ENGINE_API const Colour& GetColour() const;
+		ENGINE_API void EnableWorldSpace(bool flag);
 
 	private:
 		void ChangeText();
@@ -39,6 +40,7 @@ namespace Engine
 		Colour _colour;
 		bool _textDirty;
 		bool _colDirty;
+		std::mutex _textChangeMutex;
 	};
 }
 

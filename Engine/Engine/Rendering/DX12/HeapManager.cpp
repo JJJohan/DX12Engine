@@ -1,7 +1,4 @@
 #include "HeapManager.h"
-#include "d3dx12.h"
-#include "../../Utils/Logging.h"
-#include "../../Factory/ResourceFactory.h"
 #include "HeapResource.h"
 
 namespace Engine

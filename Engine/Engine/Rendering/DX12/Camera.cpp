@@ -1,8 +1,5 @@
 #include "Camera.h"
-#include "../../Input/Input.h"
-#include "../../Core/Time.h"
 #include "ConstantBuffer.h"
-#include <sstream>
 
 namespace Engine
 {
@@ -57,9 +54,9 @@ namespace Engine
 		                   }, "__cameraRight");
 
 		Input::RegisterMouseMoveEvent([&](long x, long y)
-			{
-				this->Transform.Rotate(float(y) / 10, float(x) / 10, 0.0f);
-			}, "__cameraRotate");
+		                              {
+			                              this->Transform.Rotate(float(y) / 10, float(x) / 10, 0.0f);
+		                              }, "__cameraRotate");
 	}
 
 	Camera::~Camera()

@@ -2,11 +2,8 @@
 #include "Font.h"
 #include "VertexBuffer.h"
 #include "Material.h"
-#include "../../Data/Colour.h"
 #include "IndexBuffer.h"
 #include "FontManager.h"
-#include "../../Factory/ResourceFactory.h"
-#include "../../Utils/Helpers.h"
 #include "ConstantBuffer.h"
 
 using namespace DirectX;
@@ -89,8 +86,10 @@ namespace Engine
 	{
 		if (!_textDirty && text != _text)
 		{
+			_textChangeMutex.lock();
 			_text = text;
 			_textDirty = true;
+			_textChangeMutex.unlock();
 		}
 	}
 

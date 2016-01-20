@@ -14,7 +14,7 @@ namespace Engine
 	public:
 		~Renderer();
 
-		static IRenderer* CreateRenderer(RenderAPI renderAPI);
+		static ENGINE_API IRenderer* CreateRenderer(RenderAPI renderAPI);
 		static void DestroyRenderer();
 		static bool Render();
 		static bool Update();

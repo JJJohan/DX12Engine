@@ -35,12 +35,12 @@ namespace Engine
 			White = 15
 		};
 
-		static void InitConsole();
-		static void SetColour(ConsoleColour textColour, ConsoleColour backgroundColour = ConsoleColour::Current);
-		static ConsoleColour GetTextColour();
-		static ConsoleColour GetBackgroundColour();
-		static Vector2 GetCursorPos();
-		static void SetCursorPos(int x, int y);
+		static ENGINE_API void InitConsole();
+		static ENGINE_API void SetColour(ConsoleColour textColour, ConsoleColour backgroundColour = ConsoleColour::Current);
+		static ENGINE_API ConsoleColour GetTextColour();
+		static ENGINE_API ConsoleColour GetBackgroundColour();
+		static ENGINE_API Vector2 GetCursorPos();
+		static ENGINE_API void SetCursorPos(int x, int y);
 
 	private:
 		static bool HandlerRoutine(DWORD ctrlType);

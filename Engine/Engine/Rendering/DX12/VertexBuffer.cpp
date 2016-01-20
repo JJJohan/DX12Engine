@@ -1,5 +1,4 @@
 #include "VertexBuffer.h"
-#include "../../Utils/Logging.h"
 #include "HeapManager.h"
 
 namespace Engine
@@ -61,7 +60,7 @@ namespace Engine
 		{
 			commandList->IASetVertexBuffers(0, 1, &_vertexBufferView);
 			_bound = true;
-		}	
+		}
 	}
 
 	const std::vector<D3D12_INPUT_ELEMENT_DESC>& VertexBufferInstance::GetInputLayout() const
@@ -142,6 +141,8 @@ namespace Engine
 			return;
 		}
 
+		bool sameSize = (size == _heapSize);
+
 		// Perform memory copy.
 		size_t offset = 0;
 		size_t totalVertices = 0;
@@ -164,10 +165,13 @@ namespace Engine
 		HeapManager::Upload(this, memory.get(), D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
 
 		// Initialize the vertex buffer view.
-		_vertexBufferView = {};
-		_vertexBufferView.BufferLocation = _pResource->GetGPUVirtualAddress();
-		_vertexBufferView.StrideInBytes = sizeof(Vertex);
-		_vertexBufferView.SizeInBytes = UINT(_heapSize);
+		if (!sameSize)
+		{
+			_vertexBufferView = {};
+			_vertexBufferView.BufferLocation = _pResource->GetGPUVirtualAddress();
+			_vertexBufferView.StrideInBytes = sizeof(Vertex);
+			_vertexBufferView.SizeInBytes = UINT(_heapSize);
+		}
 	}
 }
 

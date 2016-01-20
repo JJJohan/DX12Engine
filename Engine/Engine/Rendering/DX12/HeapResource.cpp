@@ -1,8 +1,6 @@
-#include "HeapResource.h"
-#include "HeapManager.h"
-#include "../../Utils/Logging.h"
 #include "CommandQueue.h"
-#include "d3dx12.h"
+#include "HeapManager.h"
+#include "HeapResource.h"
 
 namespace Engine
 {

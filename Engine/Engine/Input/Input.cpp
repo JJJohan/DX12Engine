@@ -1,6 +1,3 @@
-#include "Input.h"
-#include "../Utils/Logging.h"
-
 namespace Engine
 {
 	std::map<int, std::vector<Input::KeyEvent>> Input::_keyEvents;

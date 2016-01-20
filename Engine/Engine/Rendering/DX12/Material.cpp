@@ -1,7 +1,4 @@
 #include "Material.h"
-#include "../../Utils/Logging.h"
-#include <D3Dcompiler.h>
-#include "d3dx12.h"
 #include "Texture.h"
 
 #ifdef _DEBUG

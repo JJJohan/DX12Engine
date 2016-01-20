@@ -1,14 +1,5 @@
-#include <Windows.h>
 #include <VersionHelpers.h>
-#include <sstream>
-#include "SystemInfo.h"
-#include "Logging.h"
 #include "StringUtils.h"
-#include "..\Data\Vector2.h"
-#include "../Rendering/Renderer.h"
-#ifdef _DEBUG
-#include "Console.h"
-#endif
 
 namespace Engine
 {

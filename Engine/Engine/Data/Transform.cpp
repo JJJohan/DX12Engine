@@ -1,5 +1,3 @@
-#include "Transform.h"
-
 using namespace DirectX;
 
 namespace Engine

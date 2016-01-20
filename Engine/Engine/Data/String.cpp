@@ -1,7 +1,3 @@
-#include <sstream>
-#include <vector>
-#include "String.h"
-
 namespace Engine
 {
 	String::String()

@@ -5,6 +5,7 @@
 #include <dxgi1_5.h>
 #include <wrl/client.h>
 #include "Camera.h"
+#include <d3d12.h>
 #include <mutex>
 
 using namespace Microsoft::WRL;

@@ -21,18 +21,12 @@
  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "format.h"
-
-#include <string.h>
-
 #include <cctype>
 #include <cerrno>
 #include <climits>
 #include <cmath>
 #include <cstdarg>
 #include <cstddef> // for std::ptrdiff_t
-
-
 
 #if defined(_WIN32) && defined(__MINGW32__)
 # include <cstring>
@@ -69,7 +63,9 @@ using fmt::internal::Arg;
 # pragma warning(disable: 4127) // conditional expression is constant
 
 
+
 # pragma warning(disable: 4702) // unreachable code
+
 
 
 // Disable deprecation warning for strerror. The latter is not called but
@@ -96,6 +92,7 @@ namespace fmt
 #ifndef _MSC_VER
 # define FMT_SNPRINTF snprintf
 #else // _MSC_VER
+
 
 
 		inline int fmt_snprintf(char* buffer, size_t size, const char* format, ...)
@@ -541,40 +538,6 @@ int fmt::internal::CharTraits<wchar_t>::format_float(
 		       FMT_SWPRINTF(buffer, size, format, width, value) :
 		       FMT_SWPRINTF(buffer, size, format, width, precision, value);
 }
-
-template <typename T>
-const char fmt::internal::BasicData<T>::DIGITS[] =
-"0001020304050607080910111213141516171819"
-"2021222324252627282930313233343536373839"
-"4041424344454647484950515253545556575859"
-"6061626364656667686970717273747576777879"
-"8081828384858687888990919293949596979899";
-
-#define FMT_POWERS_OF_10(factor) \
-  factor * 10, \
-  factor * 100, \
-  factor * 1000, \
-  factor * 10000, \
-  factor * 100000, \
-  factor * 1000000, \
-  factor * 10000000, \
-  factor * 100000000, \
-  factor * 1000000000
-
-template <typename T>
-const uint32_t fmt::internal::BasicData<T>::POWERS_OF_10_32[] = {
-	0, FMT_POWERS_OF_10(1)
-};
-
-template <typename T>
-const uint64_t fmt::internal::BasicData<T>::POWERS_OF_10_64[] = {
-	0,
-	FMT_POWERS_OF_10(1),
-	FMT_POWERS_OF_10(fmt::ULongLong(1000000000)),
-	// Multiply several constants instead of using a single long long constant
-	// to avoid warnings about C++98 not supporting long long.
-	fmt::ULongLong(1000000000) * fmt::ULongLong(1000000000) * 10
-};
 
 FMT_FUNC void fmt::internal::report_unknown_type(char code, const char* type)
 {

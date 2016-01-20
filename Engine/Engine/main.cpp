@@ -1,22 +1,12 @@
-#include <iostream>
-#include <sstream>
-#include "Core/Core.h"
 #include "Rendering/DX12/Material.h"
 #include "Rendering/DX12/Texture.h"
 #include "Rendering/DX12/RenderObject.h"
 #include "Rendering/DX12/DX12Renderer.h"
-#include "Utils/Helpers.h"
-#include "Core/Time.h"
-#include "Input/Input.h"
 #include "Rendering/DX12/Text.h"
 #include "Rendering/DX12/FontManager.h"
 #include "Rendering/DX12/Font.h"
 #include "Rendering/DX12/VertexBuffer.h"
 #include "Rendering/DX12/IndexBuffer.h"
-#include "Factory/ResourceFactory.h"
-#if _DEBUG
-#include "Utils/Console.h"
-#endif
 
 using namespace Engine;
 

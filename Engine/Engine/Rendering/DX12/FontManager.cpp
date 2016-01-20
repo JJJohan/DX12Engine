@@ -1,9 +1,5 @@
-#include <fstream>
 #include "FontManager.h"
 #include "Texture.h"
-#include "../../Data/String.h"
-#include "../../Utils/Logging.h"
-#include "../../Factory/ResourceFactory.h"
 #include "Font.h"
 
 namespace Engine
@@ -74,7 +70,7 @@ namespace Engine
 		// Split lines.
 		String text = buffer;
 		std::vector<String> lines = text.Split('\n');
-		delete buffer;
+		delete[] buffer;
 
 		// Populate character map.
 		bool heightInfo = false;

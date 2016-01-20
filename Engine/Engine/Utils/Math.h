@@ -4,21 +4,21 @@
 
 namespace Engine
 {
-	inline float min(float a, float b)
+	inline float Min(float a, float b)
 	{
 		// Branchless SSE min.
 		_mm_store_ss(&a, _mm_min_ss(_mm_set_ss(a), _mm_set_ss(b)));
 		return a;
 	}
 
-	inline float max(float a, float b)
+	inline float Max(float a, float b)
 	{
 		// Branchless SSE max.
 		_mm_store_ss(&a, _mm_max_ss(_mm_set_ss(a), _mm_set_ss(b)));
 		return a;
 	}
 
-	inline float clamp(float val, float minval, float maxval)
+	inline float Clamp(float val, float minval, float maxval)
 	{
 		// Branchless SSE clamp.
 		// return minss( maxss(val,minval), maxval );

@@ -1,10 +1,6 @@
-#include <memory>
 #include "Texture.h"
-#include "d3dx12.h"
 #include "HeapManager.h"
-#include "../../Utils/Logging.h"
 #include "../../External/src/FreeImage/FreeImage.h"
-#include "../../Factory/ResourceFactory.h"
 
 namespace Engine
 {

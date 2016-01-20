@@ -11,37 +11,37 @@ namespace Engine
 	class Colour
 	{
 	public:
-		Colour();
-		Colour(float r, float g, float b, float a = 1.0f);
+		ENGINE_API Colour();
+		ENGINE_API Colour(float r, float g, float b, float a = 1.0f);
 
-		Colour operator*(const Colour& rhs) const;
-		Colour operator+(const Colour& rhs) const;
-		Colour operator-(const Colour& rhs) const;
+		ENGINE_API Colour operator*(const Colour& rhs) const;
+		ENGINE_API Colour operator+(const Colour& rhs) const;
+		ENGINE_API Colour operator-(const Colour& rhs) const;
 
-		Colour& operator*=(const Colour& rhs);
-		Colour& operator+=(const Colour& rhs);
-		Colour& operator-=(const Colour& rhs);
+		ENGINE_API Colour& operator*=(const Colour& rhs);
+		ENGINE_API Colour& operator+=(const Colour& rhs);
+		ENGINE_API Colour& operator-=(const Colour& rhs);
 
-		float const& GetRed() const;
-		float const& GetGreen() const;
-		float const& GetBlue() const;
-		float const& GetAlpha() const;
-		void SetRed(float const& value);
-		void SetGreen(float const& value);
-		void SetBlue(float const& value);
-		void SetAlpha(float const& value);
+		ENGINE_API float const& GetRed() const;
+		ENGINE_API float const& GetGreen() const;
+		ENGINE_API float const& GetBlue() const;
+		ENGINE_API float const& GetAlpha() const;
+		ENGINE_API void SetRed(float const& value);
+		ENGINE_API void SetGreen(float const& value);
+		ENGINE_API void SetBlue(float const& value);
+		ENGINE_API void SetAlpha(float const& value);
 
-		operator DirectX::XMFLOAT3() const;
-		operator DirectX::XMFLOAT4() const;
+		ENGINE_API operator DirectX::XMFLOAT3() const;
+		ENGINE_API operator DirectX::XMFLOAT4() const;
 
-		const static Colour Clear;
-		const static Colour White;
-		const static Colour Red;
-		const static Colour Green;
-		const static Colour Blue;
-		const static Colour Yellow;
-		const static Colour Pink;
-		const static Colour Black;
+		const static ENGINE_API Colour Clear;
+		const static ENGINE_API Colour White;
+		const static ENGINE_API Colour Red;
+		const static ENGINE_API Colour Green;
+		const static ENGINE_API Colour Blue;
+		const static ENGINE_API Colour Yellow;
+		const static ENGINE_API Colour Pink;
+		const static ENGINE_API Colour Black;
 
 	private:
 		float _red;

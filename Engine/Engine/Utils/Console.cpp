@@ -1,12 +1,6 @@
-#include <windows.h>
 #include <stdio.h>
 #include <fcntl.h>
 #include <io.h>
-#include <iostream>
-#include "Console.h"
-#include "Logging.h"
-#include "..\Core\Core.h"
-#include "..\Data\Vector2.h"
 
 namespace Engine
 {

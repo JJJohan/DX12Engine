@@ -1,6 +1,3 @@
-#include "Vector3.h"
-#include "Vector2.h"
-
 using namespace DirectX;
 
 namespace Engine

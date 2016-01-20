@@ -1,8 +1,7 @@
 #pragma once
 
 #include <comdef.h>
-#include "Logging.h"
-#include "../Core/Core.h"
+#include "Core/Core.h"
 
 static bool Failed(HRESULT task)
 {

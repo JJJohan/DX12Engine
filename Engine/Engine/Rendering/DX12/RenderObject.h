@@ -13,20 +13,20 @@ namespace Engine
 	class RenderObject
 	{
 	public:
-		RenderObject();
-		virtual ~RenderObject();
+		ENGINE_API RenderObject();
+		ENGINE_API virtual ~RenderObject();
 
-		void RenderObject::SetVertexBuffer(VertexBufferInstance* vertexBuffer);
-		VertexBufferInstance* RenderObject::GetVertexBuffer() const;
+		ENGINE_API void RenderObject::SetVertexBuffer(VertexBufferInstance* vertexBuffer);
+		ENGINE_API VertexBufferInstance* RenderObject::GetVertexBuffer() const;
 
-		void SetIndexBuffer(IndexBufferInstance* indexBuffer);
-		IndexBufferInstance* GetIndexBuffer() const;
+		ENGINE_API void SetIndexBuffer(IndexBufferInstance* indexBuffer);
+		ENGINE_API IndexBufferInstance* GetIndexBuffer() const;
 
-		void SetMaterial(Material* material);
-		Material* GetMaterial() const;
+		ENGINE_API void SetMaterial(Material* material);
+		ENGINE_API Material* GetMaterial() const;
 
 		virtual void Update();
-		virtual void Draw();
+		ENGINE_API virtual void Draw();
 
 		Transform Transform;
 

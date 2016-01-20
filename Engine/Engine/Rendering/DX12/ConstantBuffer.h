@@ -2,7 +2,6 @@
 
 #define CBUFFER_SLOT_SIZE 64
 
-#include <map>
 #include "BufferBucket.h"
 #include "BufferInstance.h"
 
@@ -13,6 +12,7 @@ namespace DirectX
 }
 
 struct ID3D12GraphicsCommandList;
+struct ID3D12DescriptorHeap;
 
 namespace Engine
 {
@@ -43,7 +43,7 @@ namespace Engine
 		};
 
 	public:
-		~ConstantBufferInstance();
+		ENGINE_API ~ConstantBufferInstance();
 
 		void SetFloat(std::string name, float value);
 		void SetInt(std::string name, int value);

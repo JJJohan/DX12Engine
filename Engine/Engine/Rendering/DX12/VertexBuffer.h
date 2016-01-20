@@ -1,8 +1,5 @@
 #pragma once
 
-#include <vector>
-#include <d3d12.h>
-#include <DirectXMath.h>
 #include "BufferBucket.h"
 #include "BufferInstance.h"
 
@@ -52,12 +49,12 @@ namespace Engine
 	class VertexBufferInstance : public BufferInstance
 	{
 	public:
-		VertexBufferInstance();
+		ENGINE_API VertexBufferInstance();
 
-		void SetVertices(std::vector<Vertex> vertices);
-		std::vector<Vertex> GetVertices() const;
+		ENGINE_API void SetVertices(std::vector<Vertex> vertices);
+		ENGINE_API std::vector<Vertex> GetVertices() const;
 
-		const std::vector<D3D12_INPUT_ELEMENT_DESC>& GetInputLayout() const;
+		ENGINE_API const std::vector<D3D12_INPUT_ELEMENT_DESC>& GetInputLayout() const;
 		size_t Count() const;
 		size_t GetSize() const override;
 

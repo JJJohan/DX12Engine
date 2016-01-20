@@ -1,7 +1,5 @@
 #pragma once
 
-#include <vector>
-#include <d3d12.h>
 #include "BufferBucket.h"
 #include "BufferInstance.h"
 
@@ -26,8 +24,8 @@ namespace Engine
 	class IndexBufferInstance : public BufferInstance
 	{
 	public:
-		void SetIndices(std::vector<int> indices);
-		std::vector<int> GetIndices() const;
+		ENGINE_API void SetIndices(std::vector<int> indices);
+		ENGINE_API std::vector<int> GetIndices() const;
 
 		size_t Count() const;
 		size_t GetSize() const override;

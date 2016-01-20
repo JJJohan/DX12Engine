@@ -1,7 +1,4 @@
 #include "FeatureSupport.h"
-#include "../../Utils/Logging.h"
-#include <vector>
-
 
 namespace Engine
 {

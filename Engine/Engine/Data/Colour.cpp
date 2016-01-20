@@ -1,6 +1,4 @@
-#include "Colour.h"
 #include "..\Utils\Math.h"
-#include <DirectXMath.h>
 
 namespace Engine
 {
@@ -31,26 +29,26 @@ namespace Engine
 
 	Colour Colour::operator*(const Colour& rhs) const
 	{
-		return Colour(clamp(_red * rhs._red, 0.0f, 1.0f),
-		              clamp(_green * rhs._green, 0.0f, 1.0f),
-		              clamp(_blue * rhs._blue, 0.0f, 1.0f),
-		              clamp(_alpha * rhs._alpha, 0.0f, 1.0f));
+		return Colour(Clamp(_red * rhs._red, 0.0f, 1.0f),
+		              Clamp(_green * rhs._green, 0.0f, 1.0f),
+		              Clamp(_blue * rhs._blue, 0.0f, 1.0f),
+		              Clamp(_alpha * rhs._alpha, 0.0f, 1.0f));
 	}
 
 	Colour Colour::operator+(const Colour& rhs) const
 	{
-		return Colour(clamp(_red + rhs._red, 0.0f, 1.0f),
-		              clamp(_green + rhs._green, 0.0f, 1.0f),
-		              clamp(_blue + rhs._blue, 0.0f, 1.0f),
-		              clamp(_alpha + rhs._alpha, 0.0f, 1.0f));
+		return Colour(Clamp(_red + rhs._red, 0.0f, 1.0f),
+		              Clamp(_green + rhs._green, 0.0f, 1.0f),
+		              Clamp(_blue + rhs._blue, 0.0f, 1.0f),
+		              Clamp(_alpha + rhs._alpha, 0.0f, 1.0f));
 	}
 
 	Colour Colour::operator-(const Colour& rhs) const
 	{
-		return Colour(clamp(_red - rhs._red, 0.0f, 1.0f),
-		              clamp(_green - rhs._green, 0.0f, 1.0f),
-		              clamp(_blue - rhs._blue, 0.0f, 1.0f),
-		              clamp(_alpha - rhs._alpha, 0.0f, 1.0f));
+		return Colour(Clamp(_red - rhs._red, 0.0f, 1.0f),
+		              Clamp(_green - rhs._green, 0.0f, 1.0f),
+		              Clamp(_blue - rhs._blue, 0.0f, 1.0f),
+		              Clamp(_alpha - rhs._alpha, 0.0f, 1.0f));
 	}
 
 	Colour& Colour::operator*=(const Colour& rhs)
@@ -105,17 +103,17 @@ namespace Engine
 
 	void Colour::SetRed(float const& value)
 	{
-		_red = clamp(value, 0.0f, 1.0f);
+		_red = Clamp(value, 0.0f, 1.0f);
 	}
 
 	void Colour::SetGreen(float const& value)
 	{
-		_green = clamp(value, 0.0f, 1.0f);
+		_green = Clamp(value, 0.0f, 1.0f);
 	}
 
 	void Colour::SetBlue(float const& value)
 	{
-		_blue = clamp(value, 0.0f, 1.0f);
+		_blue = Clamp(value, 0.0f, 1.0f);
 	}
 
 	Colour::operator DirectX::XMFLOAT3() const
@@ -130,7 +128,7 @@ namespace Engine
 
 	void Colour::SetAlpha(float const& value)
 	{
-		_alpha = clamp(value, 0.0f, 1.0f);
+		_alpha = Clamp(value, 0.0f, 1.0f);
 	}
 }
 

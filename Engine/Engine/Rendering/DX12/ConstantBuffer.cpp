@@ -1,8 +1,3 @@
-#include <DirectXMath.h>
-#include <d3d12.h>
-#include <vector>
-#include <memory>
-#include "../../Utils/Logging.h"
 #include "ConstantBuffer.h"
 #include "HeapManager.h"
 #include "VertexBuffer.h"
@@ -11,8 +6,8 @@ namespace Engine
 {
 	ConstantBuffer::ConstantBuffer()
 		: _pDescriptor(nullptr)
-		, _pCopyBuffer(nullptr)
-		, _copyBufferSize(0)
+		  , _pCopyBuffer(nullptr)
+		  , _copyBufferSize(0)
 	{
 	}
 
@@ -36,6 +31,7 @@ namespace Engine
 			_copyBufferSize = size;
 		}
 		ZeroMemory(_pCopyBuffer, _copyBufferSize);
+		bool sameSize = (size == _heapSize);
 
 		// Perform memory copy.
 		size_t offset = 0;
@@ -64,10 +60,13 @@ namespace Engine
 		HeapManager::Upload(this, _pCopyBuffer, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
 
 		// Create the resource view.
-		D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc = {};
-		cbvDesc.BufferLocation = _pResource->GetGPUVirtualAddress();
-		cbvDesc.SizeInBytes = (_heapSize + 255) & ~255;
-		_pDevice->CreateConstantBufferView(&cbvDesc, _pDescriptor->GetCPUDescriptorHandleForHeapStart());
+		if (!sameSize)
+		{
+			D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc = {};
+			cbvDesc.BufferLocation = _pResource->GetGPUVirtualAddress();
+			cbvDesc.SizeInBytes = (_heapSize + 255) & ~255;
+			_pDevice->CreateConstantBufferView(&cbvDesc, _pDescriptor->GetCPUDescriptorHandleForHeapStart());
+		}
 	}
 
 	void ConstantBuffer::Bind(ID3D12GraphicsCommandList* commandList)
@@ -224,11 +223,10 @@ namespace Engine
 	{
 		// Construct temporary buffer
 		std::vector<DataItem> data;
-		size_t offset = 0;
 		for (auto it = _cbuffer.begin(); it != _cbuffer.end(); ++it)
 		{
 			DataItem item = it->second;
-			data.push_back({ item.Data, item.Size });
+			data.push_back({item.Data, item.Size});
 		}
 
 		return data;

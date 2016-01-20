@@ -16,16 +16,16 @@ namespace Engine
 	class Core
 	{
 	public:
-		static bool Update();
-		static void Render();
-
-		static std::string GetApplicationDirectory();
-		static bool Running();
-		static void Exit();
-		static void Destroy();
-		static void Initialise(int width, int height, bool windowed, ENGINE_LINK_DESC engineLink);
+		static ENGINE_API bool Update();
+		static ENGINE_API std::string GetApplicationDirectory();
+		static ENGINE_API bool Running();
+		static ENGINE_API void Exit();
+		static ENGINE_API void Destroy();
+		static ENGINE_API void Initialise(int width, int height, bool windowed, ENGINE_LINK_DESC engineLink);
 
 	private:
+		static void Render();
+
 		static std::thread _renderThread;
 		static bool _renderThreadAssigned;
 		static bool _running;

@@ -3,8 +3,6 @@
 #include "CommandQueue.h"
 #include "../../Utils/Logging.h"
 #include "../../Factory/ResourceFactory.h"
-#include "../../Utils/SystemInfo.h"
-#include "../../Core/Time.h"
 
 //#define SINGLE_THREADED
 
@@ -12,7 +10,7 @@ namespace Engine
 {
 	std::queue<std::function<void()>> CommandQueue::_tasks;
 	std::mutex CommandQueue::_releaseMutex;
-	bool CommandQueue::_releaseRequested = false;
+	volatile bool CommandQueue::_releaseRequested = false;
 	std::vector<CommandThread*> CommandQueue::_commandThreads;
 	ID3D12CommandAllocator* CommandQueue::_commandAllocator;
 	ID3D12GraphicsCommandList* CommandQueue::_commandList;
@@ -34,6 +32,7 @@ namespace Engine
 		for (auto it = _commandThreads.begin(); it != _commandThreads.end(); ++it)
 		{
 			CommandThread* commandThread = *it;
+			commandThread->WaitCondition.notify_one();
 			commandThread->Thread.join();
 			commandThread->CommandList->Release();
 			commandThread->CommandAllocator->Release();
@@ -47,32 +46,26 @@ namespace Engine
 
 		while (!_releaseRequested)
 		{
-			if (commandThread->Available)
+			// Wait until work is available.
+			std::unique_lock<std::mutex> waitLock(commandThread->WaitMutex);
+			if (!commandThread->Waiting)
 			{
-				if (commandThread->TasksCompleted == 0)
-				{
-					if (Time::RunningTime() - commandThread->IdleTimer > 2.0f)
-					{
-						break;
-					}
-				}
+				std::lock_guard<std::mutex> lock(commandThread->LockMutex);
+				commandThread->Waiting = true;
 			}
-			else
+			commandThread->WaitCondition.wait(waitLock, [&] {return !commandThread->Available || _releaseRequested; });
+			if (_releaseRequested)
 			{
-				commandThread->Task();
+				return;
+			}
 
-				commandThread->Mutex.lock();
-				++commandThread->TasksCompleted;
-				commandThread->Available = true;
-				commandThread->Task = nullptr;
-				commandThread->Mutex.unlock();
-				commandThread->IdleTimer = Time::RunningTime();
-			}
+			commandThread->Task();
+
+			std::lock_guard<std::mutex> lock(commandThread->LockMutex);
+			++commandThread->TasksCompleted;
+			commandThread->Available = true;
+			commandThread->Task = nullptr;
 		}
-
-		commandThread->Mutex.lock();
-		commandThread->IdleTimeOut = true;
-		commandThread->Mutex.unlock();
 	}
 
 	CommandThread* CommandQueue::GetAvailableThread()
@@ -94,48 +87,27 @@ namespace Engine
 		std::vector<ID3D12CommandList*> commandLists;
 
 #ifdef SINGLE_THREADED
-		if (commandList == nullptr)
+		if (_commandList == nullptr)
 		{
-			LOGFAILEDCOM(device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&commandAllocator)));
-			LOGFAILEDCOM(device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, commandAllocator, nullptr, IID_PPV_ARGS(&commandList)));
+			LOGFAILEDCOM(device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&_commandAllocator)));
+			LOGFAILEDCOM(device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, _commandAllocator, nullptr, IID_PPV_ARGS(&_commandList)));
 		}
 		else
 		{
-			commandAllocator->Reset();
-			commandList->Reset(commandAllocator, nullptr);			
+			_commandAllocator->Reset();
+			_commandList->Reset(_commandAllocator, nullptr);
 		}
 
-		ResourceFactory::AssignCommandList(commandList);
+		ResourceFactory::AssignCommandList(_commandList);
 		while (!_tasks.empty())
 		{
 			std::function<void()> task = _tasks.front();
 			task();
 			_tasks.pop();
 		}
-		commandList->Close();
-		commandLists.push_back(commandList);
+		_commandList->Close();
+		commandLists.push_back(_commandList);
 #else
-		// Cleanup idle threads.
-		bool idleFound = true;
-		while (idleFound)
-		{
-			idleFound = false;
-			for (auto it = _commandThreads.begin(); it != _commandThreads.end(); ++it)
-			{
-				if ((*it)->IdleTimeOut)
-				{
-					CommandThread* commandThread = *it;
-					commandThread->Thread.join();
-					commandThread->CommandList->Release();
-					commandThread->CommandAllocator->Release();
-					delete commandThread;
-					idleFound = true;
-					_commandThreads.erase(it);
-					break;
-				}
-			}
-		}
-
 		// Create resources for main thread.
 		if (_commandList == nullptr)
 		{
@@ -160,9 +132,9 @@ namespace Engine
 					commandThread = new CommandThread;
 					commandThread->Available = false;
 					commandThread->TasksCompleted = 0;
-					commandThread->IdleTimeOut = false;
 					commandThread->Task = task;
 					commandThread->Open = true;
+					commandThread->Waiting = false;
 
 					ID3D12CommandAllocator* commandAllocator;
 					ID3D12GraphicsCommandList* commandList;
@@ -192,7 +164,14 @@ namespace Engine
 				_releaseMutex.lock();
 				commandThread->Task = task;
 				commandThread->Available = false;
+				commandThread->Waiting = false;
 				_releaseMutex.unlock();
+
+				// Ensure the thread is ready to be notified.
+				while (!commandThread->Waiting)
+				{
+					commandThread->WaitCondition.notify_one();
+				}
 			}
 		}
 

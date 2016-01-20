@@ -1,9 +1,5 @@
 #pragma once
 
-#include <vector>
-#include <d3d12.h>
-#include <mutex>
-
 namespace Engine
 {
 	class HeapResource;

@@ -57,6 +57,7 @@
 #endif // FREEIMAGE_EXPORTS
 
 
+
 #else 
 // try the gcc visibility support (see http://gcc.gnu.org/wiki/Visibility)
 #if defined(__GNUC__) && ((__GNUC__ >= 4) || (__GNUC__ == 3 && __GNUC_MINOR__ >= 4))
@@ -66,6 +67,7 @@
 #endif // __GNUC__
 
 
+
 		#define DLL_CALLCONV
 #if defined(GCC_HASCLASSVISIBILITY)
 			#define DLL_API __attribute__ ((visibility("default")))
@@ -73,6 +75,7 @@
 			#define DLL_API
 #endif 
 #endif // WIN32 / !WIN32
+
 
 
 #endif // FREEIMAGE_LIB
@@ -88,6 +91,7 @@
 #if (defined(BYTE_ORDER) && BYTE_ORDER==BIG_ENDIAN) || (defined(__BYTE_ORDER) && __BYTE_ORDER==__BIG_ENDIAN) || defined(__BIG_ENDIAN__)
 		#define FREEIMAGE_BIGENDIAN
 #endif // BYTE_ORDER
+
 
 
 #endif // !FREEIMAGE_[BIG|LITTLE]ENDIAN
@@ -112,6 +116,7 @@
 #else
 #define FREEIMAGE_COLORORDER FREEIMAGE_COLORORDER_BGR
 #endif // FREEIMAGE_BIGENDIAN
+
 
 
 #endif // FREEIMAGE_COLORORDER
@@ -205,6 +210,7 @@ typedef unsigned __int64 UINT64;
 
 
 
+
 typedef struct tagRGBQUAD {
 #if FREEIMAGE_COLORORDER == FREEIMAGE_COLORORDER_BGR
   BYTE rgbBlue;
@@ -215,6 +221,7 @@ typedef struct tagRGBQUAD {
   BYTE rgbGreen;
   BYTE rgbBlue;
 #endif // FREEIMAGE_COLORORDER
+
 
 
   BYTE rgbReserved;
@@ -232,6 +239,7 @@ typedef struct tagRGBTRIPLE {
 #endif // FREEIMAGE_COLORORDER
 
 
+
 } RGBTRIPLE;
 
 #if (defined(_WIN32) || defined(__WIN32__))
@@ -239,6 +247,7 @@ typedef struct tagRGBTRIPLE {
 #else
 #pragma pack()
 #endif // WIN32
+
 
 
 
@@ -366,6 +375,7 @@ typedef struct tagFICOMPLEX
 #endif // FREEIMAGE_COLORORDER
 
 
+
 #else
 #if FREEIMAGE_COLORORDER == FREEIMAGE_COLORORDER_BGR
 // Big Endian (PPC / none) : BGR(A) order
@@ -396,6 +406,7 @@ typedef struct tagFICOMPLEX
 #define FI_RGBA_BLUE_SHIFT		8
 #define FI_RGBA_ALPHA_SHIFT		0
 #endif // FREEIMAGE_COLORORDER
+
 
 
 #endif // FREEIMAGE_BIGENDIAN

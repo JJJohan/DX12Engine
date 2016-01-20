@@ -1,7 +1,5 @@
 #pragma once
 
-#include <string>
-
 namespace Engine
 {
 	enum MessageBoxType

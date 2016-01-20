@@ -1,35 +1,34 @@
 #pragma once
-#include <windows.h>
-#include "..\Data\Colour.h"
-#include <string>
+
 #include <functional>
 
 namespace Engine
 {
+	class Colour;
+
 	class IRenderer
 	{
 	public:
 		IRenderer();
 		virtual ~IRenderer();
 
-		virtual bool InitWindow(int width, int height, bool windowed);
+		ENGINE_API virtual bool InitWindow(int width, int height, bool windowed);
 		virtual bool Render() = 0;
 		virtual bool Update() = 0;
 		bool WindowRender() const;
-		virtual void SetClearColour(const Colour& colour);
-		void SetVsync(bool enabled);
-		void SetWindowTitle(const std::string& title) const;
-		std::string GetDeviceName() const;
-		size_t GetDeviceMemoryTotal() const;
-		size_t GetDeviceMemoryFree() const;
-		std::string GetMaxFeatureLevel() const;
-		HWND GetWindowHandle() const;
+		ENGINE_API virtual void SetClearColour(const Colour& colour);
+		ENGINE_API void SetVsync(bool enabled);
+		ENGINE_API void SetWindowTitle(const std::string& title) const;
+		ENGINE_API std::string GetDeviceName() const;
+		ENGINE_API size_t GetDeviceMemoryTotal() const;
+		ENGINE_API size_t GetDeviceMemoryFree() const;
+		ENGINE_API std::string GetMaxFeatureLevel() const;
+		ENGINE_API HWND GetWindowHandle() const;
 		bool RenderFinished() const;
 		void AssignDrawLoop(const std::function<void()>& drawLoop);
 		void AssignCreateMethod(const std::function<void()>& createMethod);
-		int GetFPSLimit() const;
-		int ScreenWidth() const;
-		int ScreenHeight() const;
+		ENGINE_API int ScreenWidth() const;
+		ENGINE_API int ScreenHeight() const;
 
 	protected:
 		int _screenWidth;

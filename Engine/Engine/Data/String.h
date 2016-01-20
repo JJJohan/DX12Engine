@@ -9,35 +9,35 @@ namespace Engine
 	class String
 	{
 	public:
-		String();
-		String(std::stringstream stream);
-		String(const char* string);
-		String(const wchar_t* string);
-		String(std::string string);
-		String(std::wstring string);
-		String(int value);
-		String(float value);
-		String(double value);
+		ENGINE_API String();
+		ENGINE_API String(std::stringstream stream);
+		ENGINE_API String(const char* string);
+		ENGINE_API String(const wchar_t* string);
+		ENGINE_API String(std::string string);
+		ENGINE_API String(std::wstring string);
+		ENGINE_API String(int value);
+		ENGINE_API String(float value);
+		ENGINE_API String(double value);
 
-		String operator+(const String& rhs) const;
-		bool operator==(const String& rhs) const;
-		char operator[](size_t index);
+		ENGINE_API String operator+(const String& rhs) const;
+		ENGINE_API bool operator==(const String& rhs) const;
+		ENGINE_API char operator[](size_t index);
 
-		operator std::string() const;
-		operator std::wstring() const;
-		operator std::stringstream() const;
+		ENGINE_API operator std::string() const;
+		ENGINE_API operator std::wstring() const;
+		ENGINE_API operator std::stringstream() const;
 
-		int ToInt() const;
-		float ToFloat() const;
-		double ToDouble() const;
+		ENGINE_API int ToInt() const;
+		ENGINE_API float ToFloat() const;
+		ENGINE_API double ToDouble() const;
 
-		String Trim();
-		String ToLower() const;
-		String ToUpper() const;
-		bool Contains(String string) const;
-		size_t Length() const;
-		std::vector<String> Split(char delim) const;
-		const std::string& Str() const;
+		ENGINE_API String Trim();
+		ENGINE_API String ToLower() const;
+		ENGINE_API String ToUpper() const;
+		ENGINE_API bool Contains(String string) const;
+		ENGINE_API size_t Length() const;
+		ENGINE_API std::vector<String> Split(char delim) const;
+		ENGINE_API const std::string& Str() const;
 
 		template <typename... Args>
 		static String Format(const String& string, Args ... args)

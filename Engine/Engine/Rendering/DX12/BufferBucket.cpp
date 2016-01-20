@@ -1,14 +1,13 @@
 #include "BufferBucket.h"
 #include "BufferInstance.h"
-#include "../../Utils/Logging.h"
 
 namespace Engine
 {
 	std::unordered_set<BufferBucket*> BufferBucket::_buffers;
 
 	BufferBucket::BufferBucket()
-		: _totalSize(0)
-		, _bound(false)
+		: _bound(false)
+		  , _totalSize(0)
 	{
 	}
 

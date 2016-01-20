@@ -1,10 +1,12 @@
 #pragma once
 
-#include <d3d12.h>
 #include <DirectXMath.h>
 #include "../../Data/Transform.h"
 
 using namespace DirectX;
+
+struct D3D12_VIEWPORT;
+struct ID3D12Device;
 
 namespace Engine
 {

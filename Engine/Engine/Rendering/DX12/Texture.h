@@ -1,9 +1,7 @@
 #pragma once
 
-#include <string>
-#include <d3d12.h>
-#include <wrl/client.h>
 #include <memory>
+#include <wrl/client.h>
 #include "HeapResource.h"
 
 using namespace Microsoft::WRL;
@@ -13,9 +11,9 @@ namespace Engine
 	class Texture : HeapResource
 	{
 	public:
-		~Texture();
+		ENGINE_API ~Texture();
 
-		bool Load(const std::string& filePath);
+		ENGINE_API bool Load(const std::string& filePath);
 		void Bind(ID3D12GraphicsCommandList* commandList) const;
 
 	private:

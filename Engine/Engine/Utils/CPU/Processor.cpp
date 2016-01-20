@@ -1,6 +1,4 @@
-#include <windows.h>
 #include <intrin.h>
-#include <sstream>
 #include "Processor.h"
 
 namespace Engine

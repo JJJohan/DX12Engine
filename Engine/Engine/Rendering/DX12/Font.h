@@ -21,7 +21,7 @@ namespace Engine
 		};
 
 		Letter GetLetter(char letter) const;
-		const std::string& GetName() const;
+		ENGINE_API const std::string& GetName() const;
 
 	private:
 		std::string _name;

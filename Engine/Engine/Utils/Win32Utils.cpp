@@ -1,6 +1,4 @@
 #include "Win32Utils.h"
-#include <Windows.h>
-#include "../Rendering/Renderer.h"
 
 namespace Engine
 {

@@ -1,8 +1,3 @@
-#include "Core.h"
-#include "../Utils/Logging.h"
-#include "../Input/Input.h"
-#include "Time.h"
-
 namespace Engine
 {
 	std::string Core::_appDirectory = std::string();

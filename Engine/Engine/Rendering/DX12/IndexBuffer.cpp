@@ -1,6 +1,5 @@
 #include "IndexBuffer.h"
 #include "HeapManager.h"
-#include "../../Utils/Logging.h"
 
 namespace Engine
 {
@@ -16,6 +15,8 @@ namespace Engine
 		{
 			return;
 		}
+
+		bool sameSize = (size == _heapSize);
 
 		// Perform memory copy.
 		size_t offset = 0;
@@ -39,9 +40,12 @@ namespace Engine
 		HeapManager::Upload(this, memory.get(), D3D12_RESOURCE_STATE_INDEX_BUFFER);
 
 		// Initialize the index buffer view.
-		_indexBufferView.BufferLocation = _pResource->GetGPUVirtualAddress();
-		_indexBufferView.Format = DXGI_FORMAT_R32_UINT;
-		_indexBufferView.SizeInBytes = UINT(_heapSize);
+		if (!sameSize)
+		{
+			_indexBufferView.BufferLocation = _pResource->GetGPUVirtualAddress();
+			_indexBufferView.Format = DXGI_FORMAT_R32_UINT;
+			_indexBufferView.SizeInBytes = UINT(_heapSize);
+		}
 	}
 
 	void IndexBufferInstance::SetIndices(std::vector<int> indices)

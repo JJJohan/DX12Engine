@@ -1,6 +1,5 @@
 #pragma once
 
-#include <string>
 #include "CPU\Processor.h"
 
 namespace Engine
@@ -10,9 +9,9 @@ namespace Engine
 	class SystemInfo
 	{
 	public:
-		static void PrintSystemInfo();
-		static Vector2 GetNativeResolution();
-		static int GetCPUCores();
+		static ENGINE_API void PrintSystemInfo();
+		static ENGINE_API Vector2 GetNativeResolution();
+		static ENGINE_API int GetCPUCores();
 
 	private:
 		static std::string GetOSInfo();

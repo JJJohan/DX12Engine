@@ -1,9 +1,8 @@
 #pragma once
 
-#include <set>
-#include <unordered_set>
 #include "BufferInstance.h"
 #include "HeapResource.h"
+#include <set>
 
 struct ID3D12GraphicsCommandList;
 
@@ -54,6 +53,7 @@ namespace Engine
 				if (buffer->_totalSize < 65536 - instanceSize)
 				{
 					buffer->_instances.insert(instance);
+					buffer->_totalSize += instanceSize;
 					buffer->RequestBuild();
 					return static_cast<T*>(buffer);
 				}
@@ -63,6 +63,7 @@ namespace Engine
 		T* buffer = new T();
 		buffer->_pDevice = instance->_pDevice;
 		buffer->_instances.insert(instance);
+		buffer->_totalSize += instanceSize;
 		buffer->RequestBuild();
 		_buffers.insert(buffer);
 		return buffer;

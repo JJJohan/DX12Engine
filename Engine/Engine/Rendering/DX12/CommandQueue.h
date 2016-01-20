@@ -2,7 +2,6 @@
 
 #include <queue>
 #include <functional>
-#include <mutex>
 
 struct ID3D12CommandList;
 struct ID3D12CommandAllocator;
@@ -15,14 +14,14 @@ namespace Engine
 	{
 		ID3D12CommandList* CommandList;
 		ID3D12CommandAllocator* CommandAllocator;
+		std::condition_variable WaitCondition;
 		std::thread Thread;
-		std::mutex Mutex;
+		std::mutex WaitMutex, LockMutex;
+		bool Waiting;
 		bool Available;
 		bool Open;
 		int TasksCompleted;
 		std::function<void()> Task;
-		float IdleTimer;
-		bool IdleTimeOut;
 	};
 
 	class CommandQueue
@@ -40,7 +39,7 @@ namespace Engine
 		static std::queue<std::function<void()>> _tasks;
 		static std::vector<CommandThread*> _commandThreads;
 		static std::mutex _releaseMutex;
-		static bool _releaseRequested;
+		static volatile bool _releaseRequested;
 
 		static ID3D12CommandAllocator* _commandAllocator;
 		static ID3D12GraphicsCommandList* _commandList;

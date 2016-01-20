@@ -8,23 +8,23 @@ namespace Engine
 	class Quaternion
 	{
 	public:
-		Quaternion();
-		Quaternion(float x, float y, float z, float w);
-		Quaternion(const Quaternion& quaternion);
-		Quaternion(const DirectX::XMVECTOR& quaternion);
+		ENGINE_API Quaternion();
+		ENGINE_API Quaternion(float x, float y, float z, float w);
+		ENGINE_API Quaternion(const Quaternion& quaternion);
+		ENGINE_API Quaternion(const DirectX::XMVECTOR& quaternion);
 
-		void SetEulerAngles(float pitch, float yaw, float roll);
-		void SetEulerAngles(const Vector3& eulerAngles);
-		Vector3 GetEulerAngles() const;
+		ENGINE_API void SetEulerAngles(float pitch, float yaw, float roll);
+		ENGINE_API void SetEulerAngles(const Vector3& eulerAngles);
+		ENGINE_API Vector3 GetEulerAngles() const;
 
-		Vector3 operator*(const Vector3& rhs) const;
-		Quaternion operator*(const Quaternion& rhs) const;
-		void operator=(const Quaternion& rhs);
+		ENGINE_API Vector3 operator*(const Vector3& rhs) const;
+		ENGINE_API Quaternion operator*(const Quaternion& rhs) const;
+		ENGINE_API void operator=(const Quaternion& rhs);
 
-		operator DirectX::XMFLOAT4() const;
-		operator DirectX::XMVECTOR() const;
+		ENGINE_API operator DirectX::XMFLOAT4() const;
+		ENGINE_API operator DirectX::XMVECTOR() const;
 
-		static const Quaternion& Identity;
+		static ENGINE_API const Quaternion& Identity;
 
 		float& X;
 		float& Y;

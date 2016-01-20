@@ -22,19 +22,19 @@ namespace Engine
 	public:
 		static void AssignCommandList(ID3D12CommandList* commandList);
 		static ID3D12CommandList* GetCommandList();
-		static ConstantBufferInstance* CreateConstantBuffer();
-		static VertexBufferInstance* CreateVertexBufferInstance(VertexType vertexType);
-		static IndexBufferInstance* CreateIndexBufferInstance();
-		static Material* CreateMaterial();
-		static Texture* CreateTexture();
+		static ENGINE_API ConstantBufferInstance* CreateConstantBuffer();
+		static ENGINE_API VertexBufferInstance* CreateVertexBufferInstance(VertexType vertexType);
+		static ENGINE_API IndexBufferInstance* CreateIndexBufferInstance();
+		static ENGINE_API Material* CreateMaterial();
+		static ENGINE_API Texture* CreateTexture();
 
 		static int GetTextureSlot();
 		static int GetCBufferSlot();
 		static void FreeTextureSlot(int index);
 		static void FreeCBufferSlot(int index);
 
-		const static int TextureLimit = 32;
-		const static int CBufferLimit = 8;
+		static const int TextureLimit = 32;
+		static const int CBufferLimit = 8;
 
 	private:
 		ResourceFactory()

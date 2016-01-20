@@ -213,3 +213,9 @@ GeneratedArtifacts/
 _Pvt_Extensions/
 ModelManifest.xml
 Engine/Engine/Engine.vcxproj.jjjohan.nvuser
+*.exp
+Engine/Build/Engine.dll
+Engine/Build/Engine.lib
+Engine/Build/EngineTests.dll
+Engine/Build/Engine_debug.dll
+Engine/Build/Engine_debug.lib

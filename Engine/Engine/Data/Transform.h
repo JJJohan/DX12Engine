@@ -15,32 +15,32 @@ namespace Engine
 	class Transform
 	{
 	public:
-		Transform();
+		ENGINE_API Transform();
 
-		void SetPosition(float x, float y, float z);
-		void SetPosition(const Vector3& position);
-		void SetRotation(const Quaternion& rotation);
-		void SetScale(float x, float y, float z);
-		void SetScale(const Vector3& scale);
+		ENGINE_API void SetPosition(float x, float y, float z);
+		ENGINE_API void SetPosition(const Vector3& position);
+		ENGINE_API void SetRotation(const Quaternion& rotation);
+		ENGINE_API void SetScale(float x, float y, float z);
+		ENGINE_API void SetScale(const Vector3& scale);
 
-		void Move(const Vector3& translation, Space relativeTo = World);
-		void Rotate(const Vector3& eulerAngles);
-		void Rotate(float pitch, float yaw, float roll);
-		void LookAt(float x, float y, float z);
-		void LookAt(const Vector3& position);
+		ENGINE_API void Move(const Vector3& translation, Space relativeTo = World);
+		ENGINE_API void Rotate(const Vector3& eulerAngles);
+		ENGINE_API void Rotate(float pitch, float yaw, float roll);
+		ENGINE_API void LookAt(float x, float y, float z);
+		ENGINE_API void LookAt(const Vector3& position);
 
-		Vector3 GetPosition() const;
-		Quaternion GetRotation() const;
-		Vector3 GetScale() const;
-		const DirectX::XMMATRIX& GetMatrix() const;
+		ENGINE_API Vector3 GetPosition() const;
+		ENGINE_API Quaternion GetRotation() const;
+		ENGINE_API Vector3 GetScale() const;
+		ENGINE_API const DirectX::XMMATRIX& GetMatrix() const;
 
-		void SetPosOverride(std::function<Vector3(float, float, float)> func);
-		void SetRotOverride(std::function<Quaternion(float, float, float, float)> func);
-		void SetScaleOverride(std::function<Vector3(float, float, float)> func);
+		ENGINE_API void SetPosOverride(std::function<Vector3(float, float, float)> func);
+		ENGINE_API void SetRotOverride(std::function<Quaternion(float, float, float, float)> func);
+		ENGINE_API void SetScaleOverride(std::function<Vector3(float, float, float)> func);
 
-		void GetPosOverride(std::function<Vector3(float, float, float)> func);
-		void GetRotOverride(std::function<Quaternion(float, float, float, float)> func);
-		void GetScaleOverride(std::function<Vector3(float, float, float)> func);
+		ENGINE_API void GetPosOverride(std::function<Vector3(float, float, float)> func);
+		ENGINE_API void GetRotOverride(std::function<Quaternion(float, float, float, float)> func);
+		ENGINE_API void GetScaleOverride(std::function<Vector3(float, float, float)> func);
 
 		bool Moved;
 

@@ -109,9 +109,6 @@
     <ClCompile Include="Rendering\Renderer.cpp">
       <Filter>Source Files\Rendering</Filter>
     </ClCompile>
-    <ClCompile Include="main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Utils\Console.cpp">
       <Filter>Source Files\Utils</Filter>
     </ClCompile>
@@ -187,11 +184,11 @@
     <ClCompile Include="Rendering\DX12\VertexBuffer.cpp">
       <Filter>Source Files\Rendering\DX12\Buffers</Filter>
     </ClCompile>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Utils\Console.h">
-      <Filter>Source Files\Utils</Filter>
-    </ClInclude>
     <ClInclude Include="External\src\CPPFormat\format.h">
       <Filter>External\CPPFormat</Filter>
     </ClInclude>
@@ -305,6 +302,12 @@
     </ClInclude>
     <ClInclude Include="Rendering\DX12\VertexBuffer.h">
       <Filter>Header Files\Rendering\DX12\Buffers</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils\Console.h">
+      <Filter>Header Files\Utils</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -9,8 +9,8 @@ namespace Engine
 	class FontManager
 	{
 	public:
-		static Font* LoadFont(std::string fontName, std::string textureFile, std::string fontFile);
-		static const Font* GetFont(std::string fontName);
+		ENGINE_API static Font* LoadFont(std::string fontName, std::string textureFile, std::string fontFile);
+		ENGINE_API static const Font* GetFont(std::string fontName);
 
 	private:
 		static bool LoadLayout(std::string fontFile, Font* font);

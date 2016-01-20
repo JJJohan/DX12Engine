@@ -1,8 +1,3 @@
-#include "Time.h"
-#include "../Utils/Logging.h"
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
-
 namespace Engine
 {
 	float Time::_deltaTime = 0.0f;
