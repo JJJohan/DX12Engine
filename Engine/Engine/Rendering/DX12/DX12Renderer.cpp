@@ -122,17 +122,17 @@ namespace Engine
 		// Present the frame.
 		LOGFAILEDCOMRETURN(_swapChain->Present(_vsync, 0), EXIT_FAILURE);
 
+		WaitForPreviousFrame();
+
+		// Clear static upload buffers.
+		HeapManager::UpdateHeaps();
+
 		// Resize if neccessary.
 		if (_resize)
 		{
 			ResizeRenderer();
 			_resize = false;
 		}
-
-		WaitForPreviousFrame();
-
-		// Clear static upload buffers.
-		HeapManager::UpdateHeaps();
 
 		return EXIT_SUCCESS;
 	}
@@ -261,17 +261,12 @@ namespace Engine
 		ComPtr<IDXGISwapChain> swapChain;
 		LOGFAILEDCOMRETURN(factory->CreateSwapChain(_commandQueue.Get(), &swapChainDesc, &swapChain), EXIT_FAILURE);
 		LOGFAILEDCOMRETURN(swapChain.As(&_swapChain), EXIT_FAILURE);
-		_frameIndex = _swapChain->GetCurrentBackBufferIndex();
 
-		// Create descriptor heaps.
-		// Describe and create a render target view (RTV) descriptor heap.
-		D3D12_DESCRIPTOR_HEAP_DESC rtvHeapDesc = {};
-		rtvHeapDesc.NumDescriptors = _frameCount;
-		rtvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
-		rtvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
-		LOGFAILEDCOMRETURN(
-			_device->CreateDescriptorHeap(&rtvHeapDesc, IID_PPV_ARGS(&_rtvHeap)),
-			EXIT_FAILURE);
+		_rtvDescriptorSize = _device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+		_cbvSrvDescriptorSize = _device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+
+		// Create RTV for swap chain.
+		CreateRTV();
 
 		// Describe and create a CBV/SRV heap for constants and textures.
 		D3D12_DESCRIPTOR_HEAP_DESC cbvSrvHeapDesc = {};
@@ -281,23 +276,6 @@ namespace Engine
 		LOGFAILEDCOMRETURN(
 			_device->CreateDescriptorHeap(&cbvSrvHeapDesc, IID_PPV_ARGS(&_cbvSrvHeap)),
 			EXIT_FAILURE);
-
-		_rtvDescriptorSize = _device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
-		_cbvSrvDescriptorSize = _device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-
-		// Create frame resources.
-		CD3DX12_CPU_DESCRIPTOR_HANDLE rtvHandle(_rtvHeap->GetCPUDescriptorHandleForHeapStart());
-
-		// Create a RTV for each frame.
-		for (UINT n = 0; n < _frameCount; n++)
-		{
-			LOGFAILEDCOMRETURN(
-				_swapChain->GetBuffer(n, IID_PPV_ARGS(&_renderTargets[n])),
-				EXIT_FAILURE);
-
-			_device->CreateRenderTargetView(_renderTargets[n].Get(), nullptr, rtvHandle);
-			rtvHandle.Offset(1, _rtvDescriptorSize);
-		}
 
 		LOGFAILEDCOMRETURN(
 			_device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&_commandAllocator)),
@@ -460,9 +438,7 @@ namespace Engine
 
 		// Signal and increment the fence value.
 		const UINT64 fence = _fenceValue;
-		LOGFAILEDCOMRETURN(
-			_commandQueue->Signal(_fence.Get(), fence),
-			EXIT_FAILURE);
+		LOGFAILEDCOMRETURN(_commandQueue->Signal(_fence.Get(), fence), EXIT_FAILURE);
 		_fenceValue++;
 
 		// Wait until the previous frame is finished.
@@ -480,19 +456,8 @@ namespace Engine
 		return EXIT_SUCCESS;
 	}
 
-	void DX12Renderer::ResizeRenderer()
+	void DX12Renderer::CreateRTV()
 	{
-		_pCamera->Resize(float(_screenWidth), float(_screenHeight));
-		_scissorRect.right = LONG(_screenWidth);
-		_scissorRect.bottom = LONG(_screenHeight);
-
-		for (int i = 0; i < _frameCount; ++i)
-		{
-			_renderTargets[i].Reset();
-		}
-		_rtvHeap.Reset();
-		_swapChain->ResizeBuffers(_frameCount, UINT(_screenWidth), UINT(_screenHeight), DXGI_FORMAT_R8G8B8A8_UNORM, 0);
-
 		// Create descriptor heaps.
 		// Describe and create a render target view (RTV) descriptor heap.
 		D3D12_DESCRIPTOR_HEAP_DESC rtvHeapDesc = {};
@@ -512,6 +477,37 @@ namespace Engine
 			_device->CreateRenderTargetView(_renderTargets[n].Get(), nullptr, rtvHandle);
 			rtvHandle.Offset(1, _rtvDescriptorSize);
 		}
+
+		_frameIndex = _swapChain->GetCurrentBackBufferIndex();
+	}
+
+	void DX12Renderer::ResizeRenderer()
+	{
+		// Resize camera and scissor rect.
+		_pCamera->Resize(float(_screenWidth), float(_screenHeight));
+		_scissorRect.right = LONG(_screenWidth);
+		_scissorRect.bottom = LONG(_screenHeight);
+
+		// Reset render targets if they exist.
+		for (int i = 0; i < _frameCount; ++i)
+		{
+			if (_renderTargets[i] != nullptr)
+			{
+				_renderTargets[i].Reset();
+			}
+		}
+
+		// Reset heap if it exists.
+		if (_rtvHeap != nullptr)
+		{
+			_rtvHeap.Reset();
+		}
+
+		// Resize swapchain.
+		_swapChain->ResizeBuffers(_frameCount, UINT(_screenWidth), UINT(_screenHeight), DXGI_FORMAT_R8G8B8A8_UNORM, 0);
+
+		// Recreate the RTV.
+		CreateRTV();
 	}
 }
 

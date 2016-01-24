@@ -32,6 +32,7 @@ namespace Engine
 	private:
 		void GetHardwareAdapter(IDXGIFactory2* pFactory, IDXGIAdapter3** ppAdapter);
 		void Resize(float width, float height) override;
+		void CreateRTV();
 
 		static DX12Renderer* _instance;
 		const static int _frameCount = 2;
