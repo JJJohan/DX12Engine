@@ -2,7 +2,7 @@
 #include "Font.h"
 #include "VertexBuffer.h"
 #include "Material.h"
-#include "IndexBuffer.h"
+#include "IndexBufferInstance.h"
 #include "FontManager.h"
 #include "ConstantBuffer.h"
 
@@ -137,10 +137,10 @@ namespace Engine
 			float uv1 = l.LeftUv;
 			float uv2 = l.RightUv;
 			float width = l.Width * widthScale;
-			vertices.push_back(Vertex(XMFLOAT3(0.0f + offset, -heightScale, 0.0f), _colour, XMFLOAT2(uv1, bottomUv))); // top left
-			vertices.push_back(Vertex(XMFLOAT3(0.0f + offset, 0.0f, 0.0f), _colour, XMFLOAT2(uv1, topUv))); // bottom left
-			vertices.push_back(Vertex(XMFLOAT3(width + offset, -heightScale, 0.0f), _colour, XMFLOAT2(uv2, bottomUv))); // top right
-			vertices.push_back(Vertex(XMFLOAT3(width + offset, 0.0f, 0.0f), _colour, XMFLOAT2(uv2, topUv))); // bottom right
+			vertices.push_back(Vertex(Vector3(0.0f + offset, -heightScale, 0.0f), _colour, Vector2(uv1, bottomUv))); // top left
+			vertices.push_back(Vertex(Vector3(0.0f + offset, 0.0f, 0.0f), _colour, Vector2(uv1, topUv))); // bottom left
+			vertices.push_back(Vertex(Vector3(width + offset, -heightScale, 0.0f), _colour, Vector2(uv2, bottomUv))); // top right
+			vertices.push_back(Vertex(Vector3(width + offset, 0.0f, 0.0f), _colour, Vector2(uv2, topUv))); // bottom right
 
 			offset += width;
 		}
