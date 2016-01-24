@@ -6,7 +6,7 @@
 #include "Rendering/DX12/FontManager.h"
 #include "Rendering/DX12/Font.h"
 #include "Rendering/DX12/VertexBuffer.h"
-#include "Rendering/DX12/IndexBuffer.h"
+#include "Rendering/DX12/IndexBufferInstance.h"
 
 using namespace Engine;
 
@@ -97,10 +97,10 @@ void Game::Start()
 	// Create an example triangle object.
 	std::vector<Vertex> vertices2 =
 		{
-			Vertex(XMFLOAT3(-0.25f, 0.25f, 0.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), XMFLOAT2(0.0f, 0.0f)), // bottom left
-			Vertex(XMFLOAT3(0.25f, -0.25f, 0.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), XMFLOAT2(1.0f, 1.0f)), // top right
-			Vertex(XMFLOAT3(0.25f, 0.25f, 0.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), XMFLOAT2(1.0f, 0.0f)), // bottom right
-			Vertex(XMFLOAT3(-0.25f, -0.25f, 0.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), XMFLOAT2(0.0f, 1.0f)) // top left
+			Vertex(Vector3(-0.25f, 0.25f, 0.0f), Colour(1.0f, 1.0f, 1.0f, 1.0f), Vector2(0.0f, 0.0f)), // bottom left
+			Vertex(Vector3(0.25f, -0.25f, 0.0f), Colour(1.0f, 1.0f, 1.0f, 1.0f), Vector2(1.0f, 1.0f)), // top right
+			Vertex(Vector3(0.25f, 0.25f, 0.0f), Colour(1.0f, 1.0f, 1.0f, 1.0f), Vector2(1.0f, 0.0f)), // bottom right
+			Vertex(Vector3(-0.25f, -0.25f, 0.0f), Colour(1.0f, 1.0f, 1.0f, 1.0f), Vector2(0.0f, 1.0f)) // top left
 		};
 
 	std::vector<int> indices =
@@ -162,7 +162,8 @@ void Game::Update() const
 
 	if (_pText != nullptr)
 	{
-		String text = String::Format("The frame rate is: {0} FPS", int(1.0f / Time::GPUTime()));
+		Vector3 euler = Camera::Main()->Transform.GetRotation().GetEulerAngles();
+		String text = String::Format("X: {0} . Y: {1} . Z: {2}", euler.X, euler.Y, euler.Z);
 		_pText->SetText(text);
 	}
 
