@@ -1,12 +1,14 @@
+#include <thread>
+
 namespace Engine
 {
 	std::string Core::_appDirectory = std::string();
 	bool Core::_running = true;
-	std::thread Core::_renderThread = std::thread();
 	bool Core::_renderThreadAssigned = false;
 	IRenderer* Core::_renderer = nullptr;
 	std::function<void()> Core::_updateLoop;
 	std::function<void()> Core::_destroyMethod;
+	std::thread _renderThread = std::thread();
 
 	bool Core::Update()
 	{

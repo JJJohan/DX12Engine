@@ -1,7 +1,6 @@
 #pragma once
 
 #include "../Rendering/Renderer.h"
-#include <thread>
 
 namespace Engine
 {
@@ -26,7 +25,6 @@ namespace Engine
 	private:
 		static void Render();
 
-		static std::thread _renderThread;
 		static bool _renderThreadAssigned;
 		static bool _running;
 		static std::string _appDirectory;
