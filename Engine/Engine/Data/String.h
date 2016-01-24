@@ -2,7 +2,10 @@
 
 #include <string>
 #include <vector>
+
+#ifndef ENGINENET_EXPORTS
 #include "../External/src/CPPFormat/format.h"
+#endif
 
 namespace Engine
 {
@@ -39,12 +42,19 @@ namespace Engine
 		ENGINE_API std::vector<String> Split(char delim) const;
 		ENGINE_API const std::string& Str() const;
 
+#ifndef ENGINENET_EXPORTS
 		template <typename... Args>
 		static String Format(const String& string, Args ... args)
 		{
 			std::string text = fmt::format(string._string, args...);
 			return String(text);
 		}
+#else
+		static String Format(const String& string)
+		{
+			return string;
+		}
+#endif
 
 	private:
 		std::string _string;
