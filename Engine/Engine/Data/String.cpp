@@ -81,7 +81,7 @@ namespace Engine
 			++start;
 		}
 
-		while (end > start && (_string[end] == ' ' || _string[end] == '\t'))
+		while (end > start && (_string[end - 1] == ' ' || _string[end - 1] == '\t'))
 		{
 			--end;
 		}
