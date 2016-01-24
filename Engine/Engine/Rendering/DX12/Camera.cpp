@@ -74,11 +74,16 @@ namespace Engine
 
 		if (Transform.Moved)
 		{
+			// Get position and rotation.
 			XMVECTOR rotation = Transform.GetRotation();
-			XMVECTOR direction = XMVector3Rotate(Vector3::Forward, rotation);
+			XMVECTOR position = Transform.GetPosition();
 
-			// Calculate view matrix
-			_view = XMMatrixLookToLH(Transform.GetPosition(), direction, Vector3::Up);
+			// Calculate local space directions.
+			XMVECTOR forward = XMVector3Rotate(Vector3::Forward, rotation);
+			XMVECTOR up = XMVector3Rotate(Vector3::Up, rotation);
+
+			//update view matrix
+			_view = XMMatrixLookToLH(Transform.GetPosition(), forward, up);
 			_vp = XMMatrixMultiply(_view, _projection);
 
 			Transform.Moved = false;

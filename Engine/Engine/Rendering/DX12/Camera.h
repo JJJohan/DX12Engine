@@ -17,7 +17,7 @@ namespace Engine
 	{
 	public:
 		static Camera* CreateCamera(ID3D12Device* device, float width, float height, float fovInDegrees, float nearClip, float farClip);
-		static Camera* Main();
+		static ENGINE_API Camera* Main();
 
 		~Camera();
 
