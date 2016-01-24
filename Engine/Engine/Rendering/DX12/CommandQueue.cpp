@@ -175,24 +175,27 @@ namespace Engine
 			}
 		}
 
-		// Perform the remaining task on this thread.
-		_commandAllocator->Reset();
-		_commandList->Reset(_commandAllocator, nullptr);
-		ResourceFactory::AssignCommandList(_commandList);
-		std::function<void()> task = _tasks.front();
-		_tasks.pop();
-		task();
-		_commandList->Close();
-		commandLists.push_back(_commandList);
-
-		// Wait for all tasks to complete.
-		int complete = 0;
-		while (complete != taskCount)
+		if (!_tasks.empty())
 		{
-			complete = 0;
-			for (auto it = _commandThreads.begin(); it != _commandThreads.end(); ++it)
+			// Perform the remaining task on this thread.
+			_commandAllocator->Reset();
+			_commandList->Reset(_commandAllocator, nullptr);
+			ResourceFactory::AssignCommandList(_commandList);
+			std::function<void()> task = _tasks.front();
+			_tasks.pop();
+			task();
+			_commandList->Close();
+			commandLists.push_back(_commandList);
+		
+			// Wait for all tasks to complete.
+			int complete = 0;
+			while (complete != taskCount)
 			{
-				complete += (*it)->TasksCompleted;
+				complete = 0;
+				for (auto it = _commandThreads.begin(); it != _commandThreads.end(); ++it)
+				{
+					complete += (*it)->TasksCompleted;
+				}
 			}
 		}
 
