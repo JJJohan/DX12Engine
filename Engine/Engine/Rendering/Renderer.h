@@ -20,8 +20,6 @@ namespace Engine
 		static bool Update();
 		static HWND GetWindowHandle();
 		static IRenderer* GetRenderer();
-
-	private:
 		Renderer();
 	};
 }

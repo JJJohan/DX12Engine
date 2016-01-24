@@ -1,5 +1,5 @@
 #include "RenderObject.h"
-#include "IndexBuffer.h"
+#include "IndexBufferInstance.h"
 #include "VertexBuffer.h"
 #include "Material.h"
 #include "Camera.h"

@@ -1,6 +1,6 @@
 #include "ConstantBuffer.h"
 #include "HeapManager.h"
-#include "VertexBuffer.h"
+#include "VertexBufferInstance.h"
 
 namespace Engine
 {

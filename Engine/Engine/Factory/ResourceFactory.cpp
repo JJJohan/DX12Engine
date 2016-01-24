@@ -1,6 +1,6 @@
 #include "../Rendering/DX12/DX12Renderer.h"
 #include "../Rendering/DX12/ConstantBuffer.h"
-#include "../Rendering/DX12/IndexBuffer.h"
+#include "../Rendering/DX12/IndexBufferInstance.h"
 #include "../Rendering/DX12/Texture.h"
 #include "../Rendering/DX12/Material.h"
 #include "../Rendering/DX12/VertexBuffer.h"

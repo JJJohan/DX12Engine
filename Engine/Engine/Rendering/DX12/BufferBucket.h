@@ -2,6 +2,7 @@
 
 #include "BufferInstance.h"
 #include "HeapResource.h"
+#include <unordered_set>
 #include <set>
 
 struct ID3D12GraphicsCommandList;
