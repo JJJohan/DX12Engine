@@ -180,12 +180,17 @@ namespace Engine
 
 	void Transform::Rotate(const Vector3& eulerAngles)
 	{
-		float pitch = XMConvertToRadians(eulerAngles.X);
-		float yaw = XMConvertToRadians(eulerAngles.Y);
-		float roll = XMConvertToRadians(eulerAngles.Z);
+		_eulerAngles += eulerAngles;
+		_eulerAngles.X = Math::Clamp(_eulerAngles.X, -90.0f, 90.0f);
 
-		XMVECTOR rotation = XMQuaternionRotationRollPitchYaw(pitch, yaw, roll);
-		_rotation = XMQuaternionMultiply(rotation, _rotation);
+		float pitch = XMConvertToRadians(_eulerAngles.X);
+		float yaw = XMConvertToRadians(_eulerAngles.Y);
+		float roll = XMConvertToRadians(_eulerAngles.Z);
+
+		XMVECTOR pitchRot = XMQuaternionRotationAxis(Vector3::Right, pitch);
+		XMVECTOR yawRot = XMQuaternionRotationAxis(Vector3::Up, yaw);
+		XMVECTOR rollRot = XMQuaternionRotationAxis(Vector3::Forward, roll);
+		_rotation = XMQuaternionMultiply(XMQuaternionMultiply(pitchRot, yawRot), rollRot);
 
 		UpdateMatrix();
 	}
@@ -195,9 +200,14 @@ namespace Engine
 		LookAt(Vector3(x, y, z));
 	}
 
+	Vector3 Transform::GetEulerAngles() const
+	{
+		return _eulerAngles;
+	}
+
 	void Transform::LookAt(const Vector3& position)
 	{
-		XMMATRIX lookAt = XMMatrixLookAtRH(_position, position, Vector3::Up);
+		XMMATRIX lookAt = XMMatrixLookAtLH(_position, position, Vector3::Up);
 		_rotation = XMQuaternionRotationMatrix(lookAt);
 
 		UpdateMatrix();

@@ -33,14 +33,15 @@ namespace Engine
 		ENGINE_API Quaternion GetRotation() const;
 		ENGINE_API Vector3 GetScale() const;
 		ENGINE_API const DirectX::XMMATRIX& GetMatrix() const;
+		ENGINE_API Vector3 GetEulerAngles() const;
 
-		ENGINE_API void SetPosOverride(std::function<Vector3(float, float, float)> func);
-		ENGINE_API void SetRotOverride(std::function<Quaternion(float, float, float, float)> func);
-		ENGINE_API void SetScaleOverride(std::function<Vector3(float, float, float)> func);
+		void SetPosOverride(std::function<Vector3(float, float, float)> func);
+		void SetRotOverride(std::function<Quaternion(float, float, float, float)> func);
+		void SetScaleOverride(std::function<Vector3(float, float, float)> func);
 
-		ENGINE_API void GetPosOverride(std::function<Vector3(float, float, float)> func);
-		ENGINE_API void GetRotOverride(std::function<Quaternion(float, float, float, float)> func);
-		ENGINE_API void GetScaleOverride(std::function<Vector3(float, float, float)> func);
+		void GetPosOverride(std::function<Vector3(float, float, float)> func);
+		void GetRotOverride(std::function<Quaternion(float, float, float, float)> func);
+		void GetScaleOverride(std::function<Vector3(float, float, float)> func);
 
 		bool Moved;
 
@@ -49,6 +50,7 @@ namespace Engine
 
 		Vector3 _position;
 		Quaternion _rotation;
+		Vector3 _eulerAngles;
 		Vector3 _scale;
 
 		std::function<Vector3(float, float, float)> _setPosOverrideFunc;
