@@ -29,26 +29,26 @@ namespace Engine
 
 	Colour Colour::operator*(const Colour& rhs) const
 	{
-		return Colour(Clamp(_red * rhs._red, 0.0f, 1.0f),
-		              Clamp(_green * rhs._green, 0.0f, 1.0f),
-		              Clamp(_blue * rhs._blue, 0.0f, 1.0f),
-		              Clamp(_alpha * rhs._alpha, 0.0f, 1.0f));
+		return Colour(Math::Clamp(_red * rhs._red, 0.0f, 1.0f),
+			Math::Clamp(_green * rhs._green, 0.0f, 1.0f),
+			Math::Clamp(_blue * rhs._blue, 0.0f, 1.0f),
+			Math::Clamp(_alpha * rhs._alpha, 0.0f, 1.0f));
 	}
 
 	Colour Colour::operator+(const Colour& rhs) const
 	{
-		return Colour(Clamp(_red + rhs._red, 0.0f, 1.0f),
-		              Clamp(_green + rhs._green, 0.0f, 1.0f),
-		              Clamp(_blue + rhs._blue, 0.0f, 1.0f),
-		              Clamp(_alpha + rhs._alpha, 0.0f, 1.0f));
+		return Colour(Math::Clamp(_red + rhs._red, 0.0f, 1.0f),
+			Math::Clamp(_green + rhs._green, 0.0f, 1.0f),
+			Math::Clamp(_blue + rhs._blue, 0.0f, 1.0f),
+			Math::Clamp(_alpha + rhs._alpha, 0.0f, 1.0f));
 	}
 
 	Colour Colour::operator-(const Colour& rhs) const
 	{
-		return Colour(Clamp(_red - rhs._red, 0.0f, 1.0f),
-		              Clamp(_green - rhs._green, 0.0f, 1.0f),
-		              Clamp(_blue - rhs._blue, 0.0f, 1.0f),
-		              Clamp(_alpha - rhs._alpha, 0.0f, 1.0f));
+		return Colour(Math::Clamp(_red - rhs._red, 0.0f, 1.0f),
+			Math::Clamp(_green - rhs._green, 0.0f, 1.0f),
+			Math::Clamp(_blue - rhs._blue, 0.0f, 1.0f),
+			Math::Clamp(_alpha - rhs._alpha, 0.0f, 1.0f));
 	}
 
 	Colour& Colour::operator*=(const Colour& rhs)
@@ -103,17 +103,17 @@ namespace Engine
 
 	void Colour::SetRed(float const& value)
 	{
-		_red = Clamp(value, 0.0f, 1.0f);
+		_red = Math::Clamp(value, 0.0f, 1.0f);
 	}
 
 	void Colour::SetGreen(float const& value)
 	{
-		_green = Clamp(value, 0.0f, 1.0f);
+		_green = Math::Clamp(value, 0.0f, 1.0f);
 	}
 
 	void Colour::SetBlue(float const& value)
 	{
-		_blue = Clamp(value, 0.0f, 1.0f);
+		_blue = Math::Clamp(value, 0.0f, 1.0f);
 	}
 
 	Colour::operator DirectX::XMFLOAT3() const
@@ -128,7 +128,7 @@ namespace Engine
 
 	void Colour::SetAlpha(float const& value)
 	{
-		_alpha = Clamp(value, 0.0f, 1.0f);
+		_alpha = Math::Clamp(value, 0.0f, 1.0f);
 	}
 }
 
