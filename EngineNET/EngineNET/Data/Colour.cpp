@@ -30,6 +30,11 @@ namespace EngineNET
 		_pColour = new Engine::Colour(r, g, b, a);
 	}
 
+	Colour::Colour(Engine::Colour& vec)
+	{
+		_pColour = new Engine::Colour(vec);
+	}
+
 	Colour::~Colour()
 	{
 		this->!Colour();

@@ -77,8 +77,7 @@ namespace Engine
 
 	void Vector2::operator=(const Vector2& rhs)
 	{
-		XMVECTOR v = XMVectorSet(rhs.X, rhs.Y, 0.0f, 0.0f);
-		_dxVector = v;
+		_dxVector = XMVectorSet(rhs.X, rhs.Y, 0.0f, 0.0f);
 	}
 
 	Vector2 Vector2::operator*(const float& rhs) const

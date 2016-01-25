@@ -73,7 +73,7 @@ namespace Engine
 			size_t count = Count();
 			for (int i = 0; i < count; ++i)
 			{
-				_vertices[i].Uv.Z = float(index);
+				_vertices[i].Uv.z = float(index);
 			}
 
 			VertexBuffer* buffer = static_cast<VertexBuffer*>(_pBuffer);
@@ -99,7 +99,7 @@ namespace Engine
 		{
 			for (int i = 0; i < count; ++i)
 			{
-				_vertices[i].Uv.Z = float(_bufferIndex);
+				_vertices[i].Uv.z = float(_bufferIndex);
 			}
 		}
 

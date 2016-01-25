@@ -220,3 +220,5 @@ Engine/Build/EngineTests.dll
 Engine/Build/Engine_debug.dll
 Engine/Build/Engine_debug.lib
 *.metagen
+*.lastcodeanalysissucceeded
+*.opendb

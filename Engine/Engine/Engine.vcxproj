@@ -132,6 +132,7 @@
     <ClCompile Include="Rendering\DX12\Text.cpp" />
     <ClCompile Include="Rendering\DX12\Texture.cpp" />
     <ClCompile Include="Rendering\DX12\VertexBuffer.cpp" />
+    <ClCompile Include="Rendering\DX12\VertexBufferInstance.cpp" />
     <ClCompile Include="Rendering\IRenderer.cpp" />
     <ClCompile Include="Rendering\Renderer.cpp" />
     <ClCompile Include="stdafx.cpp">
@@ -179,6 +180,7 @@
     <ClInclude Include="Rendering\DX12\Text.h" />
     <ClInclude Include="Rendering\DX12\Texture.h" />
     <ClInclude Include="Rendering\DX12\VertexBuffer.h" />
+    <ClInclude Include="Rendering\DX12\VertexBufferInstance.h" />
     <ClInclude Include="Rendering\IRenderer.h" />
     <ClInclude Include="Rendering\Renderer.h" />
     <ClInclude Include="stdafx.h" />

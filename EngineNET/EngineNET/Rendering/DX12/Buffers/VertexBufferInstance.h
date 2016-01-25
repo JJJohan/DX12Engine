@@ -10,12 +10,12 @@ namespace Engine
 namespace EngineNET
 {
 	ref class Vector3;
-	ref class Vector4;
+	ref class Colour;
 
 	public ref struct Vertex
 	{
 		Vector3^ Pos;
-		Vector4^ Col;
+		Colour^ Col;
 		Vector3^ Uv;
 	};
 

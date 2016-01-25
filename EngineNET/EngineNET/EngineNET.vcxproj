@@ -60,7 +60,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;_USRDLL;ENGINENET_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Users\JJJohan\Source\Repos\DX12Engine\Engine</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\Engine\</AdditionalIncludeDirectories>
       <ForcedIncludeFiles>
       </ForcedIncludeFiles>
     </ClCompile>
@@ -68,7 +68,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>Engine_debug.lib;FreeImage.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>C:\Users\JJJohan\Source\Repos\DX12Engine\Engine\Engine\External\lib;C:\Users\JJJohan\Source\Repos\DX12Engine\Engine\Build</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\Engine\Build;$(SolutionDir)..\Engine\Engine\External\lib</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -79,7 +79,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>NDEBUG;_WINDOWS;_USRDLL;ENGINENET_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Users\JJJohan\Source\Repos\DX12Engine\Engine</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\Engine\</AdditionalIncludeDirectories>
       <ForcedIncludeFiles>
       </ForcedIncludeFiles>
     </ClCompile>
@@ -89,7 +89,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>Engine.lib;FreeImage.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>C:\Users\JJJohan\Source\Repos\DX12Engine\Engine\Engine\External\lib;C:\Users\JJJohan\Source\Repos\DX12Engine\Engine\Build</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\Engine\Build;$(SolutionDir)..\Engine\Engine\External\lib</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -102,8 +102,8 @@
     <ClCompile Include="Data\Vector3.cpp" />
     <ClCompile Include="Data\Vector4.cpp" />
     <ClCompile Include="Factory\ResourceFactory.cpp" />
-    <ClCompile Include="Rendering\DX12\Buffers\IndexBuffer.cpp" />
-    <ClCompile Include="Rendering\DX12\Buffers\VertexBuffer.cpp" />
+    <ClCompile Include="Rendering\DX12\Buffers\IndexBufferInstance.cpp" />
+    <ClCompile Include="Rendering\DX12\Buffers\VertexBufferInstance.cpp" />
     <ClCompile Include="Rendering\DX12\DX12Renderer.cpp" />
     <ClCompile Include="Rendering\DX12\Font.cpp" />
     <ClCompile Include="Rendering\DX12\FontManager.cpp" />
@@ -124,8 +124,8 @@
     <ClInclude Include="Data\Vector3.h" />
     <ClInclude Include="Data\Vector4.h" />
     <ClInclude Include="Factory\ResourceFactory.h" />
-    <ClInclude Include="Rendering\DX12\Buffers\IndexBuffer.h" />
-    <ClInclude Include="Rendering\DX12\Buffers\VertexBuffer.h" />
+    <ClInclude Include="Rendering\DX12\Buffers\IndexBufferInstance.h" />
+    <ClInclude Include="Rendering\DX12\Buffers\VertexBufferInstance.h" />
     <ClInclude Include="Rendering\DX12\DX12Renderer.h" />
     <ClInclude Include="Rendering\DX12\Font.h" />
     <ClInclude Include="Rendering\DX12\FontManager.h" />
@@ -136,9 +136,6 @@
     <ClInclude Include="Rendering\IRenderer.h" />
     <ClInclude Include="Rendering\Renderer.h" />
     <ClInclude Include="stdafx.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\engineeditor\program.cs" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

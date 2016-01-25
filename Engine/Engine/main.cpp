@@ -5,7 +5,7 @@
 #include "Rendering/DX12/Text.h"
 #include "Rendering/DX12/FontManager.h"
 #include "Rendering/DX12/Font.h"
-#include "Rendering/DX12/VertexBuffer.h"
+#include "Rendering/DX12/VertexBufferInstance.h"
 #include "Rendering/DX12/IndexBufferInstance.h"
 
 using namespace Engine;

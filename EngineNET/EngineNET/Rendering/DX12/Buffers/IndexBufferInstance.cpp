@@ -1,7 +1,7 @@
 #include "../../../stdafx.h"
 
-#include "IndexBuffer.h"
-#include "Engine/Rendering/DX12/IndexBuffer.h"
+#include "IndexBufferInstance.h"
+#include "Engine/Rendering/DX12/IndexBufferInstance.h"
 #include <vector>
 
 namespace EngineNET

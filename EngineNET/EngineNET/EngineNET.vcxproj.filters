@@ -63,9 +63,6 @@
     <ClCompile Include="Data\Vector3.cpp">
       <Filter>Source Files\Data</Filter>
     </ClCompile>
-    <ClCompile Include="Data\Vector2.cpp">
-      <Filter>Source Files\Data</Filter>
-    </ClCompile>
     <ClCompile Include="Data\Transform.cpp">
       <Filter>Source Files\Data</Filter>
     </ClCompile>
@@ -87,12 +84,6 @@
     <ClCompile Include="Rendering\DX12\Texture.cpp">
       <Filter>Source Files\Rendering\DX12</Filter>
     </ClCompile>
-    <ClCompile Include="Rendering\DX12\Buffers\VertexBuffer.cpp">
-      <Filter>Source Files\Rendering\DX12\Buffers</Filter>
-    </ClCompile>
-    <ClCompile Include="Rendering\DX12\Buffers\IndexBuffer.cpp">
-      <Filter>Source Files\Rendering\DX12\Buffers</Filter>
-    </ClCompile>
     <ClCompile Include="Rendering\DX12\Text.cpp">
       <Filter>Source Files\Rendering\DX12</Filter>
     </ClCompile>
@@ -111,6 +102,15 @@
     <ClCompile Include="Data\Vector4.cpp">
       <Filter>Source Files\Data</Filter>
     </ClCompile>
+    <ClCompile Include="Rendering\DX12\Buffers\VertexBufferInstance.cpp">
+      <Filter>Source Files\Rendering\DX12\Buffers</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\DX12\Buffers\IndexBufferInstance.cpp">
+      <Filter>Source Files\Rendering\DX12\Buffers</Filter>
+    </ClCompile>
+    <ClCompile Include="Data\Vector2.cpp">
+      <Filter>Source Files\Data</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Data\Colour.h">
@@ -122,17 +122,11 @@
     <ClInclude Include="Data\String.h">
       <Filter>Header Files\Data</Filter>
     </ClInclude>
-    <ClInclude Include="Data\Vector2.h">
-      <Filter>Header Files\Data</Filter>
-    </ClInclude>
     <ClInclude Include="Data\Vector3.h">
       <Filter>Header Files\Data</Filter>
     </ClInclude>
     <ClInclude Include="Data\Transform.h">
       <Filter>Header Files\Data</Filter>
-    </ClInclude>
-    <ClInclude Include="stdafx.h">
-      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Core\Core.h">
       <Filter>Header Files\Core</Filter>
@@ -152,12 +146,6 @@
     <ClInclude Include="Rendering\DX12\Texture.h">
       <Filter>Header Files\Rendering\DX12</Filter>
     </ClInclude>
-    <ClInclude Include="Rendering\DX12\Buffers\IndexBuffer.h">
-      <Filter>Header Files\Rendering\DX12\Buffers</Filter>
-    </ClInclude>
-    <ClInclude Include="Rendering\DX12\Buffers\VertexBuffer.h">
-      <Filter>Header Files\Rendering\DX12\Buffers</Filter>
-    </ClInclude>
     <ClInclude Include="Rendering\DX12\Material.h">
       <Filter>Header Files\Rendering\DX12</Filter>
     </ClInclude>
@@ -176,8 +164,17 @@
     <ClInclude Include="Data\Vector4.h">
       <Filter>Header Files\Data</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\engineeditor\program.cs" />
+    <ClInclude Include="stdafx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\DX12\Buffers\IndexBufferInstance.h">
+      <Filter>Header Files\Rendering\DX12\Buffers</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\DX12\Buffers\VertexBufferInstance.h">
+      <Filter>Header Files\Rendering\DX12\Buffers</Filter>
+    </ClInclude>
+    <ClInclude Include="Data\Vector2.h">
+      <Filter>Header Files\Data</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

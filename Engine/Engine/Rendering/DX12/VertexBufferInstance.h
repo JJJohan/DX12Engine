@@ -6,6 +6,12 @@
 #include "../../Data/Vector4.h"
 #include "../../Data/Colour.h"
 
+namespace DirectX
+{
+	struct XMFLOAT3;
+	struct XMFLOAT4;
+}
+
 namespace Engine
 {
 	struct Vertex
@@ -15,15 +21,15 @@ namespace Engine
 		}
 
 		Vertex(Vector3 pos, Colour col, Vector2 uv)
+			: Pos(pos)
+			, Col(col)
+			, Uv(uv.X, uv.Y, 0.0f)
 		{
-			Pos = pos;
-			Col = col;
-			Uv = Vector3(uv.X, uv.Y, 0.0f);
 		}
 
-		Vector3 Pos;
-		Colour Col;
-		Vector3 Uv;
+		DirectX::XMFLOAT3 Pos;
+		DirectX::XMFLOAT4 Col;
+		DirectX::XMFLOAT3 Uv;
 	};
 
 	enum VertexType

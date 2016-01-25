@@ -94,8 +94,7 @@ namespace Engine
 
 	void Vector4::operator=(const Vector4& rhs)
 	{
-		XMVECTOR v = XMVectorSet(rhs.X, rhs.Y, rhs.Z, rhs.W);
-		_dxVector = v;
+		_dxVector = XMVectorSet(rhs.X, rhs.Y, rhs.Z, rhs.W);
 	}
 
 	Vector4 Vector4::operator*(const float& rhs) const

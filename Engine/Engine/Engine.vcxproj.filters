@@ -193,6 +193,9 @@
     <ClCompile Include="Rendering\DX12\IndexBufferInstance.cpp">
       <Filter>Source Files\Rendering\DX12\Buffers</Filter>
     </ClCompile>
+    <ClCompile Include="Rendering\DX12\VertexBufferInstance.cpp">
+      <Filter>Source Files\Rendering\DX12\Buffers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="External\src\CPPFormat\format.h">
@@ -319,6 +322,9 @@
       <Filter>Header Files\Data</Filter>
     </ClInclude>
     <ClInclude Include="Rendering\DX12\IndexBufferInstance.h">
+      <Filter>Header Files\Rendering\DX12\Buffers</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\DX12\VertexBufferInstance.h">
       <Filter>Header Files\Rendering\DX12\Buffers</Filter>
     </ClInclude>
   </ItemGroup>

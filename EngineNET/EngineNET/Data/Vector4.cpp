@@ -1,5 +1,6 @@
 #include "Vector4.h"
 #include "Vector3.h"
+#include "Engine/Data/Vector3.h"
 #include "Engine/Data/Vector4.h"
 
 namespace EngineNET

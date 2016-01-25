@@ -15,6 +15,7 @@ namespace EngineNET
 		Colour();
 		Colour(float r, float g, float b);
 		Colour(float r, float g, float b, float a);
+		Colour(Engine::Colour& col);
 		~Colour();
 		!Colour();
 

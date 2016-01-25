@@ -1,6 +1,6 @@
 #include "Text.h"
 #include "Font.h"
-#include "VertexBuffer.h"
+#include "VertexBufferInstance.h"
 #include "Material.h"
 #include "IndexBufferInstance.h"
 #include "FontManager.h"

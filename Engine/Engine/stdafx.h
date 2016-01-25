@@ -17,9 +17,12 @@
 #include <vector>
 #include <set>
 #include <unordered_set>
-#include <mutex>
 #include <memory>
+
+#ifndef ENGINENET_EXPORTS
+#include <mutex>
 #include <thread>
+#endif
 
 #include <d3d12.h>
 #include <DirectXMath.h>

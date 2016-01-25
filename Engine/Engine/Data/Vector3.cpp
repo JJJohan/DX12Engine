@@ -90,8 +90,7 @@ namespace Engine
 
 	void Vector3::operator=(const Vector3& rhs)
 	{
-		XMVECTOR v = XMVectorSet(rhs.X, rhs.Y, rhs.Z, 0.0f);
-		_dxVector = v;
+		_dxVector = XMVectorSet(rhs.X, rhs.Y, rhs.Z, 0.0f);
 	}
 
 	Vector3 Vector3::operator*(const float& rhs) const
