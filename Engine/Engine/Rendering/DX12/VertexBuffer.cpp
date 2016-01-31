@@ -1,6 +1,6 @@
 #include "VertexBuffer.h"
-#include "HeapManager.h"
 #include "VertexBufferInstance.h"
+#include "HeapManager.h"
 
 namespace Engine
 {

@@ -1,8 +1,5 @@
 #pragma once
 
-#include <DirectXMath.h>
-#include "../../Data/Transform.h"
-
 using namespace DirectX;
 
 struct D3D12_VIEWPORT;
@@ -21,8 +18,8 @@ namespace Engine
 
 		~Camera();
 
-		float GetFOV() const;
-		void SetFOV(float fovInDegrees);
+		ENGINE_API float GetFOV() const;
+		ENGINE_API void SetFOV(float fovInDegrees);
 
 		D3D12_VIEWPORT& GetViewPort();
 		XMMATRIX GetViewMatrix() const;

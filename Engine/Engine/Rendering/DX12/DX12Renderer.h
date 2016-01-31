@@ -21,7 +21,7 @@ namespace Engine
 		DX12Renderer();
 		virtual ~DX12Renderer();
 
-		bool InitWindow(int width, int height, bool windowed) override;
+		bool InitWindow(int width, int height, bool windowed, HWND windowHandle) override;
 		bool Update() override;
 		bool Render() override;
 

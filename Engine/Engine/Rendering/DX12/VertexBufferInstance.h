@@ -1,10 +1,6 @@
 #pragma once
 
 #include "BufferInstance.h"
-#include "../../Data/Vector2.h"
-#include "../../Data/Vector3.h"
-#include "../../Data/Vector4.h"
-#include "../../Data/Colour.h"
 
 namespace DirectX
 {
@@ -20,7 +16,7 @@ namespace Engine
 		{
 		}
 
-		Vertex(Vector3 pos, Colour col, Vector2 uv)
+		Vertex(const Vector3& pos, const Colour& col, const Vector2& uv)
 			: Pos(pos)
 			, Col(col)
 			, Uv(uv.X, uv.Y, 0.0f)
@@ -48,7 +44,7 @@ namespace Engine
 		ENGINE_API std::vector<Vertex> GetVertices() const;
 
 		ENGINE_API const std::vector<D3D12_INPUT_ELEMENT_DESC>& GetInputLayout() const;
-		size_t Count() const;
+		ENGINE_API size_t Count() const override;
 		size_t GetSize() const override;
 
 		void SetBufferIndex(int index);

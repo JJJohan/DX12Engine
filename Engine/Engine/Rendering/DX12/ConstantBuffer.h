@@ -50,6 +50,7 @@ namespace Engine
 		void SetVector(std::string name, const DirectX::XMFLOAT4& value);
 		void SetMatrix(std::string name, const DirectX::XMFLOAT4X4& value);
 		std::vector<DataItem> GetData() const;
+		size_t Count() const override;
 		size_t GetSize() const override;
 		int GetIndex() const;
 		void SetIndex(int index);

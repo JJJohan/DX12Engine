@@ -1,6 +1,8 @@
 #include "Material.h"
 #include "Texture.h"
 
+using namespace Microsoft::WRL;
+
 #ifdef _DEBUG
 // Enable better shader debugging with the graphics debugging tools.
 UINT compileFlags = D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION;

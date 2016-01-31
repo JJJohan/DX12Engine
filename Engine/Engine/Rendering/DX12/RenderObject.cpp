@@ -1,9 +1,9 @@
 #include "RenderObject.h"
-#include "IndexBufferInstance.h"
 #include "VertexBufferInstance.h"
-#include "Material.h"
-#include "Camera.h"
+#include "IndexBufferInstance.h"
 #include "ConstantBuffer.h"
+#include "Camera.h"
+#include "Material.h"
 
 namespace Engine
 {
@@ -11,8 +11,18 @@ namespace Engine
 
 	RenderObject::RenderObject()
 		: _pVertexBuffer(nullptr)
+		, _pIndexBuffer(nullptr)
+		, _pMaterial(nullptr)
+	{
+		_renderObjects.insert(this);
+		_pCbuffer = ResourceFactory::CreateConstantBuffer();
+	}
+
+	RenderObject::RenderObject(std::string name)
+		: _pVertexBuffer(nullptr)
 		  , _pIndexBuffer(nullptr)
 		  , _pMaterial(nullptr)
+		  , _name(name)
 	{
 		_renderObjects.insert(this);
 		_pCbuffer = ResourceFactory::CreateConstantBuffer();
@@ -63,6 +73,11 @@ namespace Engine
 
 	void RenderObject::Update()
 	{
+		if (_pVertexBuffer == nullptr)
+		{
+			return;
+		}
+
 		Camera::Main()->ApplyTransform(_pCbuffer, Transform);
 		_pVertexBuffer->SetBufferIndex(_pCbuffer->GetIndex());
 
@@ -76,6 +91,11 @@ namespace Engine
 
 	void RenderObject::Draw()
 	{
+		if (_pVertexBuffer == nullptr)
+		{
+			return;
+		}
+
 		ID3D12GraphicsCommandList* commandList = static_cast<ID3D12GraphicsCommandList*>(ResourceFactory::GetCommandList());
 		_pMaterial->Bind(commandList);
 		_pVertexBuffer->Bind(commandList);

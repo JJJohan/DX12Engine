@@ -44,20 +44,22 @@ namespace Engine
 		_dxQuaternion = quaternion;
 	}
 
-	void Quaternion::SetEulerAngles(float pitch, float yaw, float roll)
+	Quaternion Quaternion::Euler(float pitch, float yaw, float roll)
 	{
 		pitch = XMConvertToRadians(pitch);
 		yaw = XMConvertToRadians(yaw);
 		roll = XMConvertToRadians(roll);
-		_dxQuaternion = XMQuaternionRotationRollPitchYaw(pitch, yaw, roll);
+		XMVECTOR q = XMQuaternionRotationRollPitchYaw(pitch, yaw, roll);
+		return Quaternion(q);
 	}
 
-	void Quaternion::SetEulerAngles(const Vector3& eulerAngles)
+	Quaternion Quaternion::Euler(const Vector3& eulerAngles)
 	{
 		eulerAngles.X = XMConvertToRadians(eulerAngles.X);
 		eulerAngles.Y = XMConvertToRadians(eulerAngles.Y);
 		eulerAngles.Z = XMConvertToRadians(eulerAngles.Z);
-		_dxQuaternion = XMQuaternionRotationRollPitchYawFromVector(eulerAngles);
+		XMVECTOR q = XMQuaternionRotationRollPitchYawFromVector(eulerAngles);
+		return Quaternion(q);
 	}
 
 	Vector3 Quaternion::GetEulerAngles() const

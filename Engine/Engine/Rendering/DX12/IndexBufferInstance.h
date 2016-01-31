@@ -12,7 +12,7 @@ namespace Engine
 		ENGINE_API void SetIndices(std::vector<int> indices);
 		ENGINE_API std::vector<int> GetIndices() const;
 
-		size_t Count() const;
+		ENGINE_API size_t Count() const override;
 		size_t GetSize() const override;
 
 	private:

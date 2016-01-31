@@ -1,6 +1,6 @@
-#include "CommandQueue.h"
-#include "HeapManager.h"
 #include "HeapResource.h"
+#include "HeapManager.h"
+#include "CommandQueue.h"
 
 namespace Engine
 {

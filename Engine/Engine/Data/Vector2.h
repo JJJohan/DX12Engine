@@ -1,7 +1,5 @@
 #pragma once
 
-#include "DirectXMath.h"
-
 namespace Engine
 {
 	class Vector2

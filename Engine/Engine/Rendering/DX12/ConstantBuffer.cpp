@@ -231,5 +231,10 @@ namespace Engine
 
 		return data;
 	}
+
+	size_t ConstantBufferInstance::Count() const
+	{
+		return _cbuffer.size();
+	}
 }
 

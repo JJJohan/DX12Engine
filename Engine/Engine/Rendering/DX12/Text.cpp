@@ -1,16 +1,18 @@
 #include "Text.h"
-#include "Font.h"
-#include "VertexBufferInstance.h"
 #include "Material.h"
-#include "IndexBufferInstance.h"
 #include "FontManager.h"
+#include "Font.h"
 #include "ConstantBuffer.h"
+#include "VertexBufferInstance.h"
+#include "IndexBufferInstance.h"
 
 using namespace DirectX;
 using namespace std::placeholders;
 
 namespace Engine
 {
+	std::mutex _textChangeMutex;
+
 	Text::Text(std::string fontName)
 		: _worldSpace(false)
 		  , _textDirty(false)
@@ -22,10 +24,30 @@ namespace Engine
 
 	Text::Text(Font* font)
 		: _worldSpace(false)
+		  , _pFont(font)
 		  , _textDirty(false)
 		  , _colDirty(false)
 	{
-		_pFont = font;
+		RegisterTransform();
+	}
+
+	Text::Text(std::string name, std::string fontName)
+		: RenderObject(name)
+		, _worldSpace(false)
+		, _textDirty(false)
+		, _colDirty(false)
+	{
+		_pFont = FontManager::GetFont(fontName);
+		RegisterTransform();
+	}
+
+	Text::Text(std::string name, Font* font)
+		: RenderObject(name)
+		, _worldSpace(false)
+		, _pFont(font)
+		, _textDirty(false)
+		, _colDirty(false)
+	{
 		RegisterTransform();
 	}
 
@@ -46,7 +68,7 @@ namespace Engine
 
 	void Text::Draw()
 	{
-		if (_pVertexBuffer == nullptr || _text.empty())
+		if (_text.empty())
 		{
 			return;
 		}
@@ -56,16 +78,16 @@ namespace Engine
 
 	void Text::Update()
 	{
-		if (_text.empty())
-		{
-			return;
-		}
-
 		if (_textDirty || _colDirty)
 		{
 			ChangeText();
 			_textDirty = false;
 			_colDirty = false;
+		}
+
+		if (_text.empty())
+		{
+			return;
 		}
 
 		if (_worldSpace)
@@ -106,8 +128,8 @@ namespace Engine
 			_pIndexBuffer = ResourceFactory::CreateIndexBufferInstance();
 			_pMaterial = ResourceFactory::CreateMaterial();
 			_pMaterial->SetTexture(_pFont->_pTexture);
-			_pMaterial->LoadVertexShader(GetRelativeFilePath("Shaders\\Font.hlsl"), "VSMain", "vs_5_1");
-			_pMaterial->LoadPixelShader(GetRelativeFilePath("Shaders\\Font.hlsl"), "PSMain", "ps_5_1");
+			_pMaterial->LoadVertexShader(GetRelativePath("Shaders\\Font.hlsl"), "VSMain", "vs_5_1");
+			_pMaterial->LoadPixelShader(GetRelativePath("Shaders\\Font.hlsl"), "PSMain", "ps_5_1");
 			_pMaterial->Finalise(_pVertexBuffer->GetInputLayout(), true);
 		}
 

@@ -1,5 +1,4 @@
 #include "BufferBucket.h"
-#include "BufferInstance.h"
 
 namespace Engine
 {
@@ -22,6 +21,12 @@ namespace Engine
 
 	void BufferBucket::ReleaseInstance(BufferInstance* instance)
 	{
+		if (_instances.empty())
+		{
+			Logging::LogWarning("Tried to delete a buffer instance while the buffer is already empty.");
+			return;
+		}
+
 		auto it = _instances.find(instance);
 		if (it != _instances.end())
 		{

@@ -1,7 +1,7 @@
 #include "DX12Renderer.h"
+#include "HeapManager.h"
 #include "CommandQueue.h"
 #include "Material.h"
-#include "HeapManager.h"
 #include "RenderObject.h"
 
 namespace Engine
@@ -58,9 +58,9 @@ namespace Engine
 #endif
 	}
 
-	bool DX12Renderer::InitWindow(int width, int height, bool windowed)
+	bool DX12Renderer::InitWindow(int width, int height, bool windowed, HWND windowHandle)
 	{
-		IRenderer::InitWindow(width, height, windowed);
+		IRenderer::InitWindow(width, height, windowed, windowHandle);
 
 		_scissorRect.right = _screenWidth;
 		_scissorRect.bottom = _screenHeight;
@@ -230,7 +230,7 @@ namespace Engine
 
 #if _DEBUG
 		// Get debug device for memory reporting.
-		_device.Get()->QueryInterface(IID_PPV_ARGS(&_debugDevice));
+		_device.As(&_debugDevice);
 #endif
 
 		// Populate feature level info.

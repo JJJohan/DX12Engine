@@ -15,6 +15,7 @@ namespace Engine
 
 		void Bind(ID3D12GraphicsCommandList* commandList) const;
 		size_t GetOffset() const;
+		virtual size_t Count() const = 0;
 		virtual size_t GetSize() const = 0;
 		void Unbind() const;
 

@@ -1,11 +1,5 @@
 #pragma once
 
-#include <wrl/client.h>
-#include <vector>
-#include <d3d12.h>
-
-using namespace Microsoft::WRL;
-
 namespace Engine
 {
 	struct PSOCacheItem

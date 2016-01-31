@@ -44,8 +44,8 @@ namespace Engine
 
 	private:
 		static bool HandlerRoutine(DWORD ctrlType);
-		static int _textColour;
-		static int _backgroundColour;
+		static short _textColour;
+		static short _backgroundColour;
 	};
 }
 

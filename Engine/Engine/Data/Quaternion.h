@@ -1,5 +1,4 @@
 #pragma once
-#include <DirectXMath.h>
 
 namespace Engine
 {
@@ -13,8 +12,8 @@ namespace Engine
 		ENGINE_API Quaternion(const Quaternion& quaternion);
 		ENGINE_API Quaternion(const DirectX::XMVECTOR& quaternion);
 
-		ENGINE_API void SetEulerAngles(float pitch, float yaw, float roll);
-		ENGINE_API void SetEulerAngles(const Vector3& eulerAngles);
+		static ENGINE_API Quaternion Euler(float pitch, float yaw, float roll);
+		static ENGINE_API Quaternion Euler(const Vector3& eulerAngles);
 		ENGINE_API Vector3 GetEulerAngles() const;
 
 		ENGINE_API Vector3 operator*(const Vector3& rhs) const;

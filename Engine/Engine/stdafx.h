@@ -17,11 +17,14 @@
 #include <vector>
 #include <set>
 #include <unordered_set>
+#include <unordered_map>
 #include <memory>
+#include <queue>
 
 #ifndef ENGINENET_EXPORTS
 #include <mutex>
 #include <thread>
+#include <wrl/client.h>
 #endif
 
 #include <d3d12.h>

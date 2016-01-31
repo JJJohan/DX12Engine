@@ -1,8 +1,5 @@
 #pragma once
 
-#include <unordered_set>
-#include "../../Data/Transform.h"
-
 namespace Engine
 {
 	class Material;
@@ -14,6 +11,7 @@ namespace Engine
 	{
 	public:
 		ENGINE_API RenderObject();
+		ENGINE_API RenderObject(std::string name);
 		ENGINE_API virtual ~RenderObject();
 
 		ENGINE_API void RenderObject::SetVertexBuffer(VertexBufferInstance* vertexBuffer);
@@ -35,6 +33,7 @@ namespace Engine
 		IndexBufferInstance* _pIndexBuffer;
 		ConstantBufferInstance* _pCbuffer;
 		Material* _pMaterial;
+		std::string _name;
 
 	private:
 		static std::unordered_set<RenderObject*> _renderObjects;

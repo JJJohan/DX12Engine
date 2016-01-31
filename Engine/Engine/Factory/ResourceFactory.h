@@ -1,7 +1,5 @@
 #pragma once
 
-#include <vector>
-
 struct ID3D12CommandList;
 struct ID3D12DescriptorHeap;
 struct ID3D12Device;

@@ -1,10 +1,6 @@
 #pragma once
 
-#include <memory>
-#include <wrl/client.h>
 #include "HeapResource.h"
-
-using namespace Microsoft::WRL;
 
 namespace Engine
 {

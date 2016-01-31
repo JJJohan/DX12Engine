@@ -1,8 +1,5 @@
 #pragma once
 
-#include <queue>
-#include <functional>
-
 struct ID3D12CommandList;
 struct ID3D12CommandAllocator;
 struct ID3D12Device;
