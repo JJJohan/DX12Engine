@@ -8,11 +8,6 @@
 
 namespace EngineNET
 {
-	bool IRenderer::InitWindow(int width, int height, bool windowed)
-	{
-		return _pIRenderer->InitWindow(width, height, windowed);
-	}
-
 	void IRenderer::SetClearColour(Colour^ colour)
 	{
 		_pIRenderer->SetClearColour(*(Engine::Colour*)colour);
@@ -23,14 +18,14 @@ namespace EngineNET
 		_pIRenderer->SetVsync(enabled);
 	}
 
-	void IRenderer::SetWindowTitle(String^ title)
+	void IRenderer::SetWindowTitle(System::String^ title)
 	{
-		_pIRenderer->SetWindowTitle(title->CStr());
+		_pIRenderer->SetWindowTitle(String::Sys2Std(title));
 	}
 
-	String^ IRenderer::GetDeviceName()
+	System::String^ IRenderer::GetDeviceName()
 	{
-		return gcnew String(_pIRenderer->GetDeviceName());
+		return String::Std2Sys(_pIRenderer->GetDeviceName());
 	}
 
 	int IRenderer::GetDeviceMemoryTotal()
@@ -43,9 +38,9 @@ namespace EngineNET
 		return int(_pIRenderer->GetDeviceMemoryFree());
 	}
 
-	String^ IRenderer::GetMaxFeatureLevel()
+	System::String^ IRenderer::GetMaxFeatureLevel()
 	{
-		return gcnew String(_pIRenderer->GetMaxFeatureLevel());
+		return String::Std2Sys(_pIRenderer->GetMaxFeatureLevel());
 	}
 
 	int IRenderer::ScreenWidth()

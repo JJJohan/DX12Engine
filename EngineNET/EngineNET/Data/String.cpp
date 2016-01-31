@@ -1,5 +1,3 @@
-#include "String.h"
-#include "Engine/Data/String.h"
 #include <msclr\marshal_cppstd.h>
 
 namespace EngineNET
@@ -54,7 +52,7 @@ namespace EngineNET
 		return _pString;
 	}
 
-	std::string String::CStr()
+	String::operator std::string()
 	{
 		return std::string(_pString->Str());
 	}

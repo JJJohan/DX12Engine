@@ -1,7 +1,5 @@
 #pragma once
 
-#include "../stdafx.h"
-
 namespace Engine
 {
 	class Quaternion;
@@ -21,8 +19,8 @@ namespace EngineNET
 		Quaternion(float x, float y, float z, float w);
 		Quaternion(Quaternion^ quaternion);
 
-		void SetEulerAngles(float pitch, float yaw, float roll);
-		void SetEulerAngles(Vector3^ eulerAngles);
+		static Quaternion^ Euler(float pitch, float yaw, float roll);
+		static Quaternion^ Euler(Vector3^ eulerAngles);
 		Vector3^ GetEulerAngles();
 
 		Vector3^ operator*(Vector3^ rhs);

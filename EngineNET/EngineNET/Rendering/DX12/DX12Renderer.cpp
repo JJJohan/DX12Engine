@@ -13,14 +13,4 @@ namespace EngineNET
 	{
 		_pIRenderer = renderer;
 	}
-
-	DX12Renderer::~DX12Renderer()
-	{
-		this->!DX12Renderer();
-	}
-
-	DX12Renderer::!DX12Renderer()
-	{
-		delete _pIRenderer;
-	}
 }

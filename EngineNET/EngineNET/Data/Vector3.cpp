@@ -1,7 +1,3 @@
-#include "Vector3.h"
-#include "Vector2.h"
-#include "Engine/Data/Vector3.h"
-
 namespace EngineNET
 {
 	static Vector3::Vector3()

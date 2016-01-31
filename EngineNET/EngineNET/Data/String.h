@@ -1,8 +1,5 @@
 #pragma once
 
-#include "../stdafx.h"
-#include <string>
-
 namespace Engine
 {
 	class String;
@@ -24,15 +21,15 @@ namespace EngineNET
 		char operator[](int index);
 		operator System::String^();
 		operator Engine::String*();
-		std::string CStr();
+		operator std::string();
 
 		int Length();
 		System::String^ Str();
 
+		static std::string Sys2Std(System::String^ string);
+		static System::String^ Std2Sys(std::string string);
+
 	private:
 		Engine::String* _pString;
-
-		std::string Sys2Std(System::String^ string);
-		System::String^ Std2Sys(std::string string);
 	};
 }

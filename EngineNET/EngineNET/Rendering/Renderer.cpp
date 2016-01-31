@@ -11,7 +11,17 @@ namespace EngineNET
 	IRenderer^ Renderer::CreateRenderer()
 	{
 		Engine::IRenderer* renderer = Engine::Renderer::CreateRenderer(Engine::RenderAPI::Direct3D12);
-		DX12Renderer^ dx12 = gcnew DX12Renderer(renderer);
-		return dx12;
+		_renderer = gcnew DX12Renderer(renderer);
+		return _renderer;
+	}
+
+	void Renderer::ProcessWindowMessage(IntPtr^ hwnd, int msg, IntPtr^ wParam, IntPtr^ lParam)
+	{
+		Engine::Renderer::ProcessWindowMessage((HWND)hwnd->ToPointer(), (UINT)msg, (WPARAM)wParam->ToPointer(), (LPARAM)lParam->ToPointer());
+	}
+
+	IRenderer^ Renderer::GetRenderer()
+	{
+		return _renderer;
 	}
 }

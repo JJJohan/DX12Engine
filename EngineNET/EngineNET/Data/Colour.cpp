@@ -1,6 +1,3 @@
-#include "Colour.h"
-#include "Engine/Data/Colour.h"
-
 namespace EngineNET
 {
 	static Colour::Colour()

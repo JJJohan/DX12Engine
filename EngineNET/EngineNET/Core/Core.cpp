@@ -1,57 +1,56 @@
-#define WIN32_LEAN_AND_MEAN
-#include <Windows.h>
 #include <vcclr.h>
-
-#include "Core.h"
-#include "../Data/String.h"
-#include "Engine/Core/Core.h"
 
 using namespace System;
 using namespace System::Runtime::InteropServices;
 
 namespace EngineNET
 {
-	Core::Core()
-	{
-		_pCore = new Engine::Core();
-	}
-
-	Core::~Core()
-	{
-		this->!Core();
-	}
-
-	Core::!Core()
-	{
-		delete _pCore;
-	}
-
 	bool Core::Update()
 	{
-		return _pCore->Update();
+		return Engine::Core::Update();
 	}
 
 	String^ Core::GetApplicationDirectory()
 	{
-		return gcnew String(_pCore->GetApplicationDirectory());
+		return gcnew String(Engine::Core::GetApplicationDirectory());
 	}
 
 	bool Core::Running()
 	{
-		return _pCore->Running();
+		return Engine::Core::Running();
 	}
 
 	void Core::Exit()
 	{
-		_pCore->Exit();
+		Engine::Core::Exit();
 	}
 
 	void Core::Destroy()
 	{
-		_pCore->Destroy();
+		Engine::Core::Destroy();
+
+		if (_gchStartDelegate.IsAllocated)
+		{
+			_gchStartDelegate.Free();
+		}
+
+		if (_gchUpdateDelegate.IsAllocated)
+		{
+			_gchUpdateDelegate.Free();
+		}
+
+		if (_gchDrawDelegate.IsAllocated)
+		{
+			_gchDrawDelegate.Free();
+		}
+
+		if (_gchDestroyDelegate.IsAllocated)
+		{
+			_gchDestroyDelegate.Free();
+		}
 	}
 
-	void Core::Initialise(int width, int height, bool windowed, StartFunc^ start, UpdateFunc^ update, DrawFunc^ draw, DestroyFunc^ destroy)
+	void Core::Initialise(int width, int height, bool windowed, StartFunc^ start, UpdateFunc^ update, DrawFunc^ draw, DestroyFunc^ destroy, IntPtr^ handle)
 	{		
 		IntPtr startPtr = Marshal::GetFunctionPointerForDelegate(start);
 		IntPtr updatePtr = Marshal::GetFunctionPointerForDelegate(update);
@@ -68,6 +67,22 @@ namespace EngineNET
 		linkDesc.DrawLoop = drawCallback;
 		linkDesc.DestroyMethod = destroyCallback;
 
-		_pCore->Initialise(width, height, windowed, linkDesc);
+		_gchStartDelegate = GCHandle::Alloc(start);
+		_gchUpdateDelegate = GCHandle::Alloc(update);
+		_gchDrawDelegate = GCHandle::Alloc(draw);
+		_gchDestroyDelegate = GCHandle::Alloc(destroy);
+
+		HWND windowHandle = nullptr;
+		if (handle != nullptr)
+		{
+			windowHandle = (HWND)handle->ToPointer();
+		}
+
+		Engine::Core::Initialise(width, height, windowed, linkDesc, windowHandle);
+	}
+
+	void Core::Initialise(int width, int height, bool windowed, StartFunc^ start, UpdateFunc^ update, DrawFunc^ draw, DestroyFunc^ destroy)
+	{
+		Initialise(width, height, windowed, start, update, draw, destroy, nullptr);
 	}
 }

@@ -1,7 +1,5 @@
 #pragma once
 
-#include "../stdafx.h"
-
 namespace Engine
 {
 	class Core;
@@ -20,18 +18,18 @@ namespace EngineNET
 	public ref class Core
 	{
 	public:
-		~Core();
-		!Core();
-
 		static bool Update();
 		static String^ GetApplicationDirectory();
 		static bool Running();
 		static void Exit();
 		static void Destroy();
 		static void Initialise(int width, int height, bool windowed, StartFunc^ start, UpdateFunc^ update, DrawFunc^ draw, DestroyFunc^ destroy);
+		static void Initialise(int width, int height, bool windowed, StartFunc^ start, UpdateFunc^ update, DrawFunc^ draw, DestroyFunc^ destroy, System::IntPtr^ handle);
 
 	private:
-		Core();
-		static Engine::Core* _pCore;
+		static System::Runtime::InteropServices::GCHandle _gchStartDelegate;
+		static System::Runtime::InteropServices::GCHandle _gchUpdateDelegate;
+		static System::Runtime::InteropServices::GCHandle _gchDrawDelegate;
+		static System::Runtime::InteropServices::GCHandle _gchDestroyDelegate;
 	};
 }

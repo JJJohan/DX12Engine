@@ -1,8 +1,3 @@
-#include "Quaternion.h"
-#include "Vector3.h"
-#include "Engine/Data/Quaternion.h"
-#include "Engine/Data/Vector3.h"
-
 namespace EngineNET
 {
 	static Quaternion::Quaternion()
@@ -30,14 +25,29 @@ namespace EngineNET
 		_pQuaternion = new Engine::Quaternion(x, y, z, w);
 	}
 
-	void Quaternion::SetEulerAngles(float pitch, float yaw, float roll)
+#pragma managed(push, off)
+	float* _Euler(float pitch, float yaw, float roll)
 	{
-		_pQuaternion->SetEulerAngles(pitch, yaw, roll);
+		Engine::Quaternion q = Engine::Quaternion::Euler(pitch, yaw, roll);
+		float* val = new float[4] { q.X, q.Y, q.Z, q.W };
+		return val;
+	}
+#pragma managed(pop)
+
+	Quaternion^ Quaternion::Euler(float pitch, float yaw, float roll)
+	{
+		float* val = _Euler(pitch, yaw, roll);
+		Quaternion^ q = gcnew Quaternion(val[0], val[1], val[2], val[3]);
+		delete[] val;
+		return q;
 	}
 
-	void Quaternion::SetEulerAngles(Vector3^ eulerAngles)
+	Quaternion^ Quaternion::Euler(Vector3^ eulerAngles)
 	{
-		_pQuaternion->SetEulerAngles(*(Engine::Vector3*)eulerAngles);
+		float* val = _Euler(eulerAngles->X, eulerAngles->Y, eulerAngles->Z);
+		Quaternion^ q = gcnew Quaternion(val[0], val[1], val[2], val[3]);
+		delete[] val;
+		return q;
 	}
 
 	Quaternion::Quaternion(Quaternion^ q)
@@ -59,7 +69,7 @@ namespace EngineNET
 	}
 
 #pragma managed(push, off)
-	Engine::Quaternion* Multiply(Engine::Quaternion* lhs, Engine::Quaternion* rhs)
+	Engine::Quaternion* _Multiply(Engine::Quaternion* lhs, Engine::Quaternion* rhs)
 	{
 		Engine::Quaternion tmp;
 		tmp = lhs->operator*(*rhs);
@@ -67,7 +77,7 @@ namespace EngineNET
 		return new Engine::Quaternion(tmp.X, tmp.Y, tmp.Z, tmp.W);
 	}
 
-	Engine::Vector3* Multiply(Engine::Quaternion* lhs, Engine::Vector3* rhs)
+	Engine::Vector3* _Multiply(Engine::Quaternion* lhs, Engine::Vector3* rhs)
 	{
 		Engine::Vector3 tmp;
 		tmp = lhs->operator*(*rhs);
@@ -75,7 +85,7 @@ namespace EngineNET
 		return new Engine::Vector3(tmp.X, tmp.Y, tmp.Z);
 	}
 
-	Engine::Vector3* Euler(Engine::Quaternion* q)
+	Engine::Vector3* _GetEuler(Engine::Quaternion* q)
 	{
 		Engine::Vector3 tmp = q->GetEulerAngles();
 		return new Engine::Vector3(tmp.X, tmp.Y, tmp.Z);
@@ -84,7 +94,7 @@ namespace EngineNET
 
 	Vector3^ Quaternion::GetEulerAngles()
 	{
-		Engine::Vector3* euler = Euler(_pQuaternion);
+		Engine::Vector3* euler = _GetEuler(_pQuaternion);
 		Vector3^ out = gcnew Vector3(euler->X, euler->Y, euler->Z);
 		delete euler;
 		return out;
@@ -97,7 +107,7 @@ namespace EngineNET
 
 	Vector3^ Quaternion::operator*(Vector3^ rhs)
 	{
-		Engine::Vector3* vec = Multiply(_pQuaternion, rhs);
+		Engine::Vector3* vec = _Multiply(_pQuaternion, rhs);
 		Vector3^ out = gcnew Vector3(vec->X, vec->Y, vec->Z);
 		delete vec;
 
@@ -106,7 +116,7 @@ namespace EngineNET
 
 	Quaternion^ Quaternion::operator*(Quaternion^ rhs)
 	{
-		Engine::Quaternion* q = Multiply(_pQuaternion, rhs);
+		Engine::Quaternion* q = _Multiply(_pQuaternion, rhs);
 		Quaternion^ out = gcnew Quaternion(q->X, q->Y, q->Z, q->W);
 		delete q;
 

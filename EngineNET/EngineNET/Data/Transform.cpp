@@ -1,23 +1,8 @@
-#include "Transform.h"
-#include "Vector3.h"
-#include "Quaternion.h"
-#include "Engine/Data/Transform.h"
-
 namespace EngineNET
 {
-	Transform::Transform()
+	Transform::Transform(Engine::Transform* transform)
 	{
-		_pTransform = new Engine::Transform();
-	}
-
-	Transform::~Transform()
-	{
-		this->!Transform();
-	}
-
-	Transform::!Transform()
-	{
-		delete _pTransform;
+		_pTransform = transform;
 	}
 
 	void Transform::Move(Vector3^ translation, Space relativeTo)
@@ -25,6 +10,26 @@ namespace EngineNET
 		Engine::Vector3* v = new Engine::Vector3(translation->X, translation->Y, translation->Z);
 		_pTransform->Move(*v, (Engine::Space)relativeTo);
 		delete v;
+	}
+
+	void Transform::Rotate(Vector3^ eulerAngles)
+	{
+		_pTransform->Rotate(*(Engine::Vector3*)eulerAngles);
+	}
+
+	void Transform::Rotate(float pitch, float yaw, float roll)
+	{
+		_pTransform->Rotate(pitch, yaw, roll);
+	}
+
+	void Transform::LookAt(float x, float y, float z)
+	{
+		_pTransform->LookAt(x, y, z);
+	}
+
+	void Transform::LookAt(Vector3^ position)
+	{
+		_pTransform->LookAt(*(Engine::Vector3*)position);
 	}
 
 #pragma managed(push, off)

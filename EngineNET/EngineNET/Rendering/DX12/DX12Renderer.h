@@ -14,7 +14,5 @@ namespace EngineNET
 	{
 	public:
 		DX12Renderer(Engine::IRenderer* renderer);
-		~DX12Renderer();
-		!DX12Renderer();
 	};
 }
