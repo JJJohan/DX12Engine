@@ -5,7 +5,7 @@
 #include "Rendering/DX12/Text.h"
 #include "Rendering/DX12/FontManager.h"
 #include "Rendering/DX12/Font.h"
-#include "Rendering/DX12/VertexBuffer.h"
+#include "Rendering/DX12/VertexBufferInstance.h"
 #include "Rendering/DX12/IndexBufferInstance.h"
 
 using namespace Engine;
@@ -80,15 +80,15 @@ void Game::Start()
 	vertexBuffer->SetVertices(triangleVertices);
 
 	_pTexture = ResourceFactory::CreateTexture();
-	_pTexture->Load(GetRelativeFilePath("Textures\\font.dds"));
+	_pTexture->Load(GetRelativePath("Textures\\font.dds"));
 
 	_pMaterial = ResourceFactory::CreateMaterial();
 	_pMaterial->SetTexture(_pTexture);
-	_pMaterial->LoadVertexShader(GetRelativeFilePath("Shaders\\DiffuseTexture.hlsl"), "VSMain", "vs_5_1");
-	_pMaterial->LoadPixelShader(GetRelativeFilePath("Shaders\\DiffuseTexture.hlsl"), "PSMain", "ps_5_1");
+	_pMaterial->LoadVertexShader(GetRelativePath("Shaders\\DiffuseTexture.hlsl"), "VSMain", "vs_5_1");
+	_pMaterial->LoadPixelShader(GetRelativePath("Shaders\\DiffuseTexture.hlsl"), "PSMain", "ps_5_1");
 	_pMaterial->Finalise(vertexBuffer->GetInputLayout());
 
-	_pTriangle = new RenderObject();
+	_pTriangle = new RenderObject("triangle");
 	_pTriangle->SetVertexBuffer(vertexBuffer);
 	_pTriangle->SetMaterial(_pMaterial);
 
@@ -116,24 +116,24 @@ void Game::Start()
 	indexBuffer->SetIndices(indices);
 
 	_pTexture2 = ResourceFactory::CreateTexture();
-	_pTexture2->Load(GetRelativeFilePath("Textures\\test2.png"));
+	_pTexture2->Load(GetRelativePath("Textures\\test2.png"));
 
 	_pMaterial2 = ResourceFactory::CreateMaterial();
 	_pMaterial2->SetTexture(_pTexture2);
-	_pMaterial2->LoadVertexShader(GetRelativeFilePath("Shaders\\DiffuseTexture.hlsl"), "VSMain", "vs_5_1");
-	_pMaterial2->LoadPixelShader(GetRelativeFilePath("Shaders\\DiffuseTexture.hlsl"), "PSMain", "ps_5_1");
+	_pMaterial2->LoadVertexShader(GetRelativePath("Shaders\\DiffuseTexture.hlsl"), "VSMain", "vs_5_1");
+	_pMaterial2->LoadPixelShader(GetRelativePath("Shaders\\DiffuseTexture.hlsl"), "PSMain", "ps_5_1");
 	_pMaterial2->Finalise(vertexBuffer2->GetInputLayout());
 
-	_pTriangle2 = new RenderObject();
+	_pTriangle2 = new RenderObject("triangle2");
 	_pTriangle2->SetIndexBuffer(indexBuffer);
 	_pTriangle2->SetVertexBuffer(vertexBuffer2);
 	_pTriangle2->SetMaterial(_pMaterial2);
 
-	_pFont = FontManager::LoadFont("Myriad", GetRelativeFilePath("Textures\\myriad.dds"), GetRelativeFilePath("Textures\\myriad.txt"));
-	_pText = new Text(_pFont);
+	_pFont = FontManager::LoadFont("Myriad", GetRelativePath("Textures\\myriad.dds"), GetRelativePath("Textures\\myriad.txt"));
+	_pText = new Text("text", _pFont);
 	_pText->SetColour(Colour::Yellow);
 	_pText->Transform.SetPosition(0.0f, 0.0f, 0.0f);
-	_pText2 = new Text(_pFont);
+	_pText2 = new Text("text2", _pFont);
 	_pText2->SetText("Hello world!");
 	_pText2->Transform.SetPosition(0.0f, 20.0f, 0.0f);
 	_pText2->EnableWorldSpace(true);

@@ -13,9 +13,9 @@ namespace Engine
 
 	Colour::Colour()
 		: _red(1.0f)
-		  , _green(1.0f)
-		  , _blue(1.0f)
-		  , _alpha(1.0f)
+		, _green(1.0f)
+		, _blue(1.0f)
+		, _alpha(1.0f)
 	{
 	}
 
@@ -30,25 +30,25 @@ namespace Engine
 	Colour Colour::operator*(const Colour& rhs) const
 	{
 		return Colour(Math::Clamp(_red * rhs._red, 0.0f, 1.0f),
-			Math::Clamp(_green * rhs._green, 0.0f, 1.0f),
-			Math::Clamp(_blue * rhs._blue, 0.0f, 1.0f),
-			Math::Clamp(_alpha * rhs._alpha, 0.0f, 1.0f));
+		              Math::Clamp(_green * rhs._green, 0.0f, 1.0f),
+		              Math::Clamp(_blue * rhs._blue, 0.0f, 1.0f),
+		              Math::Clamp(_alpha * rhs._alpha, 0.0f, 1.0f));
 	}
 
 	Colour Colour::operator+(const Colour& rhs) const
 	{
 		return Colour(Math::Clamp(_red + rhs._red, 0.0f, 1.0f),
-			Math::Clamp(_green + rhs._green, 0.0f, 1.0f),
-			Math::Clamp(_blue + rhs._blue, 0.0f, 1.0f),
-			Math::Clamp(_alpha + rhs._alpha, 0.0f, 1.0f));
+		              Math::Clamp(_green + rhs._green, 0.0f, 1.0f),
+		              Math::Clamp(_blue + rhs._blue, 0.0f, 1.0f),
+		              Math::Clamp(_alpha + rhs._alpha, 0.0f, 1.0f));
 	}
 
 	Colour Colour::operator-(const Colour& rhs) const
 	{
 		return Colour(Math::Clamp(_red - rhs._red, 0.0f, 1.0f),
-			Math::Clamp(_green - rhs._green, 0.0f, 1.0f),
-			Math::Clamp(_blue - rhs._blue, 0.0f, 1.0f),
-			Math::Clamp(_alpha - rhs._alpha, 0.0f, 1.0f));
+		              Math::Clamp(_green - rhs._green, 0.0f, 1.0f),
+		              Math::Clamp(_blue - rhs._blue, 0.0f, 1.0f),
+		              Math::Clamp(_alpha - rhs._alpha, 0.0f, 1.0f));
 	}
 
 	Colour& Colour::operator*=(const Colour& rhs)

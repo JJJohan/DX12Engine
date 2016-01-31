@@ -219,3 +219,12 @@ Engine/Build/Engine.lib
 Engine/Build/EngineTests.dll
 Engine/Build/Engine_debug.dll
 Engine/Build/Engine_debug.lib
+*.metagen
+*.lastcodeanalysissucceeded
+*.opendb
+EngineNET/Build/EngineEditor.vshost.exe.config
+Engine/Build/EngineTests.lib
+EngineNET/Build/Engine.dll
+EngineNET/Build/EngineEditor.exe.config
+EngineNET/Build/EngineNET.dll
+EngineNET/Build/Engine_debug.dll

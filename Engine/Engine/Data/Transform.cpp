@@ -4,12 +4,12 @@ namespace Engine
 {
 	Transform::Transform()
 		: Moved(false)
-		  , _setPosOverride(false)
-		  , _setRotOverride(false)
-		  , _setScaleOverride(false)
-		  , _getPosOverride(false)
-		  , _getRotOverride(false)
-		  , _getScaleOverride(false)
+		, _setPosOverride(false)
+		, _setRotOverride(false)
+		, _setScaleOverride(false)
+		, _getPosOverride(false)
+		, _getRotOverride(false)
+		, _getScaleOverride(false)
 	{
 		_worldMatrix = XMMatrixTranslation(0.0f, 0.0f, 0.0f);
 		_scale = Vector3::One;

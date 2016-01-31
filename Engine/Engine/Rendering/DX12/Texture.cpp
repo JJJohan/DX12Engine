@@ -8,9 +8,9 @@ namespace Engine
 
 	Texture::Texture()
 		: _pSrvHeap(nullptr)
-		  , _width(0)
-		  , _height(0)
-		  , _size(0)
+		, _width(0)
+		, _height(0)
+		, _size(0)
 	{
 		_index = ResourceFactory::GetTextureSlot();
 		if (_index == -1)

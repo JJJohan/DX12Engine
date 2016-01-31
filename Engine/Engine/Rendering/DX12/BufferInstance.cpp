@@ -5,8 +5,8 @@ namespace Engine
 {
 	BufferInstance::BufferInstance()
 		: _pBuffer(nullptr)
-		  , _pDevice(nullptr)
-		  , _offset(0)
+		, _pDevice(nullptr)
+		, _offset(0)
 	{
 	}
 

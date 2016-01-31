@@ -20,7 +20,7 @@ namespace Engine
 		static ENGINE_API bool Running();
 		static ENGINE_API void Exit();
 		static ENGINE_API void Destroy();
-		static ENGINE_API void Initialise(int width, int height, bool windowed, ENGINE_LINK_DESC engineLink);
+		static ENGINE_API void Initialise(int width, int height, bool windowed, ENGINE_LINK_DESC engineLink, HWND windowHandle = nullptr);
 
 	private:
 		static void Render();

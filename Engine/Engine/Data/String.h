@@ -1,8 +1,5 @@
 #pragma once
 
-#include <string>
-#include <vector>
-
 #ifndef ENGINENET_EXPORTS
 #include "../External/src/CPPFormat/format.h"
 #endif

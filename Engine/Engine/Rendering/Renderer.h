@@ -19,9 +19,8 @@ namespace Engine
 		static bool Render();
 		static bool Update();
 		static HWND GetWindowHandle();
-		static IRenderer* GetRenderer();
-
-	private:
+		static ENGINE_API IRenderer* GetRenderer();
+		static ENGINE_API void ProcessWindowMessage(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 		Renderer();
 	};
 }

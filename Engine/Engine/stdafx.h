@@ -17,9 +17,15 @@
 #include <vector>
 #include <set>
 #include <unordered_set>
-#include <mutex>
+#include <unordered_map>
 #include <memory>
+#include <queue>
+
+#ifndef ENGINENET_EXPORTS
+#include <mutex>
 #include <thread>
+#include <wrl/client.h>
+#endif
 
 #include <d3d12.h>
 #include <DirectXMath.h>
@@ -30,10 +36,12 @@
 #include "Utils/Helpers.h"
 #include "Utils/Console.h"
 #include "Utils/SystemInfo.h"
+#include "Utils/Math.h"
 
 #include "Data/Colour.h"
 #include "Data/Vector2.h"
 #include "Data/Vector3.h"
+#include "Data\Vector4.h"
 #include "Data/Quaternion.h"
 #include "Data/String.h"
 #include "Data/Transform.h"
@@ -62,3 +70,4 @@
 #include "Rendering/DX12/CommandQueue.h"*/
 
 #include "Input/Input.h"
+

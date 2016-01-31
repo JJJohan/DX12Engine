@@ -12,7 +12,7 @@ namespace Engine
 		IRenderer();
 		virtual ~IRenderer();
 
-		ENGINE_API virtual bool InitWindow(int width, int height, bool windowed);
+		ENGINE_API virtual bool InitWindow(int width, int height, bool windowed, HWND windowHandle = nullptr);
 		virtual bool Render() = 0;
 		virtual bool Update() = 0;
 		bool WindowRender() const;
@@ -29,6 +29,8 @@ namespace Engine
 		void AssignCreateMethod(const std::function<void()>& createMethod);
 		ENGINE_API int ScreenWidth() const;
 		ENGINE_API int ScreenHeight() const;
+
+		static LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 	protected:
 		int _screenWidth;
@@ -53,8 +55,8 @@ namespace Engine
 		bool RegisterInstance() const;
 		bool RegisterWindow();
 
-		static LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 		static HWND _windowClosed;
+		static bool _externalHandle;
 		static bool _maximized;
 	};
 }

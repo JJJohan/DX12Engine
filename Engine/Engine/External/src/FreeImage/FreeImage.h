@@ -68,6 +68,8 @@
 
 
 
+
+
 		#define DLL_CALLCONV
 #if defined(GCC_HASCLASSVISIBILITY)
 			#define DLL_API __attribute__ ((visibility("default")))
@@ -211,6 +213,8 @@ typedef unsigned __int64 UINT64;
 
 
 
+
+
 typedef struct tagRGBQUAD {
 #if FREEIMAGE_COLORORDER == FREEIMAGE_COLORORDER_BGR
   BYTE rgbBlue;
@@ -221,6 +225,8 @@ typedef struct tagRGBQUAD {
   BYTE rgbGreen;
   BYTE rgbBlue;
 #endif // FREEIMAGE_COLORORDER
+
+
 
 
 
@@ -240,6 +246,8 @@ typedef struct tagRGBTRIPLE {
 
 
 
+
+
 } RGBTRIPLE;
 
 #if (defined(_WIN32) || defined(__WIN32__))
@@ -247,6 +255,8 @@ typedef struct tagRGBTRIPLE {
 #else
 #pragma pack()
 #endif // WIN32
+
+
 
 
 

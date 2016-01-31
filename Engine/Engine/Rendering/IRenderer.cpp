@@ -15,18 +15,19 @@ namespace Engine
 {
 	HWND IRenderer::_windowClosed = nullptr;
 	bool IRenderer::_maximized = false;
+	bool IRenderer::_externalHandle = false;
 
 	IRenderer::IRenderer()
 		: _screenWidth(0)
-		  , _screenHeight(0)
-		  , _aspectRatio(1.0f)
-		  , _windowed(false)
-		  , _windowHandle(nullptr)
-		  , _windowInstance(HINSTANCE(GetModuleHandle(nullptr)))
-		  , _deviceMemoryTotal(0)
-		  , _deviceMemoryFree(0)
-		  , _vsync(true)
-		  , _renderFinished(true)
+		, _screenHeight(0)
+		, _aspectRatio(1.0f)
+		, _windowed(false)
+		, _windowHandle(nullptr)
+		, _windowInstance(HINSTANCE(GetModuleHandle(nullptr)))
+		, _deviceMemoryTotal(0)
+		, _deviceMemoryFree(0)
+		, _vsync(true)
+		, _renderFinished(true)
 	{
 		_windowClosed = nullptr;
 		IRenderer::SetClearColour(Colour::Blue);
@@ -51,6 +52,11 @@ namespace Engine
 
 	bool IRenderer::WindowRender() const
 	{
+		if (_externalHandle)
+		{
+			return false;
+		}
+
 		// Main message loop:
 		MSG msg;
 		while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE) > 0)
@@ -62,12 +68,19 @@ namespace Engine
 		return (_windowClosed == _windowHandle);
 	}
 
-	bool IRenderer::InitWindow(int width, int height, bool windowed)
+	bool IRenderer::InitWindow(int width, int height, bool windowed, HWND windowHandle)
 	{
 		_screenWidth = width;
 		_screenHeight = height;
 		_aspectRatio = float(width) / float(height);
 		_windowed = windowed;
+
+		if (windowHandle != nullptr)
+		{
+			_windowHandle = windowHandle;
+			_externalHandle = true;
+			return EXIT_SUCCESS;
+		}
 
 		if (RegisterInstance() == 0)
 		{
@@ -169,7 +182,10 @@ namespace Engine
 			}
 
 		default:
-			return DefWindowProc(hwnd, msg, wParam, lParam);
+			if (!_externalHandle)
+			{
+				return DefWindowProc(hwnd, msg, wParam, lParam);
+			}
 		}
 
 		return EXIT_SUCCESS;
@@ -233,7 +249,6 @@ namespace Engine
 		return _screenHeight;
 	}
 
-
 	int IRenderer::ScreenWidth() const
 	{
 		return _screenWidth;
@@ -269,6 +284,11 @@ namespace Engine
 		_windowHandle = CreateWindow(L"EngineProcess", L"Engine Window", WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT,
 			_screenWidth, _screenHeight, nullptr, nullptr, _windowInstance, nullptr);
 
+		if (!_windowHandle)
+		{
+			return EXIT_FAILURE;
+		}
+
 		RAWINPUTDEVICE rid[2];
 		rid[0].usUsagePage = HID_USAGE_PAGE_GENERIC; // 0x01
 		rid[0].usUsage = HID_USAGE_GENERIC_MOUSE; // 0x02
@@ -281,11 +301,6 @@ namespace Engine
 		rid[1].hwndTarget = _windowHandle;
 
 		if (!RegisterRawInputDevices(rid, 2, sizeof(RAWINPUTDEVICE)))
-		{
-			return EXIT_FAILURE;
-		}
-
-		if (!_windowHandle)
 		{
 			return EXIT_FAILURE;
 		}

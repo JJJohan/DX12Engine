@@ -5,7 +5,7 @@ namespace Engine
 {
 	Logging::LogPriority Logging::LogLevel = Logging::LogPriority::Info;
 	bool Logging::_logToFile = true;
-	String Logging::_logFilePath = GetRelativeFilePath("");
+	String Logging::_logFilePath = GetRelativePath("");
 
 	void Logging::LogError(const String& message)
 	{

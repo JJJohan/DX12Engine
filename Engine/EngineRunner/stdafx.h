@@ -27,7 +27,6 @@
 #include "Rendering/DX12/d3dx12.h"
 
 #include "Utils/Logging.h"
-#include "Utils/Helpers.h"
 #include "Utils/Console.h"
 #include "Utils/SystemInfo.h"
 
@@ -42,6 +41,8 @@
 #include "Core/Time.h"
 
 #include "Factory/ResourceFactory.h"
+
+#include "Utils/Helpers.h"
 
 /*#include "Rendering/DX12/BufferBucket.h"
 #include "Rendering/DX12/BufferInstance.h"

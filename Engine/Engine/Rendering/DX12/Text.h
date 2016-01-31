@@ -1,8 +1,6 @@
 #pragma once
 
-#include <mutex>
 #include "RenderObject.h"
-#include "../../Data/Colour.h"
 
 namespace Engine
 {
@@ -13,6 +11,8 @@ namespace Engine
 	public:
 		ENGINE_API Text(std::string fontName);
 		ENGINE_API Text(Font* font);
+		ENGINE_API Text(std::string name, std::string fontName);
+		ENGINE_API Text(std::string name, Font* font);
 		ENGINE_API ~Text();
 
 		ENGINE_API void Draw() override;
@@ -40,7 +40,6 @@ namespace Engine
 		Colour _colour;
 		bool _textDirty;
 		bool _colDirty;
-		std::mutex _textChangeMutex;
 	};
 }
 

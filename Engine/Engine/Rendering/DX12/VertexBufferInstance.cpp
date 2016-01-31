@@ -5,7 +5,7 @@ namespace Engine
 {
 	VertexBufferInstance::VertexBufferInstance()
 		: _size(0)
-		, _bufferIndex(-1)
+		  , _bufferIndex(-1)
 	{
 		std::vector<D3D12_INPUT_ELEMENT_DESC> inputElementDescs;
 
@@ -14,31 +14,31 @@ namespace Engine
 		{
 		case VERTEX_POS_COL:
 			inputElementDescs =
-			{
-				{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-				{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
-			};
+				{
+					{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
+					{"COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0}
+				};
 
 			_inputLayout = inputElementDescs;
 			return;
 
 		case VERTEX_POS_COL_UV:
 			inputElementDescs =
-			{
-				{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-				{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-				{ "TEXCOORD", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 28, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
-			};
+				{
+					{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
+					{"COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
+					{"TEXCOORD", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 28, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0}
+				};
 
 			_inputLayout = inputElementDescs;
 			return;
 
 		case VERTEX_POS_UV:
 			inputElementDescs =
-			{
-				{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-				{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
-			};
+				{
+					{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
+					{"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0}
+				};
 
 			_inputLayout = inputElementDescs;
 			return;
@@ -73,7 +73,7 @@ namespace Engine
 			size_t count = Count();
 			for (int i = 0; i < count; ++i)
 			{
-				_vertices[i].Uv.Z = float(index);
+				_vertices[i].Uv.z = float(index);
 			}
 
 			VertexBuffer* buffer = static_cast<VertexBuffer*>(_pBuffer);
@@ -99,7 +99,7 @@ namespace Engine
 		{
 			for (int i = 0; i < count; ++i)
 			{
-				_vertices[i].Uv.Z = float(_bufferIndex);
+				_vertices[i].Uv.z = float(_bufferIndex);
 			}
 		}
 
@@ -119,3 +119,4 @@ namespace Engine
 		return _vertices;
 	}
 }
+

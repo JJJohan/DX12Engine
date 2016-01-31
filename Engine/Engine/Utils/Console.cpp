@@ -6,8 +6,8 @@ namespace Engine
 {
 	// maximum mumber of lines the output console should have
 	static const WORD MAX_CONSOLE_LINES = 500;
-	int Console::_backgroundColour = 0;
-	int Console::_textColour = 15;
+	short Console::_backgroundColour = 0;
+	short Console::_textColour = 15;
 
 	void Console::SetColour(ConsoleColour textColour, ConsoleColour backgroundColour)
 	{
@@ -59,8 +59,8 @@ namespace Engine
 	void Console::SetCursorPos(int x, int y)
 	{
 		COORD coordinates;
-		coordinates.X = x;
-		coordinates.Y = y;
+		coordinates.X = SHORT(x);
+		coordinates.Y = SHORT(y);
 		SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coordinates);
 	}
 

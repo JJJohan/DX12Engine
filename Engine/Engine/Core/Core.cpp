@@ -49,7 +49,7 @@ namespace Engine
 		}
 	}
 
-	void Core::Initialise(int width, int height, bool windowed, ENGINE_LINK_DESC engineLink)
+	void Core::Initialise(int width, int height, bool windowed, ENGINE_LINK_DESC engineLink, HWND windowHandle)
 	{
 		Time::Initialise();
 
@@ -71,7 +71,7 @@ namespace Engine
 		_renderer->AssignCreateMethod(engineLink.CreateMethod);
 		_renderer->AssignDrawLoop(engineLink.DrawLoop);
 
-		if (_renderer->InitWindow(width, height, windowed) != EXIT_FAILURE)
+		if (_renderer->InitWindow(width, height, windowed, windowHandle) != EXIT_FAILURE)
 		{
 			_renderer->SetClearColour(Colour(0.1f, 0.1f, 0.1f));
 			_renderer->SetVsync(false);

@@ -101,7 +101,7 @@ namespace Engine
 		size_t size = _string.size();
 		for (size_t i = 0; i < size; ++i)
 		{
-			s[i] = tolower(s[i]);
+			s[i] = char(tolower(s[i]));
 		}
 
 		return s;
@@ -114,7 +114,7 @@ namespace Engine
 		size_t size = _string.size();
 		for (size_t i = 0; i < size; ++i)
 		{
-			s[i] = toupper(s[i]);
+			s[i] = char(toupper(s[i]));
 		}
 
 		return s;

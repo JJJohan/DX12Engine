@@ -1,6 +1,6 @@
 #include "ConstantBuffer.h"
 #include "HeapManager.h"
-#include "VertexBuffer.h"
+#include "VertexBufferInstance.h"
 
 namespace Engine
 {
@@ -230,6 +230,11 @@ namespace Engine
 		}
 
 		return data;
+	}
+
+	size_t ConstantBufferInstance::Count() const
+	{
+		return _cbuffer.size();
 	}
 }
 

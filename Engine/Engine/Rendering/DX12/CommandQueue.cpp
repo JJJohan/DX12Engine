@@ -53,7 +53,10 @@ namespace Engine
 				std::lock_guard<std::mutex> lock(commandThread->LockMutex);
 				commandThread->Waiting = true;
 			}
-			commandThread->WaitCondition.wait(waitLock, [&] {return !commandThread->Available || _releaseRequested; });
+			commandThread->WaitCondition.wait(waitLock, [&]
+			                                  {
+				                                  return !commandThread->Available || _releaseRequested;
+			                                  });
 			if (_releaseRequested)
 			{
 				return;
@@ -186,7 +189,7 @@ namespace Engine
 			task();
 			_commandList->Close();
 			commandLists.push_back(_commandList);
-		
+
 			// Wait for all tasks to complete.
 			int complete = 0;
 			while (complete != taskCount)

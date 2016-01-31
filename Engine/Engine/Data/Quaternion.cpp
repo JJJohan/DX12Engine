@@ -6,18 +6,18 @@ namespace Engine
 
 	Quaternion::Quaternion()
 		: X(_dxQuaternion.m128_f32[0])
-		  , Y(_dxQuaternion.m128_f32[1])
-		  , Z(_dxQuaternion.m128_f32[2])
-		  , W(_dxQuaternion.m128_f32[3])
+		, Y(_dxQuaternion.m128_f32[1])
+		, Z(_dxQuaternion.m128_f32[2])
+		, W(_dxQuaternion.m128_f32[3])
 	{
 		_dxQuaternion = XMQuaternionIdentity();
 	}
 
 	Quaternion::Quaternion(float x, float y, float z, float w)
 		: X(_dxQuaternion.m128_f32[0])
-		  , Y(_dxQuaternion.m128_f32[1])
-		  , Z(_dxQuaternion.m128_f32[2])
-		  , W(_dxQuaternion.m128_f32[3])
+		, Y(_dxQuaternion.m128_f32[1])
+		, Z(_dxQuaternion.m128_f32[2])
+		, W(_dxQuaternion.m128_f32[3])
 	{
 		_dxQuaternion = XMQuaternionIdentity();
 		_dxQuaternion.m128_f32[0] = x;
@@ -28,36 +28,38 @@ namespace Engine
 
 	Quaternion::Quaternion(const Quaternion& quaternion)
 		: X(_dxQuaternion.m128_f32[0])
-		  , Y(_dxQuaternion.m128_f32[1])
-		  , Z(_dxQuaternion.m128_f32[2])
-		  , W(_dxQuaternion.m128_f32[3])
+		, Y(_dxQuaternion.m128_f32[1])
+		, Z(_dxQuaternion.m128_f32[2])
+		, W(_dxQuaternion.m128_f32[3])
 	{
 		_dxQuaternion = quaternion._dxQuaternion;
 	}
 
 	Quaternion::Quaternion(const XMVECTOR& quaternion)
 		: X(_dxQuaternion.m128_f32[0])
-		  , Y(_dxQuaternion.m128_f32[1])
-		  , Z(_dxQuaternion.m128_f32[2])
-		  , W(_dxQuaternion.m128_f32[3])
+		, Y(_dxQuaternion.m128_f32[1])
+		, Z(_dxQuaternion.m128_f32[2])
+		, W(_dxQuaternion.m128_f32[3])
 	{
 		_dxQuaternion = quaternion;
 	}
 
-	void Quaternion::SetEulerAngles(float pitch, float yaw, float roll)
+	Quaternion Quaternion::Euler(float pitch, float yaw, float roll)
 	{
 		pitch = XMConvertToRadians(pitch);
 		yaw = XMConvertToRadians(yaw);
 		roll = XMConvertToRadians(roll);
-		_dxQuaternion = XMQuaternionRotationRollPitchYaw(pitch, yaw, roll);
+		XMVECTOR q = XMQuaternionRotationRollPitchYaw(pitch, yaw, roll);
+		return Quaternion(q);
 	}
 
-	void Quaternion::SetEulerAngles(const Vector3& eulerAngles)
+	Quaternion Quaternion::Euler(const Vector3& eulerAngles)
 	{
 		eulerAngles.X = XMConvertToRadians(eulerAngles.X);
 		eulerAngles.Y = XMConvertToRadians(eulerAngles.Y);
 		eulerAngles.Z = XMConvertToRadians(eulerAngles.Z);
-		_dxQuaternion = XMQuaternionRotationRollPitchYawFromVector(eulerAngles);
+		XMVECTOR q = XMQuaternionRotationRollPitchYawFromVector(eulerAngles);
+		return Quaternion(q);
 	}
 
 	Vector3 Quaternion::GetEulerAngles() const
