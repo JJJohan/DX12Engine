@@ -223,3 +223,8 @@ Engine/Build/Engine_debug.lib
 *.lastcodeanalysissucceeded
 *.opendb
 EngineNET/Build/EngineEditor.vshost.exe.config
+Engine/Build/EngineTests.lib
+EngineNET/Build/Engine.dll
+EngineNET/Build/EngineEditor.exe.config
+EngineNET/Build/EngineNET.dll
+EngineNET/Build/Engine_debug.dll
