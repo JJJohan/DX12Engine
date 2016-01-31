@@ -6,8 +6,8 @@ namespace Engine
 {
 	ConstantBuffer::ConstantBuffer()
 		: _pDescriptor(nullptr)
-		  , _pCopyBuffer(nullptr)
-		  , _copyBufferSize(0)
+		, _pCopyBuffer(nullptr)
+		, _copyBufferSize(0)
 	{
 	}
 
@@ -81,9 +81,9 @@ namespace Engine
 
 	ConstantBufferInstance::ConstantBufferInstance(ID3D12DescriptorHeap* descriptorHeap)
 		: _index(-1)
-		  , _slotUsage(0)
-		  , _pDescriptor(descriptorHeap)
-		  , _pVertexBuffer(nullptr)
+		, _slotUsage(0)
+		, _pDescriptor(descriptorHeap)
+		, _pVertexBuffer(nullptr)
 	{
 	}
 

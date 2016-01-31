@@ -18,8 +18,8 @@ namespace Engine
 
 		Vertex(const Vector3& pos, const Colour& col, const Vector2& uv)
 			: Pos(pos)
-			  , Col(col)
-			  , Uv(uv.X, uv.Y, 0.0f)
+			, Col(col)
+			, Uv(uv.X, uv.Y, 0.0f)
 		{
 		}
 

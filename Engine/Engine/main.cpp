@@ -40,15 +40,15 @@ private:
 
 Game::Game()
 	: Renderer(nullptr)
-	  , _pTriangle(nullptr)
-	  , _pTexture(nullptr)
-	  , _pMaterial(nullptr)
-	  , _pTriangle2(nullptr)
-	  , _pTexture2(nullptr)
-	  , _pMaterial2(nullptr)
-	  , _pFont(nullptr)
-	  , _pText(nullptr)
-	  , _pText2(nullptr)
+	, _pTriangle(nullptr)
+	, _pTexture(nullptr)
+	, _pMaterial(nullptr)
+	, _pTriangle2(nullptr)
+	, _pTexture2(nullptr)
+	, _pMaterial2(nullptr)
+	, _pFont(nullptr)
+	, _pText(nullptr)
+	, _pText2(nullptr)
 {
 }
 

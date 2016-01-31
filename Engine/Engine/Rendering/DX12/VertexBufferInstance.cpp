@@ -5,7 +5,7 @@ namespace Engine
 {
 	VertexBufferInstance::VertexBufferInstance()
 		: _size(0)
-		  , _bufferIndex(-1)
+		, _bufferIndex(-1)
 	{
 		std::vector<D3D12_INPUT_ELEMENT_DESC> inputElementDescs;
 
