@@ -49,6 +49,12 @@
     <Filter Include="Source Files\Rendering\DX12\Buffers">
       <UniqueIdentifier>{375263e9-7bc1-4713-a6a4-31f8c676c739}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Utils">
+      <UniqueIdentifier>{b38d4571-1099-4db5-b7dd-2e8276caaf97}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Utils">
+      <UniqueIdentifier>{b117e532-8f14-4c8d-a0c5-dd738f2c9f1c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Data\String.cpp">
@@ -111,15 +117,24 @@
     <ClCompile Include="Data\Vector2.cpp">
       <Filter>Source Files\Data</Filter>
     </ClCompile>
+    <ClCompile Include="Core\Time.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Utils\Helpers.cpp">
+      <Filter>Source Files\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="Utils\Mathf.cpp">
+      <Filter>Source Files\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Data\Colour.h">
       <Filter>Header Files\Data</Filter>
     </ClInclude>
     <ClInclude Include="Data\Quaternion.h">
-      <Filter>Header Files\Data</Filter>
-    </ClInclude>
-    <ClInclude Include="Data\String.h">
       <Filter>Header Files\Data</Filter>
     </ClInclude>
     <ClInclude Include="Data\Vector3.h">
@@ -175,6 +190,18 @@
     </ClInclude>
     <ClInclude Include="Data\Vector2.h">
       <Filter>Header Files\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Time.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils\Helpers.h">
+      <Filter>Header Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Data\String.h">
+      <Filter>Header Files\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils\Mathf.h">
+      <Filter>Header Files\Utils</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

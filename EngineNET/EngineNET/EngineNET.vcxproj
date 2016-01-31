@@ -11,6 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <ProjectGuid>{C42D430A-9212-437F-A379-F3E4718A7DC8}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>EngineNET</RootNamespace>
@@ -56,32 +57,36 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;_USRDLL;ENGINENET_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(SolutionDir)..\Engine\</AdditionalIncludeDirectories>
-      <ForcedIncludeFiles>
-      </ForcedIncludeFiles>
+      <ForcedIncludeFiles>$(ProjectDir)stdafx.h</ForcedIncludeFiles>
+      <PrecompiledHeaderFile>$(ProjectDir)stdafx.h</PrecompiledHeaderFile>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>Engine_debug.lib;FreeImage.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)..\Engine\Build;$(SolutionDir)..\Engine\Engine\External\lib</AdditionalLibraryDirectories>
+      <ForceSymbolReferences>
+      </ForceSymbolReferences>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeader>Use</PrecompiledHeader>
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>NDEBUG;_WINDOWS;_USRDLL;ENGINENET_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(SolutionDir)..\Engine\</AdditionalIncludeDirectories>
-      <ForcedIncludeFiles>
-      </ForcedIncludeFiles>
+      <ForcedIncludeFiles>$(ProjectDir)stdafx.h</ForcedIncludeFiles>
+      <PrecompiledHeaderFile>$(ProjectDir)stdafx.h</PrecompiledHeaderFile>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -90,10 +95,13 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>Engine.lib;FreeImage.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)..\Engine\Build;$(SolutionDir)..\Engine\Engine\External\lib</AdditionalLibraryDirectories>
+      <ForceSymbolReferences>
+      </ForceSymbolReferences>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Core\Core.cpp" />
+    <ClCompile Include="Core\Time.cpp" />
     <ClCompile Include="Data\Colour.cpp" />
     <ClCompile Include="Data\Quaternion.cpp" />
     <ClCompile Include="Data\String.cpp" />
@@ -113,9 +121,18 @@
     <ClCompile Include="Rendering\DX12\Texture.cpp" />
     <ClCompile Include="Rendering\IRenderer.cpp" />
     <ClCompile Include="Rendering\Renderer.cpp" />
+    <ClCompile Include="stdafx.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)stdafx.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)stdafx.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="Utils\Helpers.cpp" />
+    <ClCompile Include="Utils\Mathf.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\Core.h" />
+    <ClInclude Include="Core\Time.h" />
     <ClInclude Include="Data\Colour.h" />
     <ClInclude Include="Data\Quaternion.h" />
     <ClInclude Include="Data\String.h" />
@@ -136,6 +153,8 @@
     <ClInclude Include="Rendering\IRenderer.h" />
     <ClInclude Include="Rendering\Renderer.h" />
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="Utils\Helpers.h" />
+    <ClInclude Include="Utils\Mathf.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -1,0 +1,14 @@
+﻿<Window x:Name="wndEditor" x:Class="EngineEditor.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:forms="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms"
+        Title="Engine Editor" Height="768" Width="1024" Closing="MainWindow_OnClosing">
+    <Grid>
+        <WindowsFormsHost x:Name="hstHost" Margin="10,10,115,10">
+            <forms:Label x:Name="pbView"/><!-- Anchor="Top,Left,Right,Bottom"/>-->
+        </WindowsFormsHost>
+        <Button x:Name="btnRed" Content="Red" HorizontalAlignment="Right" Margin="0,10,10,0" VerticalAlignment="Top" Width="100" Height="32"/>
+        <Button x:Name="btnGreen" Content="Green" HorizontalAlignment="Right" Margin="0,47,10,0" VerticalAlignment="Top" Width="100" Height="32"/>
+        <Button x:Name="btnBlue" Content="Blue" HorizontalAlignment="Right" Margin="0,84,10,0" VerticalAlignment="Top" Width="100" Height="32"/>
+    </Grid>
+</Window>
