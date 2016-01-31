@@ -6,18 +6,18 @@ namespace Engine
 
 	Quaternion::Quaternion()
 		: X(_dxQuaternion.m128_f32[0])
-		  , Y(_dxQuaternion.m128_f32[1])
-		  , Z(_dxQuaternion.m128_f32[2])
-		  , W(_dxQuaternion.m128_f32[3])
+		, Y(_dxQuaternion.m128_f32[1])
+		, Z(_dxQuaternion.m128_f32[2])
+		, W(_dxQuaternion.m128_f32[3])
 	{
 		_dxQuaternion = XMQuaternionIdentity();
 	}
 
 	Quaternion::Quaternion(float x, float y, float z, float w)
 		: X(_dxQuaternion.m128_f32[0])
-		  , Y(_dxQuaternion.m128_f32[1])
-		  , Z(_dxQuaternion.m128_f32[2])
-		  , W(_dxQuaternion.m128_f32[3])
+		, Y(_dxQuaternion.m128_f32[1])
+		, Z(_dxQuaternion.m128_f32[2])
+		, W(_dxQuaternion.m128_f32[3])
 	{
 		_dxQuaternion = XMQuaternionIdentity();
 		_dxQuaternion.m128_f32[0] = x;
@@ -28,18 +28,18 @@ namespace Engine
 
 	Quaternion::Quaternion(const Quaternion& quaternion)
 		: X(_dxQuaternion.m128_f32[0])
-		  , Y(_dxQuaternion.m128_f32[1])
-		  , Z(_dxQuaternion.m128_f32[2])
-		  , W(_dxQuaternion.m128_f32[3])
+		, Y(_dxQuaternion.m128_f32[1])
+		, Z(_dxQuaternion.m128_f32[2])
+		, W(_dxQuaternion.m128_f32[3])
 	{
 		_dxQuaternion = quaternion._dxQuaternion;
 	}
 
 	Quaternion::Quaternion(const XMVECTOR& quaternion)
 		: X(_dxQuaternion.m128_f32[0])
-		  , Y(_dxQuaternion.m128_f32[1])
-		  , Z(_dxQuaternion.m128_f32[2])
-		  , W(_dxQuaternion.m128_f32[3])
+		, Y(_dxQuaternion.m128_f32[1])
+		, Z(_dxQuaternion.m128_f32[2])
+		, W(_dxQuaternion.m128_f32[3])
 	{
 		_dxQuaternion = quaternion;
 	}

@@ -19,15 +19,15 @@ namespace Engine
 
 	IRenderer::IRenderer()
 		: _screenWidth(0)
-		  , _screenHeight(0)
-		  , _aspectRatio(1.0f)
-		  , _windowed(false)
-		  , _windowHandle(nullptr)
-		  , _windowInstance(HINSTANCE(GetModuleHandle(nullptr)))
-		  , _deviceMemoryTotal(0)
-		  , _deviceMemoryFree(0)
-		  , _vsync(true)
-		  , _renderFinished(true)
+		, _screenHeight(0)
+		, _aspectRatio(1.0f)
+		, _windowed(false)
+		, _windowHandle(nullptr)
+		, _windowInstance(HINSTANCE(GetModuleHandle(nullptr)))
+		, _deviceMemoryTotal(0)
+		, _deviceMemoryFree(0)
+		, _vsync(true)
+		, _renderFinished(true)
 	{
 		_windowClosed = nullptr;
 		IRenderer::SetClearColour(Colour::Blue);
@@ -81,12 +81,12 @@ namespace Engine
 			_externalHandle = true;
 			return EXIT_SUCCESS;
 		}
-		
+
 		if (RegisterInstance() == 0)
 		{
 			Logging::LogWin32Error();
 			return EXIT_FAILURE;
-		}	
+		}
 
 		if (RegisterWindow() != 0)
 		{
@@ -287,7 +287,7 @@ namespace Engine
 		if (!_windowHandle)
 		{
 			return EXIT_FAILURE;
-		}		
+		}
 
 		RAWINPUTDEVICE rid[2];
 		rid[0].usUsagePage = HID_USAGE_PAGE_GENERIC; // 0x01

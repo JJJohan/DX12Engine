@@ -10,56 +10,56 @@ namespace Engine
 
 	Vector3::Vector3()
 		: X(_dxVector.m128_f32[0])
-		  , Y(_dxVector.m128_f32[1])
-		  , Z(_dxVector.m128_f32[2])
+		, Y(_dxVector.m128_f32[1])
+		, Z(_dxVector.m128_f32[2])
 	{
 		_dxVector = XMVectorZero();
 	}
 
 	Vector3::Vector3(float x, float y, float z)
 		: X(_dxVector.m128_f32[0])
-		  , Y(_dxVector.m128_f32[1])
-		  , Z(_dxVector.m128_f32[2])
+		, Y(_dxVector.m128_f32[1])
+		, Z(_dxVector.m128_f32[2])
 	{
 		_dxVector = XMVectorSet(x, y, z, 0.0f);
 	}
 
 	Vector3::Vector3(const XMVECTOR& vector)
 		: X(_dxVector.m128_f32[0])
-		  , Y(_dxVector.m128_f32[1])
-		  , Z(_dxVector.m128_f32[2])
+		, Y(_dxVector.m128_f32[1])
+		, Z(_dxVector.m128_f32[2])
 	{
 		_dxVector = vector;
 	}
 
 	Vector3::Vector3(const XMFLOAT3& vector)
 		: X(_dxVector.m128_f32[0])
-		  , Y(_dxVector.m128_f32[1])
-		  , Z(_dxVector.m128_f32[2])
+		, Y(_dxVector.m128_f32[1])
+		, Z(_dxVector.m128_f32[2])
 	{
 		_dxVector = XMLoadFloat3(&vector);
 	}
 
 	Vector3::Vector3(int x, int y, int z)
 		: X(_dxVector.m128_f32[0])
-		  , Y(_dxVector.m128_f32[1])
-		  , Z(_dxVector.m128_f32[2])
+		, Y(_dxVector.m128_f32[1])
+		, Z(_dxVector.m128_f32[2])
 	{
 		_dxVector = XMVectorSet(float(x), float(y), float(z), 0.0f);
 	}
 
 	Vector3::Vector3(const Vector3& rhs)
 		: X(_dxVector.m128_f32[0])
-		  , Y(_dxVector.m128_f32[1])
-		  , Z(_dxVector.m128_f32[2])
+		, Y(_dxVector.m128_f32[1])
+		, Z(_dxVector.m128_f32[2])
 	{
 		_dxVector = XMVectorSet(rhs.X, rhs.Y, rhs.Z, 0.0f);
 	}
 
 	Vector3::Vector3(const Vector2& rhs)
 		: X(_dxVector.m128_f32[0])
-		  , Y(_dxVector.m128_f32[1])
-		  , Z(_dxVector.m128_f32[2])
+		, Y(_dxVector.m128_f32[1])
+		, Z(_dxVector.m128_f32[2])
 	{
 		_dxVector = XMVectorSet(rhs.X, rhs.Y, 0.0f, 0.0f);
 	}

@@ -6,12 +6,12 @@ namespace Engine
 {
 	HeapResource::HeapResource()
 		: _pDevice(nullptr)
-		  , _pResource(nullptr)
-		  , _heapSize(0)
-		  , _dynamic(false)
-		  , _heapPending(false)
-		  , _lastHeapSize(0)
-		  , _pHeap(nullptr)
+		, _pResource(nullptr)
+		, _heapSize(0)
+		, _dynamic(false)
+		, _heapPending(false)
+		, _lastHeapSize(0)
+		, _pHeap(nullptr)
 	{
 	}
 

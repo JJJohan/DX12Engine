@@ -21,3 +21,4 @@ namespace Engine
 		friend class IndexBuffer;
 	};
 }
+

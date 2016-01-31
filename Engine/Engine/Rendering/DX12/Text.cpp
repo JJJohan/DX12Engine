@@ -15,8 +15,8 @@ namespace Engine
 
 	Text::Text(std::string fontName)
 		: _worldSpace(false)
-		  , _textDirty(false)
-		  , _colDirty(false)
+		, _textDirty(false)
+		, _colDirty(false)
 	{
 		_pFont = FontManager::GetFont(fontName);
 		RegisterTransform();
@@ -24,9 +24,9 @@ namespace Engine
 
 	Text::Text(Font* font)
 		: _worldSpace(false)
-		  , _pFont(font)
-		  , _textDirty(false)
-		  , _colDirty(false)
+		, _pFont(font)
+		, _textDirty(false)
+		, _colDirty(false)
 	{
 		RegisterTransform();
 	}

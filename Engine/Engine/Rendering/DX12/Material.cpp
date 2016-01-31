@@ -42,11 +42,11 @@ namespace Engine
 
 	Material::Material()
 		: _pPipelineState(nullptr)
-		  , _pVertexShader(nullptr)
-		  , _pPixelShader(nullptr)
-		  , _pTexture(nullptr)
-		  , _pDevice(nullptr)
-		  , _pRootSignature(nullptr)
+		, _pVertexShader(nullptr)
+		, _pPixelShader(nullptr)
+		, _pTexture(nullptr)
+		, _pDevice(nullptr)
+		, _pRootSignature(nullptr)
 	{
 	}
 

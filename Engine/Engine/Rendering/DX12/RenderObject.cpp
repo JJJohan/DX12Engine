@@ -20,9 +20,9 @@ namespace Engine
 
 	RenderObject::RenderObject(std::string name)
 		: _pVertexBuffer(nullptr)
-		  , _pIndexBuffer(nullptr)
-		  , _pMaterial(nullptr)
-		  , _name(name)
+		, _pIndexBuffer(nullptr)
+		, _pMaterial(nullptr)
+		, _name(name)
 	{
 		_renderObjects.insert(this);
 		_pCbuffer = ResourceFactory::CreateConstantBuffer();
