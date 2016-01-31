@@ -50,5 +50,10 @@ namespace Engine
 	{
 		return _renderer.get();
 	}
+
+	void Renderer::ProcessWindowMessage(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+	{
+		IRenderer::WndProc(hwnd, msg, wParam, lParam);
+	}
 }
 
