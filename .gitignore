@@ -222,3 +222,4 @@ Engine/Build/Engine_debug.lib
 *.metagen
 *.lastcodeanalysissucceeded
 *.opendb
+EngineNET/Build/EngineEditor.vshost.exe.config
