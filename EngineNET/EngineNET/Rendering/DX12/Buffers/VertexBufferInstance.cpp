@@ -1,6 +1,6 @@
 #include "../../../stdafx.h"
-
 #include "../../../Data/Colour.h"
+#include "../../../Data/Vector2.h"
 #include "../../../Data/Vector3.h"
 #include "VertexBufferInstance.h"
 #include "Engine/Rendering/DX12/VertexBufferInstance.h"
@@ -8,73 +8,73 @@
 
 namespace EngineNET
 {
+	Vertex::Vertex(Vector3^ pos, Colour^ col, Vector2^ uv)
+	{
+		Pos = pos;
+		Col = col;
+		Uv = gcnew Vector3(uv->X, uv->Y, 0.0f);
+	}
+
 	VertexBufferInstance::VertexBufferInstance()
 	{
 		_pVertexBufferInstance = new Engine::VertexBufferInstance();
 	}
 
-	VertexBufferInstance::~VertexBufferInstance()
+	VertexBufferInstance::VertexBufferInstance(Engine::VertexBufferInstance* instance)
 	{
-		this->!VertexBufferInstance();
+		_pVertexBufferInstance = instance;
 	}
 
-	VertexBufferInstance::!VertexBufferInstance()
+	VertexBufferInstance::operator Engine::VertexBufferInstance*()
 	{
-		delete _pVertexBufferInstance;
+		return _pVertexBufferInstance;
 	}
 
 #pragma managed(push, off)
-	void _SetVertices(Engine::VertexBufferInstance* vertexBuffer, std::vector<std::vector<float>*>* verts)
+	void _SetVertices(Engine::VertexBufferInstance* vertexBuffer, std::vector<std::vector<float>>& verts, int count)
 	{
-		std::vector<std::vector<float>*> vertexArray = *verts;
-		std::vector<float> pos = *vertexArray[0];
-		std::vector<float> col = *vertexArray[1];
-		std::vector<float> uv = *vertexArray[2];
+		std::vector<float> pos = verts[0];
+		std::vector<float> col = verts[1];
+		std::vector<float> uv = verts[2];
 
-		int size = int(verts->size());
-		std::vector<Engine::Vertex> vertices(size);
-		for (int i = 0; i < size; ++i)
+		std::vector<Engine::Vertex> vertices(count);
+		for (int i = 0, posIdx = 0, colIdx = 0; i < count; ++i, posIdx += 3, colIdx += 4)
 		{
 			Engine::Vertex v;
-			v.Pos = Engine::Vector3(pos[i], pos[i + 1], pos[i + 2]);
-			v.Col = Engine::Colour(col[i], col[i + 1], col[i + 2]);
-			v.Uv = Engine::Vector3(uv[i], uv[i + 1], uv[i + 2]);
-			vertices.push_back(v);
+			v.Pos = Engine::Vector3(pos[posIdx], pos[posIdx + 1], pos[posIdx + 2]);
+			v.Col = Engine::Colour(col[colIdx], col[colIdx + 1], col[colIdx + 2], col[colIdx + 3]);
+			v.Uv = Engine::Vector3(uv[posIdx], uv[posIdx + 1], uv[posIdx + 2]);
+			vertices[i] = v;
 		}
 
 		vertexBuffer->SetVertices(vertices);
-
-		delete vertexArray[0];
-		delete vertexArray[1];
-		delete vertexArray[2];
-		delete verts;
 	}
 #pragma managed(pop)
 
 	void VertexBufferInstance::SetVertices(System::Collections::Generic::List<Vertex^>^ vertices)
 	{
 		int count = vertices->Count;
-		std::vector<std::vector<float>*>* vec = new std::vector<std::vector<float>*>(3);
-		vec->push_back(new std::vector<float>(count));
-		vec->push_back(new std::vector<float>(count));
-		vec->push_back(new std::vector<float>(count));
-		for (int i = 0; i < count; ++i)
+		std::vector<std::vector<float>> vec(3);
+		vec[0] = std::vector<float>(count * 3);
+		vec[1] = std::vector<float>(count * 4);
+		vec[2] = std::vector<float>(count * 3);
+		for (int i = 0, posIdx = 0, colIdx = 0; i < count; ++i, posIdx += 3, colIdx +=4)
 		{
-			vec->at(0)->push_back(vertices[i]->Pos->Z);
-			vec->at(0)->push_back(vertices[i]->Pos->Y);
-			vec->at(0)->push_back(vertices[i]->Pos->X);
+			vec[0][posIdx] = vertices[i]->Pos->X;
+			vec[0][posIdx + 1] = vertices[i]->Pos->Y;
+			vec[0][posIdx + 2] = vertices[i]->Pos->Z;
 
-			vec->at(1)->push_back(vertices[i]->Col->R);
-			vec->at(1)->push_back(vertices[i]->Col->G);
-			vec->at(1)->push_back(vertices[i]->Col->B);
-			vec->at(1)->push_back(vertices[i]->Col->A);
+			vec[1][colIdx] = vertices[i]->Col->R;
+			vec[1][colIdx + 1] = vertices[i]->Col->G;
+			vec[1][colIdx + 2] = vertices[i]->Col->B;
+			vec[1][colIdx + 3] = vertices[i]->Col->A;
 
-			vec->at(2)->push_back(vertices[i]->Uv->X);
-			vec->at(2)->push_back(vertices[i]->Uv->Y);
-			vec->at(2)->push_back(vertices[i]->Uv->Z);
+			vec[2][posIdx] = vertices[i]->Uv->X;
+			vec[2][posIdx + 1] = vertices[i]->Uv->Y;
+			vec[2][posIdx + 2] = vertices[i]->Uv->Z;
 		}
 
-		_SetVertices(_pVertexBufferInstance, vec);
+		_SetVertices(_pVertexBufferInstance, vec, count);
 	}
 
 	System::Collections::Generic::List<Vertex^>^ VertexBufferInstance::GetVertices()
@@ -89,9 +89,14 @@ namespace EngineNET
 			v->Col = gcnew Colour(vec[i].Col.x, vec[i].Col.y, vec[i].Col.z, vec[i].Col.w);
 			v->Uv = gcnew Vector3(vec[i].Uv.x, vec[i].Uv.y, vec[i].Uv.z);
 
-			vertices->Add(v);
+			vertices[i] = v;
 		}
 
 		return vertices;
+	}
+
+	int VertexBufferInstance::Count()
+	{
+		return int(_pVertexBufferInstance->Count());
 	}
 }
