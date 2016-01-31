@@ -11,14 +11,14 @@ namespace EngineNET
 		_pIndexBufferInstance = new Engine::IndexBufferInstance();
 	}
 
-	IndexBufferInstance::~IndexBufferInstance()
+	IndexBufferInstance::IndexBufferInstance(Engine::IndexBufferInstance* instance)
 	{
-		this->!IndexBufferInstance();
+		_pIndexBufferInstance = instance;
 	}
 
-	IndexBufferInstance::!IndexBufferInstance()
+	IndexBufferInstance::operator Engine::IndexBufferInstance*()
 	{
-		delete _pIndexBufferInstance;
+		return _pIndexBufferInstance;
 	}
 
 	void IndexBufferInstance::SetIndices(System::Collections::Generic::List<int>^ indices)
@@ -27,7 +27,7 @@ namespace EngineNET
 		std::vector<int> vec(count);		
 		for (int i = 0; i < count; ++i)
 		{
-			vec.push_back(indices[i]);
+			vec[i] = indices[i];
 		}
 
 		_pIndexBufferInstance->SetIndices(vec);
@@ -40,9 +40,14 @@ namespace EngineNET
 		System::Collections::Generic::List<int>^ indices = gcnew System::Collections::Generic::List<int>(count);
 		for (int i = 0; i < count; ++i)
 		{
-			indices->Add(vec[0]);
+			indices->Add(vec[i]);
 		}
 
 		return indices;
+	}
+
+	int IndexBufferInstance::Count()
+	{
+		return int(_pIndexBufferInstance->Count());
 	}
 }

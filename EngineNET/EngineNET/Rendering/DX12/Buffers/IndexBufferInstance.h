@@ -13,11 +13,12 @@ namespace EngineNET
 	{
 	public:
 		IndexBufferInstance();
-		~IndexBufferInstance();
-		!IndexBufferInstance();
+		IndexBufferInstance(Engine::IndexBufferInstance* instance);
+		operator Engine::IndexBufferInstance*();
 
 		void SetIndices(System::Collections::Generic::List<int>^ indices);
 		System::Collections::Generic::List<int>^ GetIndices();
+		int Count();
 
 	private:
 		Engine::IndexBufferInstance* _pIndexBufferInstance;
