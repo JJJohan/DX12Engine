@@ -1,3 +1,4 @@
+[![Stories in Ready](https://badge.waffle.io/JJJohan/DX12Engine.png?label=ready&title=Ready)](https://waffle.io/JJJohan/DX12Engine)
 # DirectX 12 Engine
 
 ## What is this? ##
