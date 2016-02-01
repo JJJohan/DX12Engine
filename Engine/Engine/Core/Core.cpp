@@ -109,6 +109,9 @@ namespace Engine
 
 		_destroyMethod();
 
+		_updateLoop = nullptr;
+		_destroyMethod = nullptr;
+
 		Renderer::DestroyRenderer();
 	}
 
