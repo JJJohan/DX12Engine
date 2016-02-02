@@ -36,7 +36,7 @@ namespace Engine
 		return instance;
 	}
 
-	VertexBufferInstance* ResourceFactory::CreateVertexBufferInstance(VertexType vertexType)
+	VertexBufferInstance* ResourceFactory::CreateVertexBufferInstance()
 	{
 		VertexBufferInstance* instance = new VertexBufferInstance();
 

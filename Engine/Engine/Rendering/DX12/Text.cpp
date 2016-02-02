@@ -124,7 +124,7 @@ namespace Engine
 
 		if (_pVertexBuffer == nullptr)
 		{
-			_pVertexBuffer = ResourceFactory::CreateVertexBufferInstance(VERTEX_POS_UV);
+			_pVertexBuffer = ResourceFactory::CreateVertexBufferInstance();
 			_pIndexBuffer = ResourceFactory::CreateIndexBufferInstance();
 			_pMaterial = ResourceFactory::CreateMaterial();
 			_pMaterial->SetTexture(_pFont->_pTexture);

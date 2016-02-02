@@ -6,6 +6,8 @@ namespace Engine
 {
 	namespace Math
 	{
+		const float Pi = 3.14159265358979323846f;
+
 		inline float Min(float a, float b)
 		{
 			// Branchless SSE min.

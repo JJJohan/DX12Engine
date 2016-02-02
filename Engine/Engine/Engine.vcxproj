@@ -134,6 +134,7 @@
     <ClCompile Include="Rendering\DX12\FeatureSupport.cpp" />
     <ClCompile Include="Rendering\DX12\Font.cpp" />
     <ClCompile Include="Rendering\DX12\FontManager.cpp" />
+    <ClCompile Include="Rendering\DX12\Primitives.cpp" />
     <ClCompile Include="Rendering\DX12\HeapManager.cpp" />
     <ClCompile Include="Rendering\DX12\HeapResource.cpp" />
     <ClCompile Include="Rendering\DX12\IndexBuffer.cpp" />
@@ -182,7 +183,7 @@
     <ClInclude Include="Rendering\DX12\FeatureSupport.h" />
     <ClInclude Include="Rendering\DX12\Font.h" />
     <ClInclude Include="Rendering\DX12\FontManager.h" />
-    <ClInclude Include="Rendering\DX12\Geometry.h" />
+    <ClInclude Include="Rendering\DX12\Primitives.h" />
     <ClInclude Include="Rendering\DX12\HeapManager.h" />
     <ClInclude Include="Rendering\DX12\HeapResource.h" />
     <ClInclude Include="Rendering\DX12\IndexBuffer.h" />

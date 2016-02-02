@@ -21,7 +21,7 @@ namespace Engine
 		static void AssignCommandList(ID3D12CommandList* commandList);
 		static ID3D12CommandList* GetCommandList();
 		static ENGINE_API ConstantBufferInstance* CreateConstantBuffer();
-		static ENGINE_API VertexBufferInstance* CreateVertexBufferInstance(VertexType vertexType);
+		static ENGINE_API VertexBufferInstance* CreateVertexBufferInstance();
 		static ENGINE_API IndexBufferInstance* CreateIndexBufferInstance();
 		static ENGINE_API Material* CreateMaterial();
 		static ENGINE_API Texture* CreateTexture();
