@@ -6,9 +6,7 @@ namespace Engine
 
 	BufferBucket::BufferBucket()
 		: _bound(false)
-		, _totalSize(0)
-	{
-	}
+		, _totalSize(0) { }
 
 	BufferBucket::~BufferBucket()
 	{

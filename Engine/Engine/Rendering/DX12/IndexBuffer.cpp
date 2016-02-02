@@ -5,9 +5,7 @@
 namespace Engine
 {
 	IndexBuffer::IndexBuffer()
-		: _indexBufferView()
-	{
-	}
+		: _indexBufferView() { }
 
 	void IndexBuffer::Build()
 	{

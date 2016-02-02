@@ -11,9 +11,7 @@ namespace Engine
 		, _dynamic(false)
 		, _heapPending(false)
 		, _lastHeapSize(0)
-		, _pHeap(nullptr)
-	{
-	}
+		, _pHeap(nullptr) { }
 
 	HeapResource::~HeapResource()
 	{

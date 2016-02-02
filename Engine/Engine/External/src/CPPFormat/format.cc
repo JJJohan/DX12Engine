@@ -178,9 +178,7 @@ namespace fmt
 				std::size_t buffer_size_;
 
 				// A noop assignment operator to avoid bogus warnings.
-				void operator=(const StrError&)
-				{
-				}
+				void operator=(const StrError&) { }
 
 				// Handle the result of XSI-compliant version of strerror_r.
 				int handle(int result)
@@ -223,9 +221,7 @@ namespace fmt
 
 			public:
 				StrError(int err_code, char*& buf, std::size_t buf_size)
-					: error_code_(err_code), buffer_(buf), buffer_size_(buf_size)
-				{
-				}
+					: error_code_(err_code), buffer_(buf), buffer_size_(buf_size) { }
 
 				int run()
 				{
@@ -287,9 +283,7 @@ namespace fmt
 			FMT_DISALLOW_COPY_AND_ASSIGN(WidthHandler);
 
 		public:
-			explicit WidthHandler(fmt::FormatSpec& spec) : spec_(spec)
-			{
-			}
+			explicit WidthHandler(fmt::FormatSpec& spec) : spec_(spec) { }
 
 			void report_unhandled_arg()
 			{
@@ -342,9 +336,7 @@ namespace fmt
 
 		public:
 			ArgConverter(fmt::internal::Arg& arg, wchar_t type)
-				: arg_(arg), type_(type)
-			{
-			}
+				: arg_(arg), type_(type) { }
 
 			void visit_bool(bool value)
 			{
@@ -399,9 +391,7 @@ namespace fmt
 			FMT_DISALLOW_COPY_AND_ASSIGN(CharConverter);
 
 		public:
-			explicit CharConverter(fmt::internal::Arg& arg) : arg_(arg)
-			{
-			}
+			explicit CharConverter(fmt::internal::Arg& arg) : arg_(arg) { }
 
 			template <typename T>
 			void visit_any_int(T value)
@@ -428,9 +418,7 @@ namespace fmt
 
 		public:
 			PrintfArgFormatter(BasicWriter<Char>& w, FormatSpec& s)
-				: ArgFormatterBase<PrintfArgFormatter<Char>, Char>(w, s)
-			{
-			}
+				: ArgFormatterBase<PrintfArgFormatter<Char>, Char>(w, s) { }
 
 			void visit_bool(bool value)
 			{
@@ -620,9 +608,7 @@ FMT_FUNC void fmt::internal::format_windows_error(
 		LPWSTR str_;
 
 	public:
-		String() : str_()
-		{
-		}
+		String() : str_() { }
 
 		~String()
 		{
@@ -654,9 +640,7 @@ FMT_FUNC void fmt::internal::format_windows_error(
 				return;
 			}
 		}
-	} FMT_CATCH(...)
-	{
-	}
+	} FMT_CATCH(...) { }
 	fmt::format_error_code(out, error_code, message); // 'fmt::' is for bcc32.
 }
 
@@ -685,9 +669,7 @@ FMT_FUNC void fmt::internal::format_system_error(
 				break; // Can't get error message, report error code instead.
 			buffer.resize(buffer.size() * 2);
 		}
-	} FMT_CATCH(...)
-	{
-	}
+	} FMT_CATCH(...) { }
 	fmt::format_error_code(out, error_code, message); // 'fmt::' is for bcc32.
 }
 
@@ -707,14 +689,14 @@ void fmt::internal::ArgMap<Char>::init(const ArgList& args)
 			internal::Arg::Type arg_type = args.type(i);
 			switch (arg_type)
 			{
-			case internal::Arg::NONE:
-				return;
-			case internal::Arg::NAMED_ARG:
-				named_arg = static_cast<const NamedArg*>(args.values_[i].pointer);
-				map_.insert(Pair(named_arg->name, *named_arg));
-				break;
-			default:
-				/*nothing*/;
+				case internal::Arg::NONE:
+					return;
+				case internal::Arg::NAMED_ARG:
+					named_arg = static_cast<const NamedArg*>(args.values_[i].pointer);
+					map_.insert(Pair(named_arg->name, *named_arg));
+					break;
+				default:
+					/*nothing*/;
 			}
 		}
 	}
@@ -731,14 +713,14 @@ void fmt::internal::ArgMap<Char>::init(const ArgList& args)
 	{
 		switch (args.args_[i].type)
 		{
-		case internal::Arg::NONE:
-			return;
-		case internal::Arg::NAMED_ARG:
-			named_arg = static_cast<const NamedArg*>(args.args_[i].pointer);
-			map_.insert(Pair(named_arg->name, *named_arg));
-			break;
-		default:
-			/*nothing*/;
+			case internal::Arg::NONE:
+				return;
+			case internal::Arg::NAMED_ARG:
+				named_arg = static_cast<const NamedArg*>(args.args_[i].pointer);
+				map_.insert(Pair(named_arg->name, *named_arg));
+				break;
+			default:
+				/*nothing*/;
 		}
 	}
 }
@@ -755,13 +737,13 @@ FMT_FUNC Arg fmt::internal::FormatterBase::do_get_arg(
 	Arg arg = args_[arg_index];
 	switch (arg.type)
 	{
-	case Arg::NONE:
-		error = "argument index out of range";
-		break;
-	case Arg::NAMED_ARG:
-		arg = *static_cast<const internal::Arg*>(arg.pointer);
-	default:
-		/*nothing*/;
+		case Arg::NONE:
+			error = "argument index out of range";
+			break;
+		case Arg::NAMED_ARG:
+			arg = *static_cast<const internal::Arg*>(arg.pointer);
+		default:
+			/*nothing*/;
 	}
 	return arg;
 }
@@ -774,24 +756,24 @@ void fmt::internal::PrintfFormatter<Char>::parse_flags(
 	{
 		switch (*s++)
 		{
-		case '-':
-			spec.align_ = ALIGN_LEFT;
-			break;
-		case '+':
-			spec.flags_ |= SIGN_FLAG | PLUS_FLAG;
-			break;
-		case '0':
-			spec.fill_ = '0';
-			break;
-		case ' ':
-			spec.flags_ |= SIGN_FLAG;
-			break;
-		case '#':
-			spec.flags_ |= HASH_FLAG;
-			break;
-		default:
-			--s;
-			return;
+			case '-':
+				spec.align_ = ALIGN_LEFT;
+				break;
+			case '+':
+				spec.flags_ |= SIGN_FLAG | PLUS_FLAG;
+				break;
+			case '0':
+				spec.fill_ = '0';
+				break;
+			case ' ':
+				spec.flags_ |= SIGN_FLAG;
+				break;
+			case '#':
+				spec.flags_ |= HASH_FLAG;
+				break;
+			default:
+				--s;
+				return;
 		}
 	}
 }
@@ -905,34 +887,34 @@ void fmt::internal::PrintfFormatter<Char>::format(
 		// Parse length and convert the argument to the required type.
 		switch (*s++)
 		{
-		case 'h':
-			if (*s == 'h')
-				ArgConverter<signed char>(arg, *++s).visit(arg);
-			else
-				ArgConverter<short>(arg, *s).visit(arg);
-			break;
-		case 'l':
-			if (*s == 'l')
-				ArgConverter<fmt::LongLong>(arg, *++s).visit(arg);
-			else
-				ArgConverter<long>(arg, *s).visit(arg);
-			break;
-		case 'j':
-			ArgConverter<intmax_t>(arg, *s).visit(arg);
-			break;
-		case 'z':
-			ArgConverter<std::size_t>(arg, *s).visit(arg);
-			break;
-		case 't':
-			ArgConverter<std::ptrdiff_t>(arg, *s).visit(arg);
-			break;
-		case 'L':
-			// printf produces garbage when 'L' is omitted for long double, no
-			// need to do the same.
-			break;
-		default:
-			--s;
-			ArgConverter<int>(arg, *s).visit(arg);
+			case 'h':
+				if (*s == 'h')
+					ArgConverter<signed char>(arg, *++s).visit(arg);
+				else
+					ArgConverter<short>(arg, *s).visit(arg);
+				break;
+			case 'l':
+				if (*s == 'l')
+					ArgConverter<fmt::LongLong>(arg, *++s).visit(arg);
+				else
+					ArgConverter<long>(arg, *s).visit(arg);
+				break;
+			case 'j':
+				ArgConverter<intmax_t>(arg, *s).visit(arg);
+				break;
+			case 'z':
+				ArgConverter<std::size_t>(arg, *s).visit(arg);
+				break;
+			case 't':
+				ArgConverter<std::ptrdiff_t>(arg, *s).visit(arg);
+				break;
+			case 'L':
+				// printf produces garbage when 'L' is omitted for long double, no
+				// need to do the same.
+				break;
+			default:
+				--s;
+				ArgConverter<int>(arg, *s).visit(arg);
 		}
 
 		// Parse type.
@@ -944,13 +926,13 @@ void fmt::internal::PrintfFormatter<Char>::format(
 			// Normalize type.
 			switch (spec.type_)
 			{
-			case 'i': case 'u':
-				spec.type_ = 'd';
-				break;
-			case 'c':
-				// TODO: handle wchar_t
-				CharConverter(arg).visit(arg);
-				break;
+				case 'i': case 'u':
+					spec.type_ = 'd';
+					break;
+				case 'c':
+					// TODO: handle wchar_t
+					CharConverter(arg).visit(arg);
+					break;
 			}
 		}
 

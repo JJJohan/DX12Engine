@@ -1,8 +1,6 @@
 namespace Engine
 {
-	String::String()
-	{
-	}
+	String::String() { }
 
 	String::String(std::stringstream stream)
 	{

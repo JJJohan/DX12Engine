@@ -420,9 +420,7 @@ namespace fmt
 
 	public:
 		/** Constructs a string reference object from a C string and a size. */
-		BasicStringRef(const Char* s, std::size_t size) : data_(s), size_(size)
-		{
-		}
+		BasicStringRef(const Char* s, std::size_t size) : data_(s), size_(size) { }
 
 		/**
 		  \rst
@@ -431,9 +429,7 @@ namespace fmt
 		  \endrst
 		 */
 		BasicStringRef(const Char* s)
-			: data_(s), size_(std::char_traits<Char>::length(s))
-		{
-		}
+			: data_(s), size_(std::char_traits<Char>::length(s)) { }
 
 		/**
 		  \rst
@@ -441,9 +437,7 @@ namespace fmt
 		  \endrst
 		 */
 		BasicStringRef(const std::basic_string<Char>& s)
-			: data_(s.c_str()), size_(s.size())
-		{
-		}
+			: data_(s.c_str()), size_(s.size()) { }
 
 		/**
 		  \rst
@@ -539,18 +533,14 @@ namespace fmt
 
 	public:
 		/** Constructs a string reference object from a C string. */
-		BasicCStringRef(const Char* s) : data_(s)
-		{
-		}
+		BasicCStringRef(const Char* s) : data_(s) { }
 
 		/**
 		  \rst
 		  Constructs a string reference from an ``std::string`` object.
 		  \endrst
 		 */
-		BasicCStringRef(const std::basic_string<Char>& s) : data_(s.c_str())
-		{
-		}
+		BasicCStringRef(const std::basic_string<Char>& s) : data_(s.c_str()) { }
 
 		/** Returns the pointer to a C string. */
 		const Char* c_str() const
@@ -569,9 +559,7 @@ namespace fmt
 	{
 	public:
 		explicit FormatError(CStringRef message)
-			: std::runtime_error(message.c_str())
-		{
-		}
+			: std::runtime_error(message.c_str()) { }
 	};
 
 	namespace internal
@@ -591,8 +579,11 @@ namespace fmt
 			return stdext::checked_array_iterator<T*>(ptr, size);
 		}
 #else
-template <typename T>
-inline T *make_ptr(T *ptr, std::size_t) { return ptr; }
+		template <typename T>
+		inline T* make_ptr(T* ptr, std::size_t)
+		{
+			return ptr;
+		}
 #endif
 	} // namespace internal
 
@@ -613,9 +604,7 @@ inline T *make_ptr(T *ptr, std::size_t) { return ptr; }
 		std::size_t capacity_;
 
 		Buffer(T* ptr = 0, std::size_t capacity = 0)
-			: ptr_(ptr), size_(0), capacity_(capacity)
-		{
-		}
+			: ptr_(ptr), size_(0), capacity_(capacity) { }
 
 		/**
 		  \rst
@@ -626,9 +615,7 @@ inline T *make_ptr(T *ptr, std::size_t) { return ptr; }
 		virtual void grow(std::size_t size) = 0;
 
 	public:
-		virtual ~Buffer()
-		{
-		}
+		virtual ~Buffer() { }
 
 		/** Returns the size of this buffer. */
 		std::size_t size() const
@@ -724,9 +711,7 @@ inline T *make_ptr(T *ptr, std::size_t) { return ptr; }
 
 		public:
 			explicit MemoryBuffer(const Allocator& alloc = Allocator())
-				: Allocator(alloc), Buffer<T>(data_, SIZE)
-			{
-			}
+				: Allocator(alloc), Buffer<T>(data_, SIZE) { }
 
 			~MemoryBuffer()
 			{
@@ -805,9 +790,7 @@ inline T *make_ptr(T *ptr, std::size_t) { return ptr; }
 		class FixedBuffer : public fmt::Buffer<Char>
 		{
 		public:
-			FixedBuffer(Char* array, std::size_t size) : fmt::Buffer<Char>(array, size)
-			{
-			}
+			FixedBuffer(Char* array, std::size_t size) : fmt::Buffer<Char>(array, size) { }
 
 		protected:
 			FMT_API void grow(std::size_t size);
@@ -820,7 +803,7 @@ inline T *make_ptr(T *ptr, std::size_t) { return ptr; }
 #if FMT_SECURE_SCL
 			typedef stdext::checked_array_iterator<Char*> CharPtr;
 #else
-  typedef Char *CharPtr;
+			typedef Char* CharPtr;
 #endif
 			static Char cast(int value)
 			{
@@ -1109,9 +1092,7 @@ inline unsigned count_digits(uint64_t n) {
 			MemoryBuffer<char, INLINE_BUFFER_SIZE> buffer_;
 
 		public:
-			UTF16ToUTF8()
-			{
-			}
+			UTF16ToUTF8() { }
 
 			FMT_API explicit UTF16ToUTF8(WStringRef s);
 
@@ -1218,9 +1199,7 @@ inline unsigned count_digits(uint64_t n) {
 		struct NamedArg;
 
 		template <typename T = void>
-		struct Null
-		{
-		};
+		struct Null { };
 
 		// A helper class template to enable or disable overloads taking wide
 		// characters and strings in MakeValue.
@@ -1322,9 +1301,7 @@ inline unsigned count_digits(uint64_t n) {
 		FMT_DISABLE_CONVERSION_TO_INT(long double);
 
 		template <bool B, class T = void>
-		struct EnableIf
-		{
-		};
+		struct EnableIf { };
 
 		template <class T>
 		struct EnableIf<true, T>
@@ -1416,9 +1393,7 @@ inline unsigned count_digits(uint64_t n) {
 			}
 
 		public:
-			MakeValue()
-			{
-			}
+			MakeValue() { }
 
 #define FMT_MAKE_VALUE_(Type, field, TYPE, rhs) \
   MakeValue(Type value) { field = rhs; } \
@@ -1591,9 +1566,7 @@ inline unsigned count_digits(uint64_t n) {
 
 			template <typename T>
 			NamedArg(BasicStringRef<Char> argname, const T& value)
-				: Arg(MakeArg<BasicFormatter<Char>>(value)), name(argname)
-			{
-			}
+				: Arg(MakeArg<BasicFormatter<Char>>(value)), name(argname) { }
 		};
 
 #define FMT_DISPATCH(call) static_cast<Impl*>(this)->call
@@ -1622,9 +1595,7 @@ inline unsigned count_digits(uint64_t n) {
 		class ArgVisitor
 		{
 		public:
-			void report_unhandled_arg()
-			{
-			}
+			void report_unhandled_arg() { }
 
 			Result visit_unhandled_arg()
 			{
@@ -1713,35 +1684,35 @@ inline unsigned count_digits(uint64_t n) {
 			{
 				switch (arg.type)
 				{
-				default:
-					FMT_ASSERT(false, "invalid argument type");
-					return Result();
-				case Arg::INT:
-					return FMT_DISPATCH(visit_int(arg.int_value));
-				case Arg::UINT:
-					return FMT_DISPATCH(visit_uint(arg.uint_value));
-				case Arg::LONG_LONG:
-					return FMT_DISPATCH(visit_long_long(arg.long_long_value));
-				case Arg::ULONG_LONG:
-					return FMT_DISPATCH(visit_ulong_long(arg.ulong_long_value));
-				case Arg::BOOL:
-					return FMT_DISPATCH(visit_bool(arg.int_value != 0));
-				case Arg::CHAR:
-					return FMT_DISPATCH(visit_char(arg.int_value));
-				case Arg::DOUBLE:
-					return FMT_DISPATCH(visit_double(arg.double_value));
-				case Arg::LONG_DOUBLE:
-					return FMT_DISPATCH(visit_long_double(arg.long_double_value));
-				case Arg::CSTRING:
-					return FMT_DISPATCH(visit_cstring(arg.string.value));
-				case Arg::STRING:
-					return FMT_DISPATCH(visit_string(arg.string));
-				case Arg::WSTRING:
-					return FMT_DISPATCH(visit_wstring(arg.wstring));
-				case Arg::POINTER:
-					return FMT_DISPATCH(visit_pointer(arg.pointer));
-				case Arg::CUSTOM:
-					return FMT_DISPATCH(visit_custom(arg.custom));
+					default:
+						FMT_ASSERT(false, "invalid argument type");
+						return Result();
+					case Arg::INT:
+						return FMT_DISPATCH(visit_int(arg.int_value));
+					case Arg::UINT:
+						return FMT_DISPATCH(visit_uint(arg.uint_value));
+					case Arg::LONG_LONG:
+						return FMT_DISPATCH(visit_long_long(arg.long_long_value));
+					case Arg::ULONG_LONG:
+						return FMT_DISPATCH(visit_ulong_long(arg.ulong_long_value));
+					case Arg::BOOL:
+						return FMT_DISPATCH(visit_bool(arg.int_value != 0));
+					case Arg::CHAR:
+						return FMT_DISPATCH(visit_char(arg.int_value));
+					case Arg::DOUBLE:
+						return FMT_DISPATCH(visit_double(arg.double_value));
+					case Arg::LONG_DOUBLE:
+						return FMT_DISPATCH(visit_long_double(arg.long_double_value));
+					case Arg::CSTRING:
+						return FMT_DISPATCH(visit_cstring(arg.string.value));
+					case Arg::STRING:
+						return FMT_DISPATCH(visit_string(arg.string));
+					case Arg::WSTRING:
+						return FMT_DISPATCH(visit_wstring(arg.wstring));
+					case Arg::POINTER:
+						return FMT_DISPATCH(visit_pointer(arg.pointer));
+					case Arg::CUSTOM:
+						return FMT_DISPATCH(visit_custom(arg.custom));
 				}
 			}
 		};
@@ -1749,9 +1720,7 @@ inline unsigned count_digits(uint64_t n) {
 		class RuntimeError : public std::runtime_error
 		{
 		protected:
-			RuntimeError() : std::runtime_error("")
-			{
-			}
+			RuntimeError() : std::runtime_error("") { }
 		};
 
 		template <typename Char>
@@ -1798,19 +1767,13 @@ inline unsigned count_digits(uint64_t n) {
 			MAX_PACKED_ARGS = 16
 		};
 
-		ArgList() : types_(0)
-		{
-		}
+		ArgList() : types_(0) { }
 
 		ArgList(ULongLong types, const internal::Value* values)
-			: types_(types), values_(values)
-		{
-		}
+			: types_(types), values_(values) { }
 
 		ArgList(ULongLong types, const internal::Arg* args)
-			: types_(types), args_(args)
-		{
-		}
+			: types_(types), args_(args) { }
 
 		/** Returns the argument at specified index. */
 		internal::Arg operator[](unsigned index) const
@@ -1863,9 +1826,7 @@ inline unsigned count_digits(uint64_t n) {
 	};
 
 	// An empty format specifier.
-	struct EmptySpec
-	{
-	};
+	struct EmptySpec { };
 
 	// A type specifier.
 	template <char TYPE>
@@ -1910,9 +1871,7 @@ inline unsigned count_digits(uint64_t n) {
 		// two specialization of WidthSpec and its subclasses.
 		wchar_t fill_;
 
-		WidthSpec(unsigned width, wchar_t fill) : width_(width), fill_(fill)
-		{
-		}
+		WidthSpec(unsigned width, wchar_t fill) : width_(width), fill_(fill) { }
 
 		unsigned width() const
 		{
@@ -1931,9 +1890,7 @@ inline unsigned count_digits(uint64_t n) {
 		Alignment align_;
 
 		AlignSpec(unsigned width, wchar_t fill, Alignment align = ALIGN_DEFAULT)
-			: WidthSpec(width, fill), align_(align)
-		{
-		}
+			: WidthSpec(width, fill), align_(align) { }
 
 		Alignment align() const
 		{
@@ -1950,9 +1907,7 @@ inline unsigned count_digits(uint64_t n) {
 	template <char TYPE>
 	struct AlignTypeSpec : AlignSpec
 	{
-		AlignTypeSpec(unsigned width, wchar_t fill) : AlignSpec(width, fill)
-		{
-		}
+		AlignTypeSpec(unsigned width, wchar_t fill) : AlignSpec(width, fill) { }
 
 		bool flag(unsigned) const
 		{
@@ -1974,9 +1929,7 @@ inline unsigned count_digits(uint64_t n) {
 
 		FormatSpec(
 			unsigned width = 0, char type = 0, wchar_t fill = ' ')
-			: AlignSpec(width, fill), flags_(0), precision_(-1), type_(type)
-		{
-		}
+			: AlignSpec(width, fill), flags_(0), precision_(-1), type_(type) { }
 
 		bool flag(unsigned f) const
 		{
@@ -2003,9 +1956,7 @@ inline unsigned count_digits(uint64_t n) {
 
 	public:
 		IntFormatSpec(T val, const SpecT& spec = SpecT())
-			: SpecT(spec), value_(val)
-		{
-		}
+			: SpecT(spec), value_(val) { }
 
 		T value() const
 		{
@@ -2217,9 +2168,7 @@ inline IntFormatSpec<TYPE, AlignTypeSpec<0>, Char> pad( \
 
 		public:
 			ArgFormatterBase(BasicWriter<Char>& w, FormatSpec& s)
-				: writer_(w), spec_(s)
-			{
-			}
+				: writer_(w), spec_(s) { }
 
 			template <typename T>
 			void visit_any_int(T value)
@@ -2319,9 +2268,7 @@ inline IntFormatSpec<TYPE, AlignTypeSpec<0>, Char> pad( \
 		public:
 			BasicArgFormatter(BasicFormatter<Char>& f, FormatSpec& s, const Char* fmt)
 				: ArgFormatterBase<BasicArgFormatter<Char>, Char>(f.writer(), s),
-				formatter_(f), format_(fmt)
-			{
-			}
+				formatter_(f), format_(fmt) { }
 
 			void visit_custom(Arg::CustomValue c)
 			{
@@ -2401,9 +2348,7 @@ inline IntFormatSpec<TYPE, AlignTypeSpec<0>, Char> pad( \
 			unsigned parse_header(const Char*& s, FormatSpec& spec);
 
 		public:
-			explicit PrintfFormatter(const ArgList& args) : FormatterBase(args)
-			{
-			}
+			explicit PrintfFormatter(const ArgList& args) : FormatterBase(args) { }
 
 			FMT_API void format(BasicWriter<Char>& writer,
 			                    BasicCStringRef<Char> format_str);
@@ -2445,9 +2390,7 @@ inline IntFormatSpec<TYPE, AlignTypeSpec<0>, Char> pad( \
 		 \endrst
 		 */
 		BasicFormatter(const ArgList& args, BasicWriter<Char>& w)
-			: internal::FormatterBase(args), writer_(w)
-		{
-		}
+			: internal::FormatterBase(args), writer_(w) { }
 
 		/** Returns a reference to the writer associated with this formatter. */
 		BasicWriter<Char>& writer()
@@ -2699,9 +2642,7 @@ inline uint64_t make_type(FMT_GEN15(FMT_ARG_TYPE_DEFAULT)) {
 
 		typedef char Char; // For FMT_VARIADIC_CTOR.
 
-		SystemError()
-		{
-		}
+		SystemError() { }
 
 	public:
 		/**
@@ -2771,7 +2712,10 @@ inline uint64_t make_type(FMT_GEN15(FMT_ARG_TYPE_DEFAULT)) {
 			return p.base();
 		}
 #else
-  static Char *get(Char *p) { return p; }
+		static Char* get(Char* p)
+		{
+			return p;
+		}
 #endif
 
 		// Fills the padding around the content and returns the pointer to the
@@ -2860,9 +2804,7 @@ inline uint64_t make_type(FMT_GEN15(FMT_ARG_TYPE_DEFAULT)) {
 		}
 
 		template <typename T>
-		void append_float_length(Char*&, T)
-		{
-		}
+		void append_float_length(Char*&, T) { }
 
 		template <typename Impl, typename Char_>
 		friend class internal::ArgFormatterBase;
@@ -2873,9 +2815,7 @@ inline uint64_t make_type(FMT_GEN15(FMT_ARG_TYPE_DEFAULT)) {
 		/**
 		  Constructs a ``BasicWriter`` object.
 		 */
-		explicit BasicWriter(Buffer<Char>& b) : buffer_(b)
-		{
-		}
+		explicit BasicWriter(Buffer<Char>& b) : buffer_(b) { }
 
 	public:
 		/**
@@ -2883,9 +2823,7 @@ inline uint64_t make_type(FMT_GEN15(FMT_ARG_TYPE_DEFAULT)) {
 		  Destroys a ``BasicWriter`` object.
 		  \endrst
 		 */
-		virtual ~BasicWriter()
-		{
-		}
+		virtual ~BasicWriter() { }
 
 		/**
 		  Returns the total number of characters written.
@@ -3235,87 +3173,87 @@ inline uint64_t make_type(FMT_GEN15(FMT_ARG_TYPE_DEFAULT)) {
 		}
 		switch (spec.type())
 		{
-		case 0: case 'd':
-			{
-				unsigned num_digits = internal::count_digits(abs_value);
-				CharPtr p = prepare_int_buffer(
-					num_digits, spec, prefix, prefix_size) + 1 - num_digits;
-				internal::format_decimal(get(p), abs_value, num_digits);
+			case 0: case 'd':
+				{
+					unsigned num_digits = internal::count_digits(abs_value);
+					CharPtr p = prepare_int_buffer(
+						num_digits, spec, prefix, prefix_size) + 1 - num_digits;
+					internal::format_decimal(get(p), abs_value, num_digits);
+					break;
+				}
+			case 'x': case 'X':
+				{
+					UnsignedType n = abs_value;
+					if (spec.flag(HASH_FLAG))
+					{
+						prefix[prefix_size++] = '0';
+						prefix[prefix_size++] = spec.type();
+					}
+					unsigned num_digits = 0;
+					do
+					{
+						++num_digits;
+					}
+					while ((n >>= 4) != 0);
+					Char* p = get(prepare_int_buffer(
+						num_digits, spec, prefix, prefix_size));
+					n = abs_value;
+					const char* digits = spec.type() == 'x' ?
+						                     "0123456789abcdef" : "0123456789ABCDEF";
+					do
+					{
+						*p-- = digits[n & 0xf];
+					}
+					while ((n >>= 4) != 0);
+					break;
+				}
+			case 'b': case 'B':
+				{
+					UnsignedType n = abs_value;
+					if (spec.flag(HASH_FLAG))
+					{
+						prefix[prefix_size++] = '0';
+						prefix[prefix_size++] = spec.type();
+					}
+					unsigned num_digits = 0;
+					do
+					{
+						++num_digits;
+					}
+					while ((n >>= 1) != 0);
+					Char* p = get(prepare_int_buffer(num_digits, spec, prefix, prefix_size));
+					n = abs_value;
+					do
+					{
+						*p-- = static_cast<Char>('0' + (n & 1));
+					}
+					while ((n >>= 1) != 0);
+					break;
+				}
+			case 'o':
+				{
+					UnsignedType n = abs_value;
+					if (spec.flag(HASH_FLAG))
+						prefix[prefix_size++] = '0';
+					unsigned num_digits = 0;
+					do
+					{
+						++num_digits;
+					}
+					while ((n >>= 3) != 0);
+					Char* p = get(prepare_int_buffer(num_digits, spec, prefix, prefix_size));
+					n = abs_value;
+					do
+					{
+						*p-- = static_cast<Char>('0' + (n & 7));
+					}
+					while ((n >>= 3) != 0);
+					break;
+				}
+			default:
+				internal::report_unknown_type(
+					spec.type(), spec.flag(CHAR_FLAG) ? "char" : "integer");
 				break;
-			}
-		case 'x': case 'X':
-			{
-				UnsignedType n = abs_value;
-				if (spec.flag(HASH_FLAG))
-				{
-					prefix[prefix_size++] = '0';
-					prefix[prefix_size++] = spec.type();
-				}
-				unsigned num_digits = 0;
-				do
-				{
-					++num_digits;
-				}
-				while ((n >>= 4) != 0);
-				Char* p = get(prepare_int_buffer(
-					num_digits, spec, prefix, prefix_size));
-				n = abs_value;
-				const char* digits = spec.type() == 'x' ?
-					                     "0123456789abcdef" : "0123456789ABCDEF";
-				do
-				{
-					*p-- = digits[n & 0xf];
-				}
-				while ((n >>= 4) != 0);
-				break;
-			}
-		case 'b': case 'B':
-			{
-				UnsignedType n = abs_value;
-				if (spec.flag(HASH_FLAG))
-				{
-					prefix[prefix_size++] = '0';
-					prefix[prefix_size++] = spec.type();
-				}
-				unsigned num_digits = 0;
-				do
-				{
-					++num_digits;
-				}
-				while ((n >>= 1) != 0);
-				Char* p = get(prepare_int_buffer(num_digits, spec, prefix, prefix_size));
-				n = abs_value;
-				do
-				{
-					*p-- = static_cast<Char>('0' + (n & 1));
-				}
-				while ((n >>= 1) != 0);
-				break;
-			}
-		case 'o':
-			{
-				UnsignedType n = abs_value;
-				if (spec.flag(HASH_FLAG))
-					prefix[prefix_size++] = '0';
-				unsigned num_digits = 0;
-				do
-				{
-					++num_digits;
-				}
-				while ((n >>= 3) != 0);
-				Char* p = get(prepare_int_buffer(num_digits, spec, prefix, prefix_size));
-				n = abs_value;
-				do
-				{
-					*p-- = static_cast<Char>('0' + (n & 7));
-				}
-				while ((n >>= 3) != 0);
-				break;
-			}
-		default:
-			internal::report_unknown_type(
-				spec.type(), spec.flag(CHAR_FLAG) ? "char" : "integer");
-			break;
 		}
 	}
 
@@ -3329,23 +3267,23 @@ inline uint64_t make_type(FMT_GEN15(FMT_ARG_TYPE_DEFAULT)) {
 		bool upper = false;
 		switch (type)
 		{
-		case 0:
-			type = 'g';
-			break;
-		case 'e': case 'f': case 'g': case 'a':
-			break;
-		case 'F':
+			case 0:
+				type = 'g';
+				break;
+			case 'e': case 'f': case 'g': case 'a':
+				break;
+			case 'F':
 #ifdef _MSC_VER
-			// MSVC's printf doesn't support 'F'.
-			type = 'f';
+				// MSVC's printf doesn't support 'F'.
+				type = 'f';
 #endif
-			// Fall through.
-		case 'E': case 'G': case 'A':
-			upper = true;
-			break;
-		default:
-			internal::report_unknown_type(type, "double");
-			break;
+				// Fall through.
+			case 'E': case 'G': case 'A':
+				upper = true;
+				break;
+			default:
+				internal::report_unknown_type(type, "double");
+				break;
 		}
 
 		char sign = 0;
@@ -3530,9 +3468,7 @@ inline uint64_t make_type(FMT_GEN15(FMT_ARG_TYPE_DEFAULT)) {
 
 	public:
 		explicit BasicMemoryWriter(const Allocator& alloc = Allocator())
-			: BasicWriter<Char>(buffer_), buffer_(alloc)
-		{
-		}
+			: BasicWriter<Char>(buffer_), buffer_(alloc) { }
 
 #if FMT_USE_RVALUE_REFERENCES   
 		/**
@@ -3542,9 +3478,7 @@ inline uint64_t make_type(FMT_GEN15(FMT_ARG_TYPE_DEFAULT)) {
 		  \endrst
 		 */
 		BasicMemoryWriter(BasicMemoryWriter&& other)
-			: BasicWriter<Char>(buffer_), buffer_(std::move(other.buffer_))
-		{
-		}
+			: BasicWriter<Char>(buffer_), buffer_(std::move(other.buffer_)) { }
 
 		/**
 		  \rst
@@ -3593,9 +3527,7 @@ inline uint64_t make_type(FMT_GEN15(FMT_ARG_TYPE_DEFAULT)) {
 		 \endrst
 		 */
 		BasicArrayWriter(Char* array, std::size_t size)
-			: BasicWriter<Char>(buffer_), buffer_(array, size)
-		{
-		}
+			: BasicWriter<Char>(buffer_), buffer_(array, size) { }
 
 		/**
 		 \rst
@@ -3605,9 +3537,7 @@ inline uint64_t make_type(FMT_GEN15(FMT_ARG_TYPE_DEFAULT)) {
 		 */
 		template <std::size_t SIZE>
 		explicit BasicArrayWriter(Char (&array)[SIZE])
-			: BasicWriter<Char>(buffer_), buffer_(array, SIZE)
-		{
-		}
+			: BasicWriter<Char>(buffer_), buffer_(array, SIZE) { }
 	};
 
 	typedef BasicArrayWriter<char> ArrayWriter;
@@ -3856,17 +3786,11 @@ inline uint64_t make_type(FMT_GEN15(FMT_ARG_TYPE_DEFAULT)) {
 			FormatSigned(value);
 		}
 
-		explicit FormatInt(unsigned value) : str_(format_decimal(value))
-		{
-		}
+		explicit FormatInt(unsigned value) : str_(format_decimal(value)) { }
 
-		explicit FormatInt(unsigned long value) : str_(format_decimal(value))
-		{
-		}
+		explicit FormatInt(unsigned long value) : str_(format_decimal(value)) { }
 
-		explicit FormatInt(ULongLong value) : str_(format_decimal(value))
-		{
-		}
+		explicit FormatInt(ULongLong value) : str_(format_decimal(value)) { }
 
 		/**
 		  Returns the number of characters written to the output buffer.
@@ -4255,18 +4179,18 @@ namespace fmt
 				{
 					switch (*p)
 					{
-					case '<':
-						spec.align_ = ALIGN_LEFT;
-						break;
-					case '>':
-						spec.align_ = ALIGN_RIGHT;
-						break;
-					case '=':
-						spec.align_ = ALIGN_NUMERIC;
-						break;
-					case '^':
-						spec.align_ = ALIGN_CENTER;
-						break;
+						case '<':
+							spec.align_ = ALIGN_LEFT;
+							break;
+						case '>':
+							spec.align_ = ALIGN_RIGHT;
+							break;
+						case '=':
+							spec.align_ = ALIGN_NUMERIC;
+							break;
+						case '^':
+							spec.align_ = ALIGN_CENTER;
+							break;
 					}
 					if (spec.align_ != ALIGN_DEFAULT)
 					{
@@ -4290,18 +4214,18 @@ namespace fmt
 			// Parse sign.
 			switch (*s)
 			{
-			case '+':
-				check_sign(s, arg);
-				spec.flags_ |= SIGN_FLAG | PLUS_FLAG;
-				break;
-			case '-':
-				check_sign(s, arg);
-				spec.flags_ |= MINUS_FLAG;
-				break;
-			case ' ':
-				check_sign(s, arg);
-				spec.flags_ |= SIGN_FLAG;
-				break;
+				case '+':
+					check_sign(s, arg);
+					spec.flags_ |= SIGN_FLAG | PLUS_FLAG;
+					break;
+				case '-':
+					check_sign(s, arg);
+					spec.flags_ |= MINUS_FLAG;
+					break;
+				case ' ':
+					check_sign(s, arg);
+					spec.flags_ |= SIGN_FLAG;
+					break;
 			}
 
 			if (*s == '#')
@@ -4335,24 +4259,24 @@ namespace fmt
 				ULongLong value = 0;
 				switch (width_arg.type)
 				{
-				case Arg::INT:
-					if (width_arg.int_value < 0)
-					FMT_THROW(FormatError("negative width"));
-					value = width_arg.int_value;
-					break;
-				case Arg::UINT:
-					value = width_arg.uint_value;
-					break;
-				case Arg::LONG_LONG:
-					if (width_arg.long_long_value < 0)
-					FMT_THROW(FormatError("negative width"));
-					value = width_arg.long_long_value;
-					break;
-				case Arg::ULONG_LONG:
-					value = width_arg.ulong_long_value;
-					break;
-				default:
-					FMT_THROW(FormatError("width is not integer"));
+					case Arg::INT:
+						if (width_arg.int_value < 0)
+						FMT_THROW(FormatError("negative width"));
+						value = width_arg.int_value;
+						break;
+					case Arg::UINT:
+						value = width_arg.uint_value;
+						break;
+					case Arg::LONG_LONG:
+						if (width_arg.long_long_value < 0)
+						FMT_THROW(FormatError("negative width"));
+						value = width_arg.long_long_value;
+						break;
+					case Arg::ULONG_LONG:
+						value = width_arg.ulong_long_value;
+						break;
+					default:
+						FMT_THROW(FormatError("width is not integer"));
 				}
 				if (value > (std::numeric_limits<int>::max)())
 				FMT_THROW(FormatError("number is too big"));
@@ -4378,24 +4302,24 @@ namespace fmt
 					ULongLong value = 0;
 					switch (precision_arg.type)
 					{
-					case Arg::INT:
-						if (precision_arg.int_value < 0)
-						FMT_THROW(FormatError("negative precision"));
-						value = precision_arg.int_value;
-						break;
-					case Arg::UINT:
-						value = precision_arg.uint_value;
-						break;
-					case Arg::LONG_LONG:
-						if (precision_arg.long_long_value < 0)
-						FMT_THROW(FormatError("negative precision"));
-						value = precision_arg.long_long_value;
-						break;
-					case Arg::ULONG_LONG:
-						value = precision_arg.ulong_long_value;
-						break;
-					default:
-						FMT_THROW(FormatError("precision is not integer"));
+						case Arg::INT:
+							if (precision_arg.int_value < 0)
+							FMT_THROW(FormatError("negative precision"));
+							value = precision_arg.int_value;
+							break;
+						case Arg::UINT:
+							value = precision_arg.uint_value;
+							break;
+						case Arg::LONG_LONG:
+							if (precision_arg.long_long_value < 0)
+							FMT_THROW(FormatError("negative precision"));
+							value = precision_arg.long_long_value;
+							break;
+						case Arg::ULONG_LONG:
+							value = precision_arg.ulong_long_value;
+							break;
+						default:
+							FMT_THROW(FormatError("precision is not integer"));
 					}
 					if (value > (std::numeric_limits<int>::max)())
 					FMT_THROW(FormatError("number is too big"));

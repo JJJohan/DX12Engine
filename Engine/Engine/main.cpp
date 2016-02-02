@@ -48,9 +48,7 @@ Game::Game()
 	, _pMaterial2(nullptr)
 	, _pFont(nullptr)
 	, _pText(nullptr)
-	, _pText2(nullptr)
-{
-}
+	, _pText2(nullptr) {}
 
 void Game::RemoveTriangles()
 {

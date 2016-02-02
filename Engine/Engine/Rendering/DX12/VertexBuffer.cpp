@@ -5,9 +5,7 @@
 namespace Engine
 {
 	VertexBuffer::VertexBuffer()
-		: _vertexBufferView()
-	{
-	}
+		: _vertexBufferView() { }
 
 	void VertexBuffer::Bind(ID3D12GraphicsCommandList* commandList)
 	{

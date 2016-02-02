@@ -35,9 +35,7 @@ namespace Engine
 		static const int CBufferLimit = 8;
 
 	private:
-		ResourceFactory()
-		{
-		};
+		ResourceFactory() { };
 
 		static void _init(DX12Renderer* renderer, ID3D12DescriptorHeap* cbvSrvHeap);
 

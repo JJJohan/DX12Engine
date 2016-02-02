@@ -46,9 +46,7 @@ namespace Engine
 		, _pPixelShader(nullptr)
 		, _pTexture(nullptr)
 		, _pDevice(nullptr)
-		, _pRootSignature(nullptr)
-	{
-	}
+		, _pRootSignature(nullptr) { }
 
 	void Material::LoadVertexShader(const std::string& shaderPath, const std::string& entryPoint, const std::string& shaderVersion)
 	{

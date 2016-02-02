@@ -182,6 +182,7 @@
     <ClInclude Include="Rendering\DX12\FeatureSupport.h" />
     <ClInclude Include="Rendering\DX12\Font.h" />
     <ClInclude Include="Rendering\DX12\FontManager.h" />
+    <ClInclude Include="Rendering\DX12\Geometry.h" />
     <ClInclude Include="Rendering\DX12\HeapManager.h" />
     <ClInclude Include="Rendering\DX12\HeapResource.h" />
     <ClInclude Include="Rendering\DX12\IndexBuffer.h" />

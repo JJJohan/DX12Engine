@@ -3,9 +3,7 @@
 
 namespace Engine
 {
-	IndexBufferInstance::IndexBufferInstance()
-	{
-	}
+	IndexBufferInstance::IndexBufferInstance() { }
 
 	void IndexBufferInstance::SetIndices(std::vector<int> indices)
 	{

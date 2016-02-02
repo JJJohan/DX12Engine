@@ -8,9 +8,7 @@ namespace Engine
 		, _topUv(0)
 		, _bottomUv(1)
 		, _widthScale(1)
-		, _heightScale(1)
-	{
-	}
+		, _heightScale(1) { }
 
 	Font::~Font()
 	{

@@ -6,9 +6,7 @@ namespace Engine
 	BufferInstance::BufferInstance()
 		: _pBuffer(nullptr)
 		, _pDevice(nullptr)
-		, _offset(0)
-	{
-	}
+		, _offset(0) { }
 
 	void BufferInstance::SetOffset(size_t offset)
 	{

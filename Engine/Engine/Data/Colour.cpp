@@ -15,9 +15,7 @@ namespace Engine
 		: _red(1.0f)
 		, _green(1.0f)
 		, _blue(1.0f)
-		, _alpha(1.0f)
-	{
-	}
+		, _alpha(1.0f) { }
 
 	Colour::Colour(float r, float g, float b, float a)
 	{

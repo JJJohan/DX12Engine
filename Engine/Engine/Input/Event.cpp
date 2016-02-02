@@ -5,9 +5,7 @@ namespace Engine
 	static int eventId = 0;
 
 	Event::Event()
-		: _id(eventId++)
-	{
-	}
+		: _id(eventId++) { }
 
 	int Event::ID() const
 	{

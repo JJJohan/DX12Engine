@@ -97,9 +97,7 @@ namespace Engine
 		LOGFAILEDCOMRETURN(_commandAllocator->Reset(), EXIT_FAILURE);
 
 		// Check if the camera has moved.
-		if (_pCamera->Update())
-		{
-		}
+		if (_pCamera->Update()) { }
 
 		// Update objects
 		for (auto it = RenderObject::_renderObjects.begin(); it != RenderObject::_renderObjects.end(); ++it)

@@ -327,6 +327,9 @@
     <ClInclude Include="Rendering\DX12\VertexBufferInstance.h">
       <Filter>Header Files\Rendering\DX12\Buffers</Filter>
     </ClInclude>
+    <ClInclude Include="Rendering\DX12\Geometry.h">
+      <Filter>Header Files\Rendering\DX12</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\Build\Shaders\Diffuse.hlsl">

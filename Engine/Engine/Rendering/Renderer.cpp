@@ -9,9 +9,9 @@ namespace Engine
 	{
 		switch (renderAPI)
 		{
-		case Direct3D12:
-			_renderer = std::make_unique<DX12Renderer>();
-			break;
+			case Direct3D12:
+				_renderer = std::make_unique<DX12Renderer>();
+				break;
 		}
 
 		return _renderer.get();
@@ -37,9 +37,7 @@ namespace Engine
 		return _renderer.get()->GetWindowHandle();
 	}
 
-	Renderer::Renderer()
-	{
-	}
+	Renderer::Renderer() { }
 
 	Renderer::~Renderer()
 	{

@@ -12,16 +12,12 @@ namespace Engine
 {
 	struct Vertex
 	{
-		Vertex()
-		{
-		}
+		Vertex() { }
 
 		Vertex(const Vector3& pos, const Colour& col, const Vector2& uv)
 			: Pos(pos)
 			, Col(col)
-			, Uv(uv.X, uv.Y, 0.0f)
-		{
-		}
+			, Uv(uv.X, uv.Y, 0.0f) { }
 
 		DirectX::XMFLOAT3 Pos;
 		DirectX::XMFLOAT4 Col;

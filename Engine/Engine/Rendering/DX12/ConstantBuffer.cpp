@@ -7,9 +7,7 @@ namespace Engine
 	ConstantBuffer::ConstantBuffer()
 		: _pDescriptor(nullptr)
 		, _pCopyBuffer(nullptr)
-		, _copyBufferSize(0)
-	{
-	}
+		, _copyBufferSize(0) { }
 
 	ConstantBuffer::~ConstantBuffer()
 	{
@@ -83,9 +81,7 @@ namespace Engine
 		: _index(-1)
 		, _slotUsage(0)
 		, _pDescriptor(descriptorHeap)
-		, _pVertexBuffer(nullptr)
-	{
-	}
+		, _pVertexBuffer(nullptr) { }
 
 	ConstantBufferInstance::~ConstantBufferInstance()
 	{
