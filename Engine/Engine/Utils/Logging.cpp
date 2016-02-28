@@ -11,7 +11,6 @@ namespace Engine
 	{
 		LogLevel = LogPriority::Error;
 		Log(message);
-
 		Win32Utils::ShowMessageBox(message, "Error");
 	}
 

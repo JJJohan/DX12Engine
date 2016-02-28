@@ -36,4 +36,3 @@ namespace Engine
 		_pBuffer->Unbind();
 	}
 }
-

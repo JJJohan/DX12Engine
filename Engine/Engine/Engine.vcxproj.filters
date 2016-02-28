@@ -199,6 +199,15 @@
     <ClCompile Include="Rendering\DX12\Primitives.cpp">
       <Filter>Source Files\Rendering\DX12</Filter>
     </ClCompile>
+    <ClCompile Include="Rendering\DX12\GBuffer.cpp">
+      <Filter>Source Files\Rendering\DX12\Buffers</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\DX12\Light.cpp">
+      <Filter>Source Files\Rendering\DX12</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\DX12\D3DUtils.cpp">
+      <Filter>Source Files\Rendering\DX12</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="External\src\CPPFormat\format.h">
@@ -333,6 +342,15 @@
     <ClInclude Include="Rendering\DX12\Primitives.h">
       <Filter>Header Files\Rendering\DX12</Filter>
     </ClInclude>
+    <ClInclude Include="Rendering\DX12\GBuffer.h">
+      <Filter>Header Files\Rendering\DX12\Buffers</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\DX12\Light.h">
+      <Filter>Header Files\Rendering\DX12</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\DX12\D3DUtils.h">
+      <Filter>Header Files\Rendering\DX12</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\Build\Shaders\Diffuse.hlsl">
@@ -342,6 +360,9 @@
       <Filter>Shaders</Filter>
     </FxCompile>
     <FxCompile Include="..\Build\Shaders\DiffuseTexture.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Shaders\DiffuseTexture_Deferred.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
   </ItemGroup>

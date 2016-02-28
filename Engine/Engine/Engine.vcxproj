@@ -130,10 +130,13 @@
     <ClCompile Include="Rendering\DX12\Camera.cpp" />
     <ClCompile Include="Rendering\DX12\CommandQueue.cpp" />
     <ClCompile Include="Rendering\DX12\ConstantBuffer.cpp" />
+    <ClCompile Include="Rendering\DX12\D3DUtils.cpp" />
     <ClCompile Include="Rendering\DX12\DX12Renderer.cpp" />
     <ClCompile Include="Rendering\DX12\FeatureSupport.cpp" />
     <ClCompile Include="Rendering\DX12\Font.cpp" />
     <ClCompile Include="Rendering\DX12\FontManager.cpp" />
+    <ClCompile Include="Rendering\DX12\GBuffer.cpp" />
+    <ClCompile Include="Rendering\DX12\Light.cpp" />
     <ClCompile Include="Rendering\DX12\Primitives.cpp" />
     <ClCompile Include="Rendering\DX12\HeapManager.cpp" />
     <ClCompile Include="Rendering\DX12\HeapResource.cpp" />
@@ -179,10 +182,13 @@
     <ClInclude Include="Rendering\DX12\Camera.h" />
     <ClInclude Include="Rendering\DX12\CommandQueue.h" />
     <ClInclude Include="Rendering\DX12\ConstantBuffer.h" />
+    <ClInclude Include="Rendering\DX12\D3DUtils.h" />
     <ClInclude Include="Rendering\DX12\DX12Renderer.h" />
     <ClInclude Include="Rendering\DX12\FeatureSupport.h" />
     <ClInclude Include="Rendering\DX12\Font.h" />
     <ClInclude Include="Rendering\DX12\FontManager.h" />
+    <ClInclude Include="Rendering\DX12\GBuffer.h" />
+    <ClInclude Include="Rendering\DX12\Light.h" />
     <ClInclude Include="Rendering\DX12\Primitives.h" />
     <ClInclude Include="Rendering\DX12\HeapManager.h" />
     <ClInclude Include="Rendering\DX12\HeapResource.h" />
@@ -215,6 +221,14 @@
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">VSMain</EntryPointName>
     </FxCompile>
     <FxCompile Include="..\Build\Shaders\Font.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </ShaderType>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">VSMain</EntryPointName>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">VSMain</EntryPointName>
+    </FxCompile>
+    <FxCompile Include="Shaders\DiffuseTexture_Deferred.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
       </ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">

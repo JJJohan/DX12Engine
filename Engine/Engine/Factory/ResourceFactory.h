@@ -24,7 +24,7 @@ namespace Engine
 		static ENGINE_API VertexBufferInstance* CreateVertexBufferInstance();
 		static ENGINE_API IndexBufferInstance* CreateIndexBufferInstance();
 		static ENGINE_API Material* CreateMaterial();
-		static ENGINE_API Texture* CreateTexture();
+		static ENGINE_API Texture* CreateTexture(int width, int height);
 
 		static int GetTextureSlot();
 		static int GetCBufferSlot();

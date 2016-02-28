@@ -64,9 +64,9 @@ namespace Engine
 		return material;
 	}
 
-	Texture* ResourceFactory::CreateTexture()
+	Texture* ResourceFactory::CreateTexture(int width, int height)
 	{
-		Texture* texture = new Texture();
+		Texture* texture = new Texture(width, height);
 
 		texture->_pDevice = _pDevice;
 		texture->_pSrvHeap = _pCbvSrvHeap;

@@ -14,6 +14,7 @@ using namespace DirectX;
 namespace Engine
 {
 	class RenderObject;
+	class GBuffer;
 
 	class DX12Renderer : public IRenderer
 	{
@@ -40,6 +41,7 @@ namespace Engine
 
 		// Pipeline objects
 		Camera* _pCamera;
+		GBuffer* _pGBuffer;
 		D3D12_RECT _scissorRect;
 		ComPtr<IDXGISwapChain3> _swapChain;
 		ComPtr<ID3D12Device> _device;
@@ -53,8 +55,7 @@ namespace Engine
 #if _DEBUG
 		ComPtr<ID3D12DebugDevice> _debugDevice;
 #endif
-		int _rtvDescriptorSize;
-		int _cbvSrvDescriptorSize;
+
 		bool _useWarpDevice;
 		bool _resize;
 

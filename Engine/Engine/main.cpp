@@ -7,6 +7,7 @@
 #include "Rendering/DX12/Font.h"
 #include "Rendering/DX12/VertexBufferInstance.h"
 #include "Rendering/DX12/IndexBufferInstance.h"
+#include "Rendering/DX12/Primitives.h"
 
 using namespace Engine;
 
@@ -52,12 +53,10 @@ Game::Game()
 
 void Game::RemoveTriangles()
 {
-	delete _pTriangle;
-	delete _pTriangle2;
-	_pTriangle = nullptr;
-	_pTriangle2 = nullptr;
-	Logging::Log("Deleted triangles.");
-	Input::UnregisterKey("deleteTriangles");
+	VertexBufferInstance* vBuffer = _pTriangle->GetVertexBuffer();
+	std::vector<Vertex> verts = vBuffer->GetVertices();
+	verts[0].Pos.x += 5.0f;
+	vBuffer->SetVertices(verts);
 }
 
 void Game::Start()
@@ -74,20 +73,16 @@ void Game::Start()
 			{{0.25f, -0.25f, 0.0f},{1.0f, 1.0f, 1.0f, 1.0f},{1.0f, 64.0f}}
 		};
 
-	VertexBufferInstance* vertexBuffer = ResourceFactory::CreateVertexBufferInstance(VERTEX_POS_UV);
-	vertexBuffer->SetVertices(triangleVertices);
-
-	_pTexture = ResourceFactory::CreateTexture();
-	_pTexture->Load(GetRelativePath("Textures\\font.dds"));
+	_pTexture = ResourceFactory::CreateTexture(0, 0);
+	_pTexture->Load(GetRelativePath("Textures\\test2.png"));
 
 	_pMaterial = ResourceFactory::CreateMaterial();
 	_pMaterial->SetTexture(_pTexture);
-	_pMaterial->LoadVertexShader(GetRelativePath("Shaders\\DiffuseTexture.hlsl"), "VSMain", "vs_5_1");
-	_pMaterial->LoadPixelShader(GetRelativePath("Shaders\\DiffuseTexture.hlsl"), "PSMain", "ps_5_1");
-	_pMaterial->Finalise(vertexBuffer->GetInputLayout());
+	_pMaterial->LoadVertexShader(GetRelativePath("Shaders\\DiffuseTexture_Deferred.hlsl"), "VSMain", "vs_5_1");
+	_pMaterial->LoadPixelShader(GetRelativePath("Shaders\\DiffuseTexture_Deferred.hlsl"), "PSMain", "ps_5_1");
+	_pMaterial->Finalise(Material::Default_Input_Layout);
 
-	_pTriangle = new RenderObject("triangle");
-	_pTriangle->SetVertexBuffer(vertexBuffer);
+	_pTriangle = Primitives::CreateCylinder("triangle", 8);
 	_pTriangle->SetMaterial(_pMaterial);
 
 	Engine::Input::RegisterKey('F', KeyDown, std::bind(&Game::RemoveTriangles, this), "deleteTriangles");
@@ -95,10 +90,10 @@ void Game::Start()
 	// Create an example triangle object.
 	std::vector<Vertex> vertices2 =
 		{
-			Vertex(Vector3(-0.25f, 0.25f, 0.0f), Colour(1.0f, 1.0f, 1.0f, 1.0f), Vector2(0.0f, 0.0f)), // bottom left
-			Vertex(Vector3(0.25f, -0.25f, 0.0f), Colour(1.0f, 1.0f, 1.0f, 1.0f), Vector2(1.0f, 1.0f)), // top right
-			Vertex(Vector3(0.25f, 0.25f, 0.0f), Colour(1.0f, 1.0f, 1.0f, 1.0f), Vector2(1.0f, 0.0f)), // bottom right
-			Vertex(Vector3(-0.25f, -0.25f, 0.0f), Colour(1.0f, 1.0f, 1.0f, 1.0f), Vector2(0.0f, 1.0f)) // top left
+			Vertex(Vector3(-0.25f, 0.25f, 0.0f), Colour::White, Vector2(0.0f, 0.0f)), // bottom left
+			Vertex(Vector3(0.25f, -0.25f, 0.0f), Colour::White, Vector2(1.0f, 1.0f)), // top right
+			Vertex(Vector3(0.25f, 0.25f, 0.0f), Colour::White, Vector2(1.0f, 0.0f)), // bottom right
+			Vertex(Vector3(-0.25f, -0.25f, 0.0f), Colour::White, Vector2(0.0f, 1.0f)) // top left
 		};
 
 	std::vector<int> indices =
@@ -107,19 +102,19 @@ void Game::Start()
 			0, 1, 3
 		};
 
-	VertexBufferInstance* vertexBuffer2 = ResourceFactory::CreateVertexBufferInstance(VERTEX_POS_UV);
+	VertexBufferInstance* vertexBuffer2 = ResourceFactory::CreateVertexBufferInstance();
 	vertexBuffer2->SetVertices(vertices2);
 
 	IndexBufferInstance* indexBuffer = ResourceFactory::CreateIndexBufferInstance();
 	indexBuffer->SetIndices(indices);
 
-	_pTexture2 = ResourceFactory::CreateTexture();
+	_pTexture2 = ResourceFactory::CreateTexture(0, 0);
 	_pTexture2->Load(GetRelativePath("Textures\\test2.png"));
 
 	_pMaterial2 = ResourceFactory::CreateMaterial();
 	_pMaterial2->SetTexture(_pTexture2);
-	_pMaterial2->LoadVertexShader(GetRelativePath("Shaders\\DiffuseTexture.hlsl"), "VSMain", "vs_5_1");
-	_pMaterial2->LoadPixelShader(GetRelativePath("Shaders\\DiffuseTexture.hlsl"), "PSMain", "ps_5_1");
+	_pMaterial2->LoadVertexShader(GetRelativePath("Shaders\\DiffuseTexture_Deferred.hlsl"), "VSMain", "vs_5_1");
+	_pMaterial2->LoadPixelShader(GetRelativePath("Shaders\\DiffuseTexture_Deferred.hlsl"), "PSMain", "ps_5_1");
 	_pMaterial2->Finalise(vertexBuffer2->GetInputLayout());
 
 	_pTriangle2 = new RenderObject("triangle2");

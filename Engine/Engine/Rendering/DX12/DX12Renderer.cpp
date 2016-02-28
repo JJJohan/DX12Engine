@@ -3,6 +3,7 @@
 #include "CommandQueue.h"
 #include "Material.h"
 #include "RenderObject.h"
+#include "GBuffer.h"
 
 namespace Engine
 {
@@ -11,6 +12,7 @@ namespace Engine
 	DX12Renderer::DX12Renderer()
 		: _featureInfo()
 		, _pCamera(nullptr)
+		, _pGBuffer(nullptr)
 		, _scissorRect()
 		, _swapChain(nullptr)
 		, _device(nullptr)
@@ -19,8 +21,6 @@ namespace Engine
 		, _rootSignature(nullptr)
 		, _rtvHeap(nullptr)
 		, _commandList(nullptr)
-		, _rtvDescriptorSize(0)
-		, _cbvSrvDescriptorSize(0)
 		, _useWarpDevice(false)
 		, _resize(false)
 		, _frameIndex(0)
@@ -39,6 +39,7 @@ namespace Engine
 		CloseHandle(_fenceEvent);
 
 		delete _pCamera;
+		delete _pGBuffer;
 
 		HeapManager::ReleaseHeaps();
 		Material::ReleasePSOCache();
@@ -226,6 +227,9 @@ namespace Engine
 			Logging::Log("Creating Direct3D12 device using adapter '" + adapterInfo.Name + "'.");
 		}
 
+		// Initialise the utility class.
+		D3DUtils::Initialise(_device.Get());
+
 #if _DEBUG
 		// Get debug device for memory reporting.
 		_device.As(&_debugDevice);
@@ -260,11 +264,8 @@ namespace Engine
 		LOGFAILEDCOMRETURN(factory->CreateSwapChain(_commandQueue.Get(), &swapChainDesc, &swapChain), EXIT_FAILURE);
 		LOGFAILEDCOMRETURN(swapChain.As(&_swapChain), EXIT_FAILURE);
 
-		_rtvDescriptorSize = _device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
-		_cbvSrvDescriptorSize = _device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-
 		// Create RTV for swap chain.
-		CreateRTV();
+		//CreateRTV();
 
 		// Describe and create a CBV/SRV heap for constants and textures.
 		D3D12_DESCRIPTOR_HEAP_DESC cbvSrvHeapDesc = {};
@@ -291,13 +292,15 @@ namespace Engine
 		// Create an empty root signature.
 		{
 			// define descriptor tables for a CBV for shaders
-			CD3DX12_DESCRIPTOR_RANGE DescRange[2];
-			DescRange[0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, ResourceFactory::CBufferLimit, 0);
-			DescRange[1].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, ResourceFactory::TextureLimit, 0);
+			CD3DX12_DESCRIPTOR_RANGE DescRange[3];
+			DescRange[0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, GBuffer::GBUFFER_NUM_TEXTURES, 0);
+			DescRange[1].Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, ResourceFactory::CBufferLimit, 0);
+			DescRange[2].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, ResourceFactory::TextureLimit, GBuffer::GBUFFER_NUM_TEXTURES);
 
-			CD3DX12_ROOT_PARAMETER rootParameters[2];
-			rootParameters[0].InitAsDescriptorTable(1, &DescRange[0], D3D12_SHADER_VISIBILITY_VERTEX);
-			rootParameters[1].InitAsDescriptorTable(1, &DescRange[1], D3D12_SHADER_VISIBILITY_PIXEL);
+			CD3DX12_ROOT_PARAMETER rootParameters[3];
+			rootParameters[0].InitAsDescriptorTable(1, &DescRange[0], D3D12_SHADER_VISIBILITY_PIXEL);
+			rootParameters[1].InitAsDescriptorTable(1, &DescRange[1], D3D12_SHADER_VISIBILITY_VERTEX);
+			rootParameters[2].InitAsDescriptorTable(1, &DescRange[2], D3D12_SHADER_VISIBILITY_PIXEL);
 
 			D3D12_STATIC_SAMPLER_DESC sampler = {};
 			sampler.Filter = D3D12_FILTER_ANISOTROPIC;
@@ -318,10 +321,12 @@ namespace Engine
 			rootSignatureDesc.Init(_countof(rootParameters), rootParameters, 1, &sampler, D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
 
 			ComPtr<ID3DBlob> signature;
-			ComPtr<ID3DBlob> error;
-			LOGFAILEDCOMRETURN(
-				D3D12SerializeRootSignature(&rootSignatureDesc, D3D_ROOT_SIGNATURE_VERSION_1, &signature, &error),
-				EXIT_FAILURE);
+			ID3DBlob* error;
+			D3D12SerializeRootSignature(&rootSignatureDesc, D3D_ROOT_SIGNATURE_VERSION_1, &signature, &error);
+			if (!D3DUtils::Succeeded(error))
+			{
+				return EXIT_FAILURE;
+			}
 
 			LOGFAILEDCOMRETURN(
 				_device->CreateRootSignature(0, signature->GetBufferPointer(), signature->GetBufferSize(), IID_PPV_ARGS(&_rootSignature)),
@@ -330,6 +335,9 @@ namespace Engine
 
 		// Initialise factory pointers.
 		ResourceFactory::_init(static_cast<DX12Renderer*>(this), _cbvSrvHeap.Get());
+
+		// Initialise the GBuffer.
+		_pGBuffer = new GBuffer(_device.Get(), _commandList.Get(), _cbvSrvHeap.Get());
 
 		// Call the resource creation method.
 		CommandQueue::Enqueue(_createMethod);
@@ -353,18 +361,35 @@ namespace Engine
 		// Point to CBVs and SRVs.
 		ID3D12DescriptorHeap* ppHeaps[] = {_cbvSrvHeap.Get()};
 		_commandList->SetDescriptorHeaps(_countof(ppHeaps), ppHeaps);
-		CD3DX12_GPU_DESCRIPTOR_HANDLE cbvHandle(_cbvSrvHeap->GetGPUDescriptorHandleForHeapStart(), 0, _cbvSrvDescriptorSize);
-		CD3DX12_GPU_DESCRIPTOR_HANDLE srvHandle(_cbvSrvHeap->GetGPUDescriptorHandleForHeapStart(), ResourceFactory::CBufferLimit, _cbvSrvDescriptorSize);
-		_commandList->SetGraphicsRootDescriptorTable(0, cbvHandle);
-		_commandList->SetGraphicsRootDescriptorTable(1, srvHandle);
+		CD3DX12_GPU_DESCRIPTOR_HANDLE gbfHandle(ppHeaps[0]->GetGPUDescriptorHandleForHeapStart(), 0, D3DUtils::GetSRVDescriptorSize());
+		CD3DX12_GPU_DESCRIPTOR_HANDLE cbvHandle(ppHeaps[0]->GetGPUDescriptorHandleForHeapStart(), GBuffer::GBUFFER_NUM_TEXTURES, D3DUtils::GetSRVDescriptorSize());
+		CD3DX12_GPU_DESCRIPTOR_HANDLE srvHandle(ppHeaps[0]->GetGPUDescriptorHandleForHeapStart(), GBuffer::GBUFFER_NUM_TEXTURES + ResourceFactory::CBufferLimit, D3DUtils::GetSRVDescriptorSize());
+		_commandList->SetGraphicsRootDescriptorTable(0, gbfHandle);
+		_commandList->SetGraphicsRootDescriptorTable(1, cbvHandle);
+		_commandList->SetGraphicsRootDescriptorTable(2, srvHandle);
 
-		_commandList->RSSetViewports(1, &_pCamera->GetViewPort());
 		_commandList->RSSetScissorRects(1, &_scissorRect);
 		Material::ClearPSOHistory();
 
-		// Indicate that the back buffer will be used as a render target.
+		//CD3DX12_CPU_DESCRIPTOR_HANDLE rtvHandle(_rtvHeap->GetCPUDescriptorHandleForHeapStart(), _frameIndex, _rtvDescriptorSize);
+		_pGBuffer->Bind();
+		//_commandList->OMSetRenderTargets(1, &rtvHandle, FALSE, nullptr);
+
+		// Record commands.
+		_pGBuffer->Clear();
+		//_commandList->ClearRenderTargetView(rtvHandle, _clearColour, 0, nullptr);
+
+		// Execute the draw loop function.
+		_commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		_drawLoop();
+
+		_pGBuffer->Present();
+
+		_commandList->Close();
+
+		/*// Indicate that the back buffer will be used as a render target.
 		_commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(_renderTargets[_frameIndex].Get(),
-		                                                                       D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET));
+			D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET));
 
 		CD3DX12_CPU_DESCRIPTOR_HANDLE rtvHandle(_rtvHeap->GetCPUDescriptorHandleForHeapStart(), _frameIndex, _rtvDescriptorSize);
 		_commandList->OMSetRenderTargets(1, &rtvHandle, FALSE, nullptr);
@@ -378,9 +403,9 @@ namespace Engine
 
 		// Indicate that the back buffer will now be used to present.
 		_commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(_renderTargets[_frameIndex].Get(),
-		                                                                       D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT));
+			D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT));
 
-		_commandList->Close();
+		_commandList->Close();*/
 	}
 
 	void DX12Renderer::Sync()
@@ -473,7 +498,7 @@ namespace Engine
 			LOGFAILEDCOM(_swapChain->GetBuffer(n, IID_PPV_ARGS(&_renderTargets[n])));
 
 			_device->CreateRenderTargetView(_renderTargets[n].Get(), nullptr, rtvHandle);
-			rtvHandle.Offset(1, _rtvDescriptorSize);
+			rtvHandle.Offset(1, D3DUtils::GetRTVDescriptorSize());
 		}
 
 		_frameIndex = _swapChain->GetCurrentBackBufferIndex();
@@ -505,7 +530,7 @@ namespace Engine
 		_swapChain->ResizeBuffers(_frameCount, UINT(_screenWidth), UINT(_screenHeight), DXGI_FORMAT_R8G8B8A8_UNORM, 0);
 
 		// Recreate the RTV.
-		CreateRTV();
+		//CreateRTV();
 	}
 }
 

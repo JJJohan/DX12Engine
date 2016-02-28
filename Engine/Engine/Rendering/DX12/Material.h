@@ -33,6 +33,8 @@ namespace Engine
 		ENGINE_API void SetTexture(Texture* texture);
 		ENGINE_API Texture* GetTexture() const;
 
+		static ENGINE_API std::vector<D3D12_INPUT_ELEMENT_DESC> Default_Input_Layout;
+
 	private:
 		Material();
 

@@ -1,5 +1,6 @@
 #include "Material.h"
 #include "Texture.h"
+#include "GBuffer.h"
 
 using namespace Microsoft::WRL;
 
@@ -14,6 +15,12 @@ namespace Engine
 {
 	ID3D12PipelineState* Material::_pLastPipelineState = nullptr;
 	std::vector<PSOCacheItem> Material::_psoCache;
+	std::vector<D3D12_INPUT_ELEMENT_DESC> Material::Default_Input_Layout =
+	{
+		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+		{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 28, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
+	};
 
 	ID3D12PipelineState* Material::GetPSO(const void* vertexByteCode, const void* pixelByteCode, bool alpha)
 	{
@@ -50,14 +57,16 @@ namespace Engine
 
 	void Material::LoadVertexShader(const std::string& shaderPath, const std::string& entryPoint, const std::string& shaderVersion)
 	{
-		ComPtr<ID3DBlob> errorMessage;
+		ID3DBlob* errorMessage = nullptr;
 		std::wstring widePath = std::wstring(shaderPath.begin(), shaderPath.end());
 		D3DCompileFromFile(widePath.c_str(), nullptr, nullptr, entryPoint.c_str(), shaderVersion.c_str(), compileFlags, 0, &_pVertexShader, &errorMessage);
-		if (errorMessage.Get() != nullptr)
+		
+		if (!D3DUtils::Succeeded(errorMessage))
 		{
-			Logging::LogError(static_cast<LPCTSTR>(errorMessage->GetBufferPointer()));
+			return;
 		}
-		else if (_pVertexShader == nullptr)
+
+		if (_pVertexShader == nullptr)
 		{
 			Logging::LogError("Failed to load vertex shader. No compilation error available.");
 		}
@@ -65,14 +74,16 @@ namespace Engine
 
 	void Material::LoadPixelShader(const std::string& shaderPath, const std::string& entryPoint, const std::string& shaderVersion)
 	{
-		ComPtr<ID3DBlob> errorMessage;
+		ID3DBlob* errorMessage = nullptr;
 		std::wstring widePath = std::wstring(shaderPath.begin(), shaderPath.end());
 		D3DCompileFromFile(widePath.c_str(), nullptr, nullptr, entryPoint.c_str(), shaderVersion.c_str(), compileFlags, 0, &_pPixelShader, &errorMessage);
-		if (errorMessage.Get() != nullptr)
+		
+		if (!D3DUtils::Succeeded(errorMessage))
 		{
-			Logging::LogError(static_cast<LPCTSTR>(errorMessage->GetBufferPointer()));
+			return;
 		}
-		else if (_pPixelShader == nullptr)
+
+		if (_pPixelShader == nullptr)
 		{
 			Logging::LogError("Failed to load pixel shader. No compilation error available.");
 		}
@@ -109,8 +120,12 @@ namespace Engine
 			psoDesc.DepthStencilState.StencilEnable = FALSE;
 			psoDesc.SampleMask = UINT_MAX ;
 			psoDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
-			psoDesc.NumRenderTargets = 1;
-			psoDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
+			psoDesc.NumRenderTargets = GBuffer::GBUFFER_NUM_TEXTURES;
+			psoDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
+			for (size_t i = 0; i < GBuffer::GBUFFER_NUM_TEXTURES; ++i)
+			{
+				psoDesc.RTVFormats[i] = DXGI_FORMAT_R32G32B32A32_FLOAT;
+			}
 			psoDesc.SampleDesc.Count = 1;
 
 			LOGFAILEDCOM(_pDevice->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&_pPipelineState)));

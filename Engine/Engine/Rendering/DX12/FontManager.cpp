@@ -16,7 +16,7 @@ namespace Engine
 		}
 
 		// Load the font texture.
-		Texture* texture = ResourceFactory::CreateTexture();
+		Texture* texture = ResourceFactory::CreateTexture(0, 0);
 		if (!texture->Load(textureFile))
 		{
 			// Textures have their own error handling.

@@ -62,7 +62,10 @@ namespace Engine
 				return;
 			}
 
-			commandThread->Task();
+			if (commandThread->Task != nullptr)
+			{
+				commandThread->Task();
+			}
 
 			std::lock_guard<std::mutex> lock(commandThread->LockMutex);
 			++commandThread->TasksCompleted;
@@ -186,7 +189,10 @@ namespace Engine
 			ResourceFactory::AssignCommandList(_commandList);
 			std::function<void()> task = _tasks.front();
 			_tasks.pop();
-			task();
+			if (task != nullptr)
+			{
+				task();
+			}
 			_commandList->Close();
 			commandLists.push_back(_commandList);
 
