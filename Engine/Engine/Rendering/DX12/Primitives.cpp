@@ -31,9 +31,9 @@ namespace Engine
 			case 3: // Right
 				tl = Vector3(i == 1 ? -0.5f : 0.5f, 0.5f, i == 1 ? 0.5f : -0.5f);
 				tr = Vector3(i == 1 ? -0.5f : 0.5f, 0.5f, i == 1 ? -0.5f : 0.5f);
-bl = Vector3(i == 1 ? -0.5f : 0.5f, -0.5f, i == 1 ? 0.5f : -0.5f);
-br = Vector3(i == 1 ? -0.5f : 0.5f, -0.5f, i == 1 ? -0.5f : 0.5f);
-break;
+				bl = Vector3(i == 1 ? -0.5f : 0.5f, -0.5f, i == 1 ? 0.5f : -0.5f);
+				br = Vector3(i == 1 ? -0.5f : 0.5f, -0.5f, i == 1 ? -0.5f : 0.5f);
+				break;
 			case 4: // Top
 			case 5: // Bottom
 				tl = Vector3(i == 4 ? -0.5f : 0.5f, i == 5 ? -0.5f : 0.5f, 0.5f);
