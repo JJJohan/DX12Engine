@@ -170,8 +170,116 @@ namespace Engine
 			sides = 3;
 		}
 
-		Logging::LogError("Not implemented.");
-		return nullptr;
+		float stepTheta = 2.0f * Math::Pi / sides;
+		float stepU = 1.0f / sides;
+		int verticesPerCircle = sides + 1;
+		int indicesPerCap = sides - 2;
+		int firstSidePos = verticesPerCircle * 2;
+		int vertexCount = verticesPerCircle * 4;
+
+		int posIndex = 0;
+		int uvIndex = 0;
+		int triIndex = 0;
+
+		std::vector<Vector3> positions(vertexCount);
+		std::vector<Vector2> uvs(vertexCount);
+		std::vector<int> indices((indicesPerCap + sides) * 6);
+
+		int curTheta = 0;
+		std::vector<float> halfCosThetas(verticesPerCircle);
+		std::vector<float> halfSinThetas(verticesPerCircle);
+		for (int i = 0; i < verticesPerCircle; ++i)
+		{
+			halfCosThetas[i] = cosf(curTheta) * 0.5f;
+			halfSinThetas[i] = sinf(curTheta) * 0.5f;
+			curTheta += stepTheta;
+		}
+
+		// Top cap
+		for (int i = 0; i < verticesPerCircle; ++i)
+		{
+			positions[posIndex++] = Vector3(halfCosThetas[i], 0.5f, halfSinThetas[i]);
+			uvs[uvIndex++] = Vector2(halfCosThetas[i] + 0.5f, halfSinThetas[i] + 0.5);
+		}
+		for (int i = 0; i < indicesPerCap; ++i)
+		{
+			indices[triIndex++] = 0;
+			indices[triIndex++] = i + 1;
+			indices[triIndex++] = i + 2;
+		}
+
+		// Bottom cap
+		for (int i = 0; i < verticesPerCircle; ++i)
+		{
+			positions[posIndex++] = Vector3(halfCosThetas[i], -0.5f, halfSinThetas[i]);
+			uvs[uvIndex++] = Vector2(halfCosThetas[i] + 0.5f, -halfSinThetas[i] + 0.5f);
+		}
+		for (int i = 0; i < indicesPerCap; ++i)
+		{
+			indices[triIndex++] = verticesPerCircle + i + 2;
+			indices[triIndex++] = verticesPerCircle + i + 1;
+			indices[triIndex++] = verticesPerCircle;
+		}
+
+		// Top cap (for the sides)
+		float curU = 1.0f;
+		for (int i = 0; i < verticesPerCircle; ++i)
+		{
+			positions[posIndex++] = Vector3(halfCosThetas[i], 0.5f, halfSinThetas[i]);
+			uvs[uvIndex++] = Vector2(curU, 0.0f);
+
+			curU -= stepU;
+		}
+
+		// Bottom cap (for the sides)
+		curU = 1.0f;
+		for (int i = 0; i < verticesPerCircle; ++i)
+		{
+			positions[posIndex++] = Vector3(halfCosThetas[i], -0.5f, halfSinThetas[i]);
+			uvs[uvIndex++] = Vector2(curU, 1.0f);
+
+			curU -= stepU;
+		}
+		// Sides (excep the last quad)
+		for (int i = 0; i < sides; ++i)
+		{
+			// Top tri
+			indices[triIndex++] = firstSidePos + verticesPerCircle + i + 1; // bottom-right
+			indices[triIndex++] = firstSidePos + i + 1; // top-right
+			indices[triIndex++] = firstSidePos + i; // top-left
+
+			// Bottom tri
+			indices[triIndex++] = firstSidePos + verticesPerCircle + i; // bottom-left
+			indices[triIndex++] = firstSidePos + verticesPerCircle + i + 1; // bottom-right
+			indices[triIndex++] = firstSidePos + i; // top-left
+		}
+
+		// Combine vertex data
+		std::vector<Vertex> vertices(vertexCount);
+		for (int i = 0; i < vertexCount; ++i)
+		{
+			vertices[i] = Vertex(positions[i], Colour::White, uvs[i]);
+		}
+
+		// Vertex Buffer
+		VertexBufferInstance* vertexBuffer = ResourceFactory::CreateVertexBufferInstance();
+		vertexBuffer->SetVertices(vertices);
+
+		// Index Buffer
+		IndexBufferInstance* indexBuffer = ResourceFactory::CreateIndexBufferInstance();
+		indexBuffer->SetIndices(indices);
+
+		// Render Object
+		RenderObject* renderObject = new RenderObject(name);
+		renderObject->SetVertexBuffer(vertexBuffer);
+		renderObject->SetIndexBuffer(indexBuffer);
+
+		// Transform
+		renderObject->Transform.SetPosition(pos);
+		renderObject->Transform.SetRotation(rot);
+		renderObject->Transform.SetScale(scale);
+
+		return renderObject;
 	}
 
 	ENGINE_API RenderObject* Primitives::CreateQuad(Vector3 pos, Quaternion rot, Vector3 scale)
