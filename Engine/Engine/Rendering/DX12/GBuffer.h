@@ -29,7 +29,7 @@ namespace Engine
 
 	private:
 		
-
+		void FinishResourceInit();
 		void CreateHeaps();
 		void CreateTextures();
 

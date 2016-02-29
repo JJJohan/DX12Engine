@@ -2,6 +2,8 @@
 #include "Texture.h"
 #include "Camera.h"
 #include <dxgi1_4.h>
+#include "DX12Renderer.h"
+#include "CommandQueue.h"
 
 namespace Engine
 {
@@ -76,13 +78,6 @@ namespace Engine
 
 	void GBuffer::CreateTextures()
 	{
-		// Render target view description.
-		D3D12_RENDER_TARGET_VIEW_DESC rtvDesc = {};
-		rtvDesc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
-		rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
-		rtvDesc.Texture2D.MipSlice = 0;
-		rtvDesc.Texture2D.PlaneSlice = 0;
-
 		// Create a resource description for the textures.
 		D3D12_RESOURCE_DESC textureDesc = {};
 		textureDesc.MipLevels = 1;
@@ -102,9 +97,6 @@ namespace Engine
 			_pTextures[i]->SetResourceDescription(textureDesc);
 			_pTextures[i]->SetDescriptorHandle(_srvHandle);
 			_pTextures[i]->Apply();
-
-			_pDevice->CreateRenderTargetView(_pTextures[i]->GetResource(), &rtvDesc, _rtvHandle);
-			_rtvHandle.Offset(1, D3DUtils::GetRTVDescriptorSize());
 			_srvHandle.Offset(1, D3DUtils::GetSRVDescriptorSize());
 		}
 
@@ -120,16 +112,36 @@ namespace Engine
 		depthDesc.SampleDesc.Quality = 0;
 		depthDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
 
+		// Create depth texture.
+		_pDepthTexture = ResourceFactory::CreateTexture(_screenWidth, _screenHeight);
+		_pDepthTexture->SetResourceDescription(depthDesc);
+		_pDepthTexture->Apply();
+
+		CommandQueue::Enqueue(std::bind(&GBuffer::FinishResourceInit, this));
+	}
+
+	void GBuffer::FinishResourceInit()
+	{
+		// Render target view description.
+		D3D12_RENDER_TARGET_VIEW_DESC rtvDesc = {};
+		rtvDesc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+		rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
+		rtvDesc.Texture2D.MipSlice = 0;
+		rtvDesc.Texture2D.PlaneSlice = 0;
+
+		// Create render textures.
+		for (int i = 0; i < GBUFFER_NUM_TEXTURES; ++i)
+		{
+			_pDevice->CreateRenderTargetView(_pTextures[i]->GetResource(), &rtvDesc, _rtvHandle);
+			_rtvHandle.Offset(1, D3DUtils::GetRTVDescriptorSize());
+		}
+
 		// Create a depth stencil view description.
 		D3D12_DEPTH_STENCIL_VIEW_DESC stencilDesc = {};
 		stencilDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
 		stencilDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
 		stencilDesc.Texture2D.MipSlice = 0;
 
-		// Create depth texture.
-		_pDepthTexture = ResourceFactory::CreateTexture(_screenWidth, _screenHeight);
-		_pDepthTexture->SetResourceDescription(depthDesc);
-		_pDepthTexture->Apply();
 		_pDevice->CreateDepthStencilView(_pDepthTexture->GetResource(), &stencilDesc, _pDsvHeap->GetCPUDescriptorHandleForHeapStart());
 	}
 
@@ -166,7 +178,7 @@ namespace Engine
 	void GBuffer::Clear()
 	{
 		// Clear the render target buffers.
-		float clearColour[] = { 0.0f, 0.0f, 0.2f, 1.0f };
+		FLOAT clearColour[] = { 0.0f, 0.0f, 0.2f, 1.0f };
 		_rtvHandle = CD3DX12_CPU_DESCRIPTOR_HANDLE(_pRtvHeap->GetCPUDescriptorHandleForHeapStart());
 		for (int i = 0; i < GBUFFER_NUM_TEXTURES; ++i)
 		{

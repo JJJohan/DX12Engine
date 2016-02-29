@@ -336,13 +336,12 @@ namespace Engine
 		// Initialise factory pointers.
 		ResourceFactory::_init(static_cast<DX12Renderer*>(this), _cbvSrvHeap.Get());
 
-		// Initialise the GBuffer.
-		_pGBuffer = new GBuffer(_device.Get(), _commandList.Get(), _cbvSrvHeap.Get());
-
 		// Call the resource creation method.
 		CommandQueue::Enqueue(_createMethod);
 		std::vector<ID3D12CommandList*> commandLists = CommandQueue::Process(_device.Get());
 		_commandQueue->ExecuteCommandLists(UINT(commandLists.size()), &commandLists[0]);
+		
+		_pGBuffer = new GBuffer(_device.Get(), _commandList.Get(), _cbvSrvHeap.Get());
 
 		// Create synchronization objects and wait until assets have been uploaded to the GPU.
 		Sync();
