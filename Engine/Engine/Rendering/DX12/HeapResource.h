@@ -13,12 +13,21 @@ namespace Engine
 	public:
 		ID3D12Resource* GetResource() const;
 
+		struct HeapDesc
+		{
+			D3D12_HEAP_PROPERTIES *pHeapProperties;
+			D3D12_HEAP_FLAGS HeapFlags;
+			D3D12_RESOURCE_STATES InitialResourceState;
+			D3D12_CLEAR_VALUE *pOptimizedClearValue;
+		};
+
 	protected:
 		HeapResource();
 		virtual ~HeapResource();
 
 		bool PrepareHeapResource();
 		bool PrepareHeapResource(const D3D12_RESOURCE_DESC& resourceDesc);
+		bool PrepareHeapResource(const D3D12_RESOURCE_DESC& resourceDesc, const HeapDesc& heapDesc);
 		void HeapTask(const std::function<void()>& heapTask);
 		void MarkDynamic();
 
