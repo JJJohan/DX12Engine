@@ -4,6 +4,9 @@
 #include <dxgi1_4.h>
 #include "DX12Renderer.h"
 #include "CommandQueue.h"
+#include "Material.h"
+#include "VertexBufferInstance.h"
+#include "IndexBufferInstance.h"
 
 namespace Engine
 {
@@ -14,6 +17,8 @@ namespace Engine
 		, _pDevice(device)
 		, _pCommandList(commandList)
 		, _pDepthTexture(nullptr)
+		, _pScreenQuad(nullptr)
+		, _pScreenMaterial(nullptr)
 		, _screenWidth(0)
 		, _screenHeight(0)
 	{
@@ -23,6 +28,7 @@ namespace Engine
 		// Initialise resources.
 		CreateHeaps();
 		CreateTextures();
+		CreateScreenQuad();
 	}
 
 	GBuffer::~GBuffer()
@@ -37,6 +43,10 @@ namespace Engine
 		// Release depth texture.
 		delete _pDepthTexture;
 		_pDepthTexture = nullptr;
+
+		// Release screen resources.
+		delete _pScreenQuad;
+		delete _pScreenMaterial;
 
 		// Release heaps.
 		_pRtvHeap->Release();
@@ -68,12 +78,42 @@ namespace Engine
 		dsvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_DSV;
 		dsvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
 		LOGFAILEDCOM(_pDevice->CreateDescriptorHeap(&dsvHeapDesc, IID_PPV_ARGS(&_pDsvHeap)));
+	}
 
-		// Initialise the shader resource view (SRV) handle.
-		_srvHandle = CD3DX12_CPU_DESCRIPTOR_HANDLE(
-			_pSrvHeap->GetCPUDescriptorHandleForHeapStart(),
-			ResourceFactory::TextureLimit,
-			D3DUtils::GetSRVDescriptorSize());
+	void GBuffer::CreateScreenQuad()
+	{
+		// Initialise buffers
+		std::vector<Vertex> vertices =
+		{
+			Vertex(Vector3(-1.0f, 1.0f, 0.0f), Colour::White, Vector2(0.0f, 0.0f)), // bottom left
+			Vertex(Vector3(1.0f, -1.0f, 0.0f), Colour::White, Vector2(1.0f, 1.0f)), // top right
+			Vertex(Vector3(1.0f, 1.0f, 0.0f), Colour::White, Vector2(1.0f, 0.0f)), // bottom right
+			Vertex(Vector3(-1.0f, -1.0f, 0.0f), Colour::White, Vector2(0.0f, 1.0f)) // top left
+		};
+
+		std::vector<int> indices =
+		{
+			1, 0, 2,
+			0, 1, 3
+		};
+
+		VertexBufferInstance* vertexBuffer = ResourceFactory::CreateVertexBufferInstance();
+		vertexBuffer->SetVertices(vertices);
+
+		IndexBufferInstance* indexBuffer = ResourceFactory::CreateIndexBufferInstance();
+		indexBuffer->SetIndices(indices);
+
+		// Initialise material
+		_pScreenMaterial = ResourceFactory::CreateMaterial();
+		_pScreenMaterial->LoadPixelShader(GetRelativePath("Shaders\\Quad.hlsl"), "PSMain", "ps_5_1");
+		_pScreenMaterial->LoadVertexShader(GetRelativePath("Shaders\\Quad.hlsl"), "VSMain", "vs_5_1");
+		_pScreenMaterial->Finalise(Material::Default_Input_Layout);
+
+		// Initialise screen quad
+		_pScreenQuad = new RenderObject();
+		_pScreenQuad->SetVertexBuffer(vertexBuffer);
+		_pScreenQuad->SetIndexBuffer(indexBuffer);
+		_pScreenQuad->SetMaterial(_pScreenMaterial);
 	}
 
 	void GBuffer::CreateTextures()
@@ -106,10 +146,8 @@ namespace Engine
 		{
 			_pTextures[i] = ResourceFactory::CreateTexture(_screenWidth, _screenHeight);
 			_pTextures[i]->SetResourceDescription(textureDesc);
-			_pTextures[i]->SetHeapDescription(D3D12_HEAP_TYPE_DEFAULT, D3D12_HEAP_FLAG_NONE, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, texClearVal);
-			_pTextures[i]->SetDescriptorHandle(_srvHandle);
+			_pTextures[i]->SetHeapDescription(D3D12_HEAP_TYPE_DEFAULT, D3D12_HEAP_FLAG_NONE, D3D12_RESOURCE_STATE_RENDER_TARGET, texClearVal);
 			_pTextures[i]->Apply();
-			_srvHandle.Offset(1, D3DUtils::GetSRVDescriptorSize());
 		}
 
 		// Create a resource description for the depth texture.
@@ -218,6 +256,11 @@ namespace Engine
 
 	void GBuffer::Present() const
 	{
+		// Draw the textures to a screen space quad.
+		_pScreenQuad->GetMaterial()->SetTexture(_pTextures[0]);
+		//_pTextures[0]->Bind(_pCommandList);
+		_pScreenQuad->Draw();
+
 		// Indicate that the GBuffer textures will now be used to present.
 		for (int i = 0; i < GBUFFER_NUM_TEXTURES; ++i)
 		{

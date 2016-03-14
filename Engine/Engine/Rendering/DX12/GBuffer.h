@@ -1,4 +1,5 @@
 #pragma once
+#include "RenderObject.h"
 
 namespace Engine
 {
@@ -28,9 +29,9 @@ namespace Engine
 		};
 
 	private:
-		
 		void FinishResourceInit();
 		void CreateHeaps();
+		void CreateScreenQuad();
 		void CreateTextures();
 
 		bool _initialised;
@@ -43,10 +44,11 @@ namespace Engine
 		ID3D12GraphicsCommandList* _pCommandList;
 
 		CD3DX12_CPU_DESCRIPTOR_HANDLE _rtvHandle;
-		CD3DX12_CPU_DESCRIPTOR_HANDLE _srvHandle;
 
 		Texture* _pTextures[GBUFFER_NUM_TEXTURES];
 		Texture* _pDepthTexture;
+		RenderObject* _pScreenQuad;
+		Material* _pScreenMaterial;
 		
 		int _screenWidth;
 		int _screenHeight;

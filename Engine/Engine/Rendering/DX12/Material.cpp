@@ -89,7 +89,7 @@ namespace Engine
 		}
 	}
 
-	void Material::Finalise(std::vector<D3D12_INPUT_ELEMENT_DESC> inputLayout, bool alpha)
+	void Material::Finalise(std::vector<D3D12_INPUT_ELEMENT_DESC> inputLayout, bool alpha, bool deferred)
 	{
 		_pPipelineState = GetPSO(_pVertexShader->GetBufferPointer(), _pPixelShader->GetBufferPointer(), alpha);
 
@@ -120,11 +120,14 @@ namespace Engine
 			psoDesc.DepthStencilState.StencilEnable = FALSE;
 			psoDesc.SampleMask = UINT_MAX ;
 			psoDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
-			psoDesc.NumRenderTargets = GBuffer::GBUFFER_NUM_TEXTURES;
-			psoDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
-			for (size_t i = 0; i < GBuffer::GBUFFER_NUM_TEXTURES; ++i)
+			if (deferred)
 			{
-				psoDesc.RTVFormats[i] = DXGI_FORMAT_R32G32B32A32_FLOAT;
+				psoDesc.NumRenderTargets = GBuffer::GBUFFER_NUM_TEXTURES;
+				psoDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
+				for (size_t i = 0; i < GBuffer::GBUFFER_NUM_TEXTURES; ++i)
+				{
+					psoDesc.RTVFormats[i] = DXGI_FORMAT_R32G32B32A32_FLOAT;
+				}
 			}
 			psoDesc.SampleDesc.Count = 1;
 

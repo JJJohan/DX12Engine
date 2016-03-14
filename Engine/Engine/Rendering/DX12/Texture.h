@@ -13,7 +13,6 @@ namespace Engine
 		void Bind(ID3D12GraphicsCommandList* commandList) const;
 		void SetResourceDescription(const D3D12_RESOURCE_DESC& desc);
 		void Apply();
-		void SetDescriptorHandle(CD3DX12_CPU_DESCRIPTOR_HANDLE handle);
 
 	private:
 		Texture(int width, int height);

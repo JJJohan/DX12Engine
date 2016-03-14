@@ -272,7 +272,7 @@ namespace Engine
 
 		// Describe and create a CBV/SRV heap for constants and textures.
 		D3D12_DESCRIPTOR_HEAP_DESC cbvSrvHeapDesc = {};
-		cbvSrvHeapDesc.NumDescriptors = GBuffer::GBUFFER_NUM_TEXTURES + ResourceFactory::CBufferLimit + ResourceFactory::TextureLimit;
+		cbvSrvHeapDesc.NumDescriptors = ResourceFactory::CBufferLimit + ResourceFactory::TextureLimit;
 		cbvSrvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
 		cbvSrvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
 		LOGFAILEDCOMRETURN(
@@ -295,15 +295,13 @@ namespace Engine
 		// Create an empty root signature.
 		{
 			// define descriptor tables for a CBV for shaders
-			CD3DX12_DESCRIPTOR_RANGE DescRange[3];
+			CD3DX12_DESCRIPTOR_RANGE DescRange[2];
 			DescRange[0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, ResourceFactory::CBufferLimit, 0);
 			DescRange[1].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, GBuffer::GBUFFER_NUM_TEXTURES, 0);
-			DescRange[2].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, ResourceFactory::TextureLimit, GBuffer::GBUFFER_NUM_TEXTURES);
 
-			CD3DX12_ROOT_PARAMETER rootParameters[3];
+			CD3DX12_ROOT_PARAMETER rootParameters[2];
 			rootParameters[0].InitAsDescriptorTable(1, &DescRange[0], D3D12_SHADER_VISIBILITY_VERTEX);
 			rootParameters[1].InitAsDescriptorTable(1, &DescRange[1], D3D12_SHADER_VISIBILITY_PIXEL);
-			rootParameters[2].InitAsDescriptorTable(1, &DescRange[2], D3D12_SHADER_VISIBILITY_PIXEL);
 
 			D3D12_STATIC_SAMPLER_DESC sampler = {};
 			sampler.Filter = D3D12_FILTER_ANISOTROPIC;
@@ -339,13 +337,13 @@ namespace Engine
 		// Initialise factory pointers.
 		ResourceFactory::_init(static_cast<DX12Renderer*>(this), _cbvSrvHeap.Get());
 
+		_pGBuffer = new GBuffer(_device.Get(), _commandList.Get(), _cbvSrvHeap.Get());
+
 		// Call the resource creation method.
 		CommandQueue::Enqueue(_createMethod);
 		std::vector<ID3D12CommandList*> commandLists = CommandQueue::Process(_device.Get());
 		_commandQueue->ExecuteCommandLists(UINT(commandLists.size()), &commandLists[0]);
 		
-		_pGBuffer = new GBuffer(_device.Get(), _commandList.Get(), _cbvSrvHeap.Get());
-
 		// Create synchronization objects and wait until assets have been uploaded to the GPU.
 		Sync();
 
@@ -368,8 +366,6 @@ namespace Engine
 		_commandList->SetGraphicsRootDescriptorTable(0, rootHandle);
 		rootHandle.Offset(ResourceFactory::CBufferLimit, D3DUtils::GetSRVDescriptorSize());
 		_commandList->SetGraphicsRootDescriptorTable(1, rootHandle);
-		rootHandle.Offset(GBuffer::GBUFFER_NUM_TEXTURES, D3DUtils::GetSRVDescriptorSize());
-		_commandList->SetGraphicsRootDescriptorTable(2, rootHandle);
 
 		_commandList->RSSetScissorRects(1, &_scissorRect);
 		Material::ClearPSOHistory();

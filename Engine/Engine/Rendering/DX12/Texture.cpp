@@ -117,17 +117,6 @@ namespace Engine
 		HeapTask(std::bind(&Texture::Finalise, this));
 	}
 
-	void Texture::SetDescriptorHandle(CD3DX12_CPU_DESCRIPTOR_HANDLE handle)
-	{
-		if (_index != -1)
-		{
-			ResourceFactory::FreeTextureSlot(_index);
-			_index = -1;
-		}
-
-		_heapHandle = handle;
-	}
-
 	void Texture::Finalise()
 	{
 		// Check we have loaded a texture, otherwise fill the texture with a black colour.
@@ -157,10 +146,7 @@ namespace Engine
 		HeapManager::Upload(this, _fileBuffer.get(), _width * 4, int(_heapSize), D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 
 		// Create descriptor handle if custom one is not provided.
-		if (_index != -1)
-		{
-			_heapHandle = CD3DX12_CPU_DESCRIPTOR_HANDLE(_pSrvHeap->GetCPUDescriptorHandleForHeapStart(), _index, D3DUtils::GetSRVDescriptorSize());
-		}
+		_heapHandle = CD3DX12_CPU_DESCRIPTOR_HANDLE(_pSrvHeap->GetCPUDescriptorHandleForHeapStart(), _index, D3DUtils::GetSRVDescriptorSize());
 
 		// Describe and create a SRV for the texture.
 		D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};

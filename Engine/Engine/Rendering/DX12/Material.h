@@ -24,7 +24,7 @@ namespace Engine
 
 		ID3D12PipelineState* GetPipelineState() const;
 
-		ENGINE_API void Finalise(std::vector<D3D12_INPUT_ELEMENT_DESC> inputLayout, bool alpha = false);
+		ENGINE_API void Finalise(std::vector<D3D12_INPUT_ELEMENT_DESC> inputLayout, bool alpha = false, bool deferred = true);
 
 		void Bind(ID3D12GraphicsCommandList* commandList) const;
 		static void ClearPSOHistory();
