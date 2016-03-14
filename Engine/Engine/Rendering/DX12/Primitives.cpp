@@ -185,7 +185,7 @@ namespace Engine
 		std::vector<Vector2> uvs(vertexCount);
 		std::vector<int> indices((indicesPerCap + sides) * 6);
 
-		int curTheta = 0;
+		float curTheta = 0.0f;
 		std::vector<float> halfCosThetas(verticesPerCircle);
 		std::vector<float> halfSinThetas(verticesPerCircle);
 		for (int i = 0; i < verticesPerCircle; ++i)
@@ -199,7 +199,7 @@ namespace Engine
 		for (int i = 0; i < verticesPerCircle; ++i)
 		{
 			positions[posIndex++] = Vector3(halfCosThetas[i], 0.5f, halfSinThetas[i]);
-			uvs[uvIndex++] = Vector2(halfCosThetas[i] + 0.5f, halfSinThetas[i] + 0.5);
+			uvs[uvIndex++] = Vector2(halfCosThetas[i] + 0.5f, halfSinThetas[i] + 0.5f);
 		}
 		for (int i = 0; i < indicesPerCap; ++i)
 		{

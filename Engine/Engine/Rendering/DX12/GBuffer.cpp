@@ -90,11 +90,23 @@ namespace Engine
 		textureDesc.SampleDesc.Quality = 0;
 		textureDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
 
+		D3D12_DEPTH_STENCIL_VALUE texStencilVal;
+		texStencilVal.Depth = 1;
+		texStencilVal.Stencil = 0;
+		D3D12_CLEAR_VALUE* texClearVal = new D3D12_CLEAR_VALUE();
+		texClearVal->Format = textureDesc.Format;
+		texClearVal->DepthStencil = texStencilVal;
+		texClearVal->Color[0] = 0.0f;
+		texClearVal->Color[1] = 0.0f;
+		texClearVal->Color[2] = 0.0f;
+		texClearVal->Color[3] = 1.0f;
+
 		// Create textures.
 		for (int i = 0; i < GBUFFER_NUM_TEXTURES; ++i)
 		{
 			_pTextures[i] = ResourceFactory::CreateTexture(_screenWidth, _screenHeight);
 			_pTextures[i]->SetResourceDescription(textureDesc);
+			_pTextures[i]->SetHeapDescription(D3D12_HEAP_TYPE_DEFAULT, D3D12_HEAP_FLAG_NONE, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, texClearVal);
 			_pTextures[i]->SetDescriptorHandle(_srvHandle);
 			_pTextures[i]->Apply();
 			_srvHandle.Offset(1, D3DUtils::GetSRVDescriptorSize());
@@ -112,9 +124,21 @@ namespace Engine
 		depthDesc.SampleDesc.Quality = 0;
 		depthDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
 
+		D3D12_DEPTH_STENCIL_VALUE depthStencilVal;
+		depthStencilVal.Depth = 1;
+		depthStencilVal.Stencil = 0;
+		D3D12_CLEAR_VALUE* depthClearVal = new D3D12_CLEAR_VALUE();
+		depthClearVal->Format = depthDesc.Format;
+		depthClearVal->DepthStencil = depthStencilVal;
+		depthClearVal->Color[0] = 0.0f;
+		depthClearVal->Color[1] = 0.0f;
+		depthClearVal->Color[2] = 0.0f;
+		depthClearVal->Color[3] = 1.0f;
+
 		// Create depth texture.
 		_pDepthTexture = ResourceFactory::CreateTexture(_screenWidth, _screenHeight);
 		_pDepthTexture->SetResourceDescription(depthDesc);
+		_pDepthTexture->SetHeapDescription(D3D12_HEAP_TYPE_DEFAULT, D3D12_HEAP_FLAG_NONE, D3D12_RESOURCE_STATE_DEPTH_WRITE, depthClearVal);
 		_pDepthTexture->Apply();
 
 		CommandQueue::Enqueue(std::bind(&GBuffer::FinishResourceInit, this));
@@ -155,14 +179,16 @@ namespace Engine
 		return _pDsvHeap;
 	}
 
-	void GBuffer::Bind() const
+	void GBuffer::Write() const
 	{
 		// Indicate that the GBuffer textures will be used as render targets.
 		for (int i = 0; i < GBUFFER_NUM_TEXTURES; ++i)
 		{
 			_pCommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(_pTextures[i]->GetResource(),
-				D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET));
+				D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_RENDER_TARGET));
 		}
+		_pCommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(_pDepthTexture->GetResource(),
+			D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_DEPTH_WRITE));
 		
 		// Bind the render target view array and depth stencil buffer to the output render pipeline.
 		CD3DX12_CPU_DESCRIPTOR_HANDLE rtvHandle = CD3DX12_CPU_DESCRIPTOR_HANDLE(
@@ -178,7 +204,7 @@ namespace Engine
 	void GBuffer::Clear()
 	{
 		// Clear the render target buffers.
-		FLOAT clearColour[] = { 0.0f, 0.0f, 0.2f, 1.0f };
+		FLOAT clearColour[] = { 0.0f, 0.0f, 0.0f, 1.0f };
 		_rtvHandle = CD3DX12_CPU_DESCRIPTOR_HANDLE(_pRtvHeap->GetCPUDescriptorHandleForHeapStart());
 		for (int i = 0; i < GBUFFER_NUM_TEXTURES; ++i)
 		{
@@ -187,7 +213,7 @@ namespace Engine
 		}
 
 		// Clear the depth buffer.
-		_pCommandList->ClearDepthStencilView(_pDsvHeap->GetCPUDescriptorHandleForHeapStart(), D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 1, &_screenRect);
+		_pCommandList->ClearDepthStencilView(_pDsvHeap->GetCPUDescriptorHandleForHeapStart(), D3D12_CLEAR_FLAG_DEPTH, 0.0f, 0, 1, &_screenRect);
 	}
 
 	void GBuffer::Present() const
@@ -196,8 +222,10 @@ namespace Engine
 		for (int i = 0; i < GBUFFER_NUM_TEXTURES; ++i)
 		{
 			_pCommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(_pTextures[i]->GetResource(),
-				D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT));
+				D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE));
 		}
+		_pCommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(_pDepthTexture->GetResource(),
+			D3D12_RESOURCE_STATE_DEPTH_WRITE, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE));
 	}
 }
 

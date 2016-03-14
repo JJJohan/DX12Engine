@@ -4,7 +4,6 @@
 #include "ConstantBuffer.h"
 #include "Camera.h"
 #include "Material.h"
-#include "GBuffer.h"
 
 namespace Engine
 {

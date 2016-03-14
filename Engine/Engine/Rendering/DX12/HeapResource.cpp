@@ -10,8 +10,10 @@ namespace Engine
 		, _heapSize(0)
 		, _dynamic(false)
 		, _heapPending(false)
+		, _customHeapDesc(false)
 		, _lastHeapSize(0)
-		, _pHeap(nullptr) { }
+		, _pHeap(nullptr)
+	{ }
 
 	HeapResource::~HeapResource()
 	{
@@ -26,15 +28,22 @@ namespace Engine
 	bool HeapResource::PrepareHeapResource(const D3D12_RESOURCE_DESC& resourceDesc)
 	{
 		HeapDesc heapDesc;
-		heapDesc.pHeapProperties = &CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
-		heapDesc.HeapFlags = D3D12_HEAP_FLAG_NONE;
-		heapDesc.InitialResourceState = D3D12_RESOURCE_STATE_COPY_DEST;
-		heapDesc.pOptimizedClearValue = nullptr;
+		if (_customHeapDesc)
+		{
+			heapDesc = _heapDesc;
+		}
+		else
+		{
+			heapDesc.HeapType = D3D12_HEAP_TYPE_DEFAULT;
+			heapDesc.HeapFlags = D3D12_HEAP_FLAG_NONE;
+			heapDesc.InitialResourceState = D3D12_RESOURCE_STATE_COPY_DEST;
+			heapDesc.pOptimizedClearValue = nullptr;
+		}
 
 		return PrepareHeapResource(resourceDesc, heapDesc);
 	}
 
-	bool HeapResource::PrepareHeapResource(const D3D12_RESOURCE_DESC& resourceDesc, const HeapDesc& heapDesc)
+	bool HeapResource::PrepareHeapResource(const D3D12_RESOURCE_DESC& resourceDesc, HeapDesc& heapDesc)
 	{
 		bool newHeap = false;
 		if (_pResource == nullptr || _lastHeapSize < _heapSize)
@@ -46,7 +55,7 @@ namespace Engine
 
 			_lastHeapSize = _heapSize;
 			LOGFAILEDCOM(_pDevice->CreateCommittedResource(
-				heapDesc.pHeapProperties,
+				&CD3DX12_HEAP_PROPERTIES(heapDesc.HeapType),
 				heapDesc.HeapFlags,
 				&resourceDesc,
 				heapDesc.InitialResourceState,
@@ -57,6 +66,15 @@ namespace Engine
 		}
 
 		return newHeap;
+	}
+
+	void HeapResource::SetHeapDescription(D3D12_HEAP_TYPE heapType, D3D12_HEAP_FLAGS flags, D3D12_RESOURCE_STATES initialState, D3D12_CLEAR_VALUE* clearValue)
+	{
+		_customHeapDesc = true;
+		_heapDesc.HeapType = heapType;
+		_heapDesc.HeapFlags = flags;
+		_heapDesc.InitialResourceState = initialState;
+		_heapDesc.pOptimizedClearValue = clearValue;
 	}
 
 	void HeapResource::HeapTask(const std::function<void()>& heapTask)

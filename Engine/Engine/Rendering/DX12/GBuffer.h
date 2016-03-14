@@ -13,7 +13,7 @@ namespace Engine
 		ID3D12DescriptorHeap* GetRTVHeap() const;
 		ID3D12DescriptorHeap* GetDSVHeap() const;
 
-		void Bind() const;
+		void Write() const;
 		void Present() const;
 		void Clear();
 		void Resize();

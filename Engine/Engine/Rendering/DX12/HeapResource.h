@@ -12,14 +12,17 @@ namespace Engine
 	{
 	public:
 		ID3D12Resource* GetResource() const;
-
+		D3D12_RESOURCE_STATES GetResourceState() const;
+		
 		struct HeapDesc
 		{
-			D3D12_HEAP_PROPERTIES *pHeapProperties;
+			D3D12_HEAP_TYPE HeapType;
 			D3D12_HEAP_FLAGS HeapFlags;
 			D3D12_RESOURCE_STATES InitialResourceState;
-			D3D12_CLEAR_VALUE *pOptimizedClearValue;
+			D3D12_CLEAR_VALUE* pOptimizedClearValue;
 		};
+
+		void SetHeapDescription(D3D12_HEAP_TYPE heapType, D3D12_HEAP_FLAGS flags, D3D12_RESOURCE_STATES initialState, D3D12_CLEAR_VALUE* clearValue);
 
 	protected:
 		HeapResource();
@@ -27,7 +30,7 @@ namespace Engine
 
 		bool PrepareHeapResource();
 		bool PrepareHeapResource(const D3D12_RESOURCE_DESC& resourceDesc);
-		bool PrepareHeapResource(const D3D12_RESOURCE_DESC& resourceDesc, const HeapDesc& heapDesc);
+		bool PrepareHeapResource(const D3D12_RESOURCE_DESC& resourceDesc, HeapDesc& heapDesc);
 		void HeapTask(const std::function<void()>& heapTask);
 		void MarkDynamic();
 
@@ -38,8 +41,11 @@ namespace Engine
 	private:
 		bool _dynamic;
 		bool _heapPending;
+		bool _customHeapDesc;
 		unsigned long long _lastHeapSize;
 		ID3D12Resource* _pHeap;
+		HeapDesc _heapDesc;
+		D3D12_RESOURCE_STATES _resourceState;
 
 		friend class HeapManager;
 	};

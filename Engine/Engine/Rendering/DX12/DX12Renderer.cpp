@@ -194,7 +194,7 @@ namespace Engine
 
 		if (_useWarpDevice)
 		{
-			ComPtr<IDXGIAdapter> warpAdapter;
+			ComPtr<IDXGIAdapter3> warpAdapter;
 			LOGFAILEDCOMRETURN(
 				factory->EnumWarpAdapter(IID_PPV_ARGS(&warpAdapter)),
 				EXIT_FAILURE);
@@ -202,6 +202,9 @@ namespace Engine
 			LOGFAILEDCOMRETURN(
 				D3D12CreateDevice(warpAdapter.Get(), D3D_FEATURE_LEVEL_12_0, IID_PPV_ARGS(&_device)),
 				EXIT_FAILURE);
+
+			AdapterInfo adapterInfo = FeatureSupport::QueryAdapterInfo(warpAdapter.Get());
+			_deviceName = adapterInfo.Name;
 		}
 		else
 		{
@@ -222,9 +225,6 @@ namespace Engine
 				EXIT_FAILURE);
 			_deviceMemoryTotal = adapterInfo.DedicatedMemory;
 			_deviceMemoryFree = (videoMemInfo.Budget - videoMemInfo.CurrentUsage) / 1024 / 1024;
-
-			SystemInfo::PrintSystemInfo();
-			Logging::Log("Creating Direct3D12 device using adapter '" + adapterInfo.Name + "'.");
 		}
 
 		// Initialise the utility class.
@@ -238,6 +238,9 @@ namespace Engine
 		// Populate feature level info.
 		_featureInfo = FeatureSupport::QueryDeviceFeatures(_device.Get(), DXGI_FORMAT_R8G8B8A8_UNORM);
 		_featureLevel = FeatureSupport::GetFeatureLevelString(_featureInfo.MaxFeatureLevelSupported);
+
+		SystemInfo::PrintSystemInfo();
+		Logging::Log("Creating Direct3D12 device using adapter '" + _deviceName + "'.");
 
 		// Describe and create the command queue.
 		D3D12_COMMAND_QUEUE_DESC queueDesc = {};
@@ -269,7 +272,7 @@ namespace Engine
 
 		// Describe and create a CBV/SRV heap for constants and textures.
 		D3D12_DESCRIPTOR_HEAP_DESC cbvSrvHeapDesc = {};
-		cbvSrvHeapDesc.NumDescriptors = ResourceFactory::CBufferLimit + ResourceFactory::TextureLimit;
+		cbvSrvHeapDesc.NumDescriptors = GBuffer::GBUFFER_NUM_TEXTURES + ResourceFactory::CBufferLimit + ResourceFactory::TextureLimit;
 		cbvSrvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
 		cbvSrvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
 		LOGFAILEDCOMRETURN(
@@ -293,13 +296,13 @@ namespace Engine
 		{
 			// define descriptor tables for a CBV for shaders
 			CD3DX12_DESCRIPTOR_RANGE DescRange[3];
-			DescRange[0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, GBuffer::GBUFFER_NUM_TEXTURES, 0);
-			DescRange[1].Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, ResourceFactory::CBufferLimit, 0);
+			DescRange[0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, ResourceFactory::CBufferLimit, 0);
+			DescRange[1].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, GBuffer::GBUFFER_NUM_TEXTURES, 0);
 			DescRange[2].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, ResourceFactory::TextureLimit, GBuffer::GBUFFER_NUM_TEXTURES);
 
 			CD3DX12_ROOT_PARAMETER rootParameters[3];
-			rootParameters[0].InitAsDescriptorTable(1, &DescRange[0], D3D12_SHADER_VISIBILITY_PIXEL);
-			rootParameters[1].InitAsDescriptorTable(1, &DescRange[1], D3D12_SHADER_VISIBILITY_VERTEX);
+			rootParameters[0].InitAsDescriptorTable(1, &DescRange[0], D3D12_SHADER_VISIBILITY_VERTEX);
+			rootParameters[1].InitAsDescriptorTable(1, &DescRange[1], D3D12_SHADER_VISIBILITY_PIXEL);
 			rootParameters[2].InitAsDescriptorTable(1, &DescRange[2], D3D12_SHADER_VISIBILITY_PIXEL);
 
 			D3D12_STATIC_SAMPLER_DESC sampler = {};
@@ -353,30 +356,26 @@ namespace Engine
 	{
 		ResourceFactory::AssignCommandList(_commandList.Get());
 		_commandList->Reset(_commandAllocator.Get(), nullptr);
-
+		
 		// Set necessary state.
 		_commandList->SetGraphicsRootSignature(_rootSignature.Get());
 
 		// Point to CBVs and SRVs.
 		ID3D12DescriptorHeap* ppHeaps[] = {_cbvSrvHeap.Get()};
 		_commandList->SetDescriptorHeaps(_countof(ppHeaps), ppHeaps);
-		CD3DX12_GPU_DESCRIPTOR_HANDLE gbfHandle(ppHeaps[0]->GetGPUDescriptorHandleForHeapStart(), 0, D3DUtils::GetSRVDescriptorSize());
-		CD3DX12_GPU_DESCRIPTOR_HANDLE cbvHandle(ppHeaps[0]->GetGPUDescriptorHandleForHeapStart(), GBuffer::GBUFFER_NUM_TEXTURES, D3DUtils::GetSRVDescriptorSize());
-		CD3DX12_GPU_DESCRIPTOR_HANDLE srvHandle(ppHeaps[0]->GetGPUDescriptorHandleForHeapStart(), GBuffer::GBUFFER_NUM_TEXTURES + ResourceFactory::CBufferLimit, D3DUtils::GetSRVDescriptorSize());
-		_commandList->SetGraphicsRootDescriptorTable(0, gbfHandle);
-		_commandList->SetGraphicsRootDescriptorTable(1, cbvHandle);
-		_commandList->SetGraphicsRootDescriptorTable(2, srvHandle);
+
+		CD3DX12_GPU_DESCRIPTOR_HANDLE rootHandle(ppHeaps[0]->GetGPUDescriptorHandleForHeapStart(), 0, D3DUtils::GetSRVDescriptorSize() * GBuffer::GBUFFER_NUM_TEXTURES);
+		_commandList->SetGraphicsRootDescriptorTable(0, rootHandle);
+		rootHandle.Offset(ResourceFactory::CBufferLimit, D3DUtils::GetSRVDescriptorSize());
+		_commandList->SetGraphicsRootDescriptorTable(1, rootHandle);
+		rootHandle.Offset(GBuffer::GBUFFER_NUM_TEXTURES, D3DUtils::GetSRVDescriptorSize());
+		_commandList->SetGraphicsRootDescriptorTable(2, rootHandle);
 
 		_commandList->RSSetScissorRects(1, &_scissorRect);
 		Material::ClearPSOHistory();
 
-		//CD3DX12_CPU_DESCRIPTOR_HANDLE rtvHandle(_rtvHeap->GetCPUDescriptorHandleForHeapStart(), _frameIndex, _rtvDescriptorSize);
-		_pGBuffer->Bind();
-		//_commandList->OMSetRenderTargets(1, &rtvHandle, FALSE, nullptr);
-
-		// Record commands.
+		_pGBuffer->Write();
 		_pGBuffer->Clear();
-		//_commandList->ClearRenderTargetView(rtvHandle, _clearColour, 0, nullptr);
 
 		// Execute the draw loop function.
 		_commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -385,26 +384,6 @@ namespace Engine
 		_pGBuffer->Present();
 
 		_commandList->Close();
-
-		/*// Indicate that the back buffer will be used as a render target.
-		_commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(_renderTargets[_frameIndex].Get(),
-			D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET));
-
-		CD3DX12_CPU_DESCRIPTOR_HANDLE rtvHandle(_rtvHeap->GetCPUDescriptorHandleForHeapStart(), _frameIndex, _rtvDescriptorSize);
-		_commandList->OMSetRenderTargets(1, &rtvHandle, FALSE, nullptr);
-
-		// Record commands.
-		_commandList->ClearRenderTargetView(rtvHandle, _clearColour, 0, nullptr);
-
-		// Execute the draw loop function.
-		_commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		_drawLoop();
-
-		// Indicate that the back buffer will now be used to present.
-		_commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(_renderTargets[_frameIndex].Get(),
-			D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT));
-
-		_commandList->Close();*/
 	}
 
 	void DX12Renderer::Sync()
@@ -413,8 +392,7 @@ namespace Engine
 
 		if (_fence.Get() == nullptr)
 		{
-			LOGFAILEDCOM(
-				_device->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&_fence)));
+			LOGFAILEDCOM(_device->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&_fence)));
 
 			_fenceValue = 1;
 		}
