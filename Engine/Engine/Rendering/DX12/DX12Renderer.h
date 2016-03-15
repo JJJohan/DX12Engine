@@ -25,6 +25,7 @@ namespace Engine
 		bool InitWindow(int width, int height, bool windowed, HWND windowHandle) override;
 		bool Update() override;
 		bool Render() override;
+		void BindBackBuffer();
 
 		static DX12Renderer* Get();
 

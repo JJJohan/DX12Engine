@@ -126,7 +126,7 @@ namespace Engine
 				psoDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
 				for (size_t i = 0; i < GBuffer::GBUFFER_NUM_TEXTURES; ++i)
 				{
-					psoDesc.RTVFormats[i] = DXGI_FORMAT_R32G32B32A32_FLOAT;
+					psoDesc.RTVFormats[i] = DXGI_FORMAT_R8G8B8A8_UNORM;
 				}
 			}
 			psoDesc.SampleDesc.Count = 1;

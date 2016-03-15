@@ -48,15 +48,18 @@ namespace Engine
 		{
 			// Wait until work is available.
 			std::unique_lock<std::mutex> waitLock(commandThread->WaitMutex);
+
 			if (!commandThread->Waiting)
 			{
 				std::lock_guard<std::mutex> lock(commandThread->LockMutex);
 				commandThread->Waiting = true;
 			}
+
 			commandThread->WaitCondition.wait(waitLock, [&]
-			                                  {
-				                                  return !commandThread->Available || _releaseRequested;
-			                                  });
+			{
+				return !commandThread->Available || _releaseRequested;
+			});
+
 			if (_releaseRequested)
 			{
 				return;

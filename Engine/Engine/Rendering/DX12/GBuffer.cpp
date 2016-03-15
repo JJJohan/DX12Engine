@@ -10,12 +10,13 @@
 
 namespace Engine
 {
-	GBuffer::GBuffer(ID3D12Device* device, ID3D12GraphicsCommandList* commandList, ID3D12DescriptorHeap* srvHeap)
+	GBuffer::GBuffer(ID3D12Device* device, ID3D12GraphicsCommandList* commandList, ID3D12DescriptorHeap* srvHeap, IDXGISwapChain3* swapChain)
 		: _pRtvHeap(nullptr)
 		, _pDsvHeap(nullptr)
 		, _pSrvHeap(srvHeap)
 		, _pDevice(device)
 		, _pCommandList(commandList)
+		, _pSwapChain(swapChain)
 		, _pDepthTexture(nullptr)
 		, _pScreenQuad(nullptr)
 		, _pScreenMaterial(nullptr)
@@ -121,7 +122,7 @@ namespace Engine
 		// Create a resource description for the textures.
 		D3D12_RESOURCE_DESC textureDesc = {};
 		textureDesc.MipLevels = 1;
-		textureDesc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+		textureDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 		textureDesc.Width = _screenWidth;
 		textureDesc.Height = _screenHeight;
 		textureDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET;
@@ -186,7 +187,7 @@ namespace Engine
 	{
 		// Render target view description.
 		D3D12_RENDER_TARGET_VIEW_DESC rtvDesc = {};
-		rtvDesc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+		rtvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 		rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
 		rtvDesc.Texture2D.MipSlice = 0;
 		rtvDesc.Texture2D.PlaneSlice = 0;
@@ -256,11 +257,6 @@ namespace Engine
 
 	void GBuffer::Present() const
 	{
-		// Draw the textures to a screen space quad.
-		_pScreenQuad->GetMaterial()->SetTexture(_pTextures[0]);
-		//_pTextures[0]->Bind(_pCommandList);
-		_pScreenQuad->Draw();
-
 		// Indicate that the GBuffer textures will now be used to present.
 		for (int i = 0; i < GBUFFER_NUM_TEXTURES; ++i)
 		{
@@ -269,6 +265,11 @@ namespace Engine
 		}
 		_pCommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(_pDepthTexture->GetResource(),
 			D3D12_RESOURCE_STATE_DEPTH_WRITE, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE));
+
+		// Draw the textures to a screen space quad.
+		DX12Renderer::Get()->BindBackBuffer();
+		_pScreenQuad->GetMaterial()->SetTexture(_pTextures[2]);
+		_pScreenQuad->Draw();
 	}
 }
 

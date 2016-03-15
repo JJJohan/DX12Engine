@@ -268,7 +268,7 @@ namespace Engine
 		LOGFAILEDCOMRETURN(swapChain.As(&_swapChain), EXIT_FAILURE);
 
 		// Create RTV for swap chain.
-		//CreateRTV();
+		CreateRTV();
 
 		// Describe and create a CBV/SRV heap for constants and textures.
 		D3D12_DESCRIPTOR_HEAP_DESC cbvSrvHeapDesc = {};
@@ -337,7 +337,7 @@ namespace Engine
 		// Initialise factory pointers.
 		ResourceFactory::_init(static_cast<DX12Renderer*>(this), _cbvSrvHeap.Get());
 
-		_pGBuffer = new GBuffer(_device.Get(), _commandList.Get(), _cbvSrvHeap.Get());
+		_pGBuffer = new GBuffer(_device.Get(), _commandList.Get(), _cbvSrvHeap.Get(), _swapChain.Get());
 
 		// Call the resource creation method.
 		CommandQueue::Enqueue(_createMethod);
@@ -354,6 +354,8 @@ namespace Engine
 	{
 		ResourceFactory::AssignCommandList(_commandList.Get());
 		_commandList->Reset(_commandAllocator.Get(), nullptr);
+		_commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(_renderTargets[_frameIndex].Get(),
+			D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET));
 		
 		// Set necessary state.
 		_commandList->SetGraphicsRootSignature(_rootSignature.Get());
@@ -379,6 +381,8 @@ namespace Engine
 
 		_pGBuffer->Present();
 
+		_commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(_renderTargets[_frameIndex].Get(),
+			D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT));
 		_commandList->Close();
 	}
 
@@ -477,6 +481,14 @@ namespace Engine
 		_frameIndex = _swapChain->GetCurrentBackBufferIndex();
 	}
 
+	void DX12Renderer::BindBackBuffer()
+	{
+		CD3DX12_CPU_DESCRIPTOR_HANDLE rtvHandle(_rtvHeap->GetCPUDescriptorHandleForHeapStart());
+		rtvHandle.Offset(_frameIndex, D3DUtils::GetRTVDescriptorSize());
+		_commandList->OMSetRenderTargets(1, &rtvHandle, FALSE, nullptr);
+		//_commandList->SetGraphicsRootDescriptorTable(1, srvHandle);
+	}
+
 	void DX12Renderer::ResizeRenderer()
 	{
 		// Resize camera and scissor rect.
@@ -503,7 +515,7 @@ namespace Engine
 		_swapChain->ResizeBuffers(_frameCount, UINT(_screenWidth), UINT(_screenHeight), DXGI_FORMAT_R8G8B8A8_UNORM, 0);
 
 		// Recreate the RTV.
-		//CreateRTV();
+		CreateRTV();
 	}
 }
 

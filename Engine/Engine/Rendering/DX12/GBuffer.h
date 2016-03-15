@@ -1,6 +1,8 @@
 #pragma once
 #include "RenderObject.h"
 
+struct IDXGISwapChain3;
+
 namespace Engine
 {
 	class Texture;
@@ -8,7 +10,7 @@ namespace Engine
 	class GBuffer
 	{
 	public:
-		GBuffer(ID3D12Device* device, ID3D12GraphicsCommandList* commandList, ID3D12DescriptorHeap* srvHeap);
+		GBuffer(ID3D12Device* device, ID3D12GraphicsCommandList* commandList, ID3D12DescriptorHeap* srvHeap, IDXGISwapChain3* swapChain);
 		~GBuffer();
 
 		ID3D12DescriptorHeap* GetRTVHeap() const;
@@ -42,6 +44,7 @@ namespace Engine
 
 		ID3D12Device* _pDevice;
 		ID3D12GraphicsCommandList* _pCommandList;
+		IDXGISwapChain3* _pSwapChain;
 
 		CD3DX12_CPU_DESCRIPTOR_HANDLE _rtvHandle;
 
