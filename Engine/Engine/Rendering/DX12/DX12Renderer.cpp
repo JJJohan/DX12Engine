@@ -380,6 +380,7 @@ namespace Engine
 		_drawLoop();
 
 		_pGBuffer->Present();
+		_pGBuffer->DrawTextures();
 
 		_commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(_renderTargets[_frameIndex].Get(),
 			D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT));
@@ -486,7 +487,9 @@ namespace Engine
 		CD3DX12_CPU_DESCRIPTOR_HANDLE rtvHandle(_rtvHeap->GetCPUDescriptorHandleForHeapStart());
 		rtvHandle.Offset(_frameIndex, D3DUtils::GetRTVDescriptorSize());
 		_commandList->OMSetRenderTargets(1, &rtvHandle, FALSE, nullptr);
-		//_commandList->SetGraphicsRootDescriptorTable(1, srvHandle);
+		
+		const float clearColor[] = { 0.0f, 0.0f, 0.2f, 1.0f };
+		_commandList->ClearRenderTargetView(rtvHandle, clearColor, 0, nullptr);
 	}
 
 	void DX12Renderer::ResizeRenderer()

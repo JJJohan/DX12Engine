@@ -26,6 +26,7 @@ PSInput VSMain(VSInput i)
 
 	i.pos.w = 1.0f;
 	o.pos = i.pos;
+	o.pos = mul(o.pos, mvp[i.uv.z]);
 
 	o.col = i.col;
 	o.uv = i.uv.xy;

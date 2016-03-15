@@ -131,10 +131,18 @@ namespace Engine
 
 	void Camera::ApplyTransform(ConstantBufferInstance* buffer, const Engine::Transform& transform) const
 	{
-		XMMATRIX mvp = XMMatrixTranspose(transform.GetMatrix() * _vp);
+		XMMATRIX mvp;
+		if (transform.GetIs2D())
+		{
+			mvp = XMMatrixTranspose(transform.GetMatrix() * _vp);
+		}
+		else
+		{
+			mvp = XMMatrixTranspose(transform.GetMatrix());
+		}
+
 		XMFLOAT4X4 mvpT;
 		XMStoreFloat4x4(&mvpT, mvp);
-
 		buffer->SetMatrix("mvp", mvpT);
 	}
 

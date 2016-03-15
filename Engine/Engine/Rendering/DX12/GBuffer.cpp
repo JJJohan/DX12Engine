@@ -255,6 +255,28 @@ namespace Engine
 		_pCommandList->ClearDepthStencilView(_pDsvHeap->GetCPUDescriptorHandleForHeapStart(), D3D12_CLEAR_FLAG_DEPTH, 0.0f, 0, 1, &_screenRect);
 	}
 
+	void GBuffer::DrawTextures()
+	{
+		// Draw the textures to a screen space quad.
+		_pScreenQuad->Transform.SetIs2D(true);
+		_pScreenQuad->Transform.SetScale(0.5f, 0.5f, 1.0f);
+		_pScreenQuad->Transform.SetPosition(-0.5f, 0.5f, 0.0f);
+		_pScreenQuad->GetMaterial()->SetTexture(_pTextures[2]);
+		_pScreenQuad->Draw();
+
+		//_pScreenQuad->Transform.SetPosition(-0.5f, -0.5f, 0.0f);
+		//_pScreenQuad->GetMaterial()->SetTexture(_pTextures[1]);
+		//_pScreenQuad->Draw();
+
+		/*_pScreenQuad->Transform.SetPosition(0.5f, 0.5f, 0.0f);
+		_pScreenQuad->GetMaterial()->SetTexture(_pTextures[2]);
+		_pScreenQuad->Draw();
+
+		_pScreenQuad->Transform.SetPosition(0.5f, -0.5f, 0.0f);
+		_pScreenQuad->GetMaterial()->SetTexture(_pDepthTexture);
+		_pScreenQuad->Draw();*/
+	}
+
 	void GBuffer::Present() const
 	{
 		// Indicate that the GBuffer textures will now be used to present.
@@ -266,10 +288,7 @@ namespace Engine
 		_pCommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(_pDepthTexture->GetResource(),
 			D3D12_RESOURCE_STATE_DEPTH_WRITE, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE));
 
-		// Draw the textures to a screen space quad.
 		DX12Renderer::Get()->BindBackBuffer();
-		_pScreenQuad->GetMaterial()->SetTexture(_pTextures[2]);
-		_pScreenQuad->Draw();
 	}
 }
 

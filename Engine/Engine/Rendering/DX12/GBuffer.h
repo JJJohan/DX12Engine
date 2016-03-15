@@ -21,6 +21,8 @@ namespace Engine
 		void Clear();
 		void Resize();
 
+		void DrawTextures();
+
 		enum GBUFFER_TEXTURE_TYPE 
 		{
 			GBUFFER_TEXTURE_TYPE_POSITION,
