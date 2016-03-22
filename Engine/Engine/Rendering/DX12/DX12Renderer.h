@@ -25,6 +25,7 @@ namespace Engine
 		bool InitWindow(int width, int height, bool windowed, HWND windowHandle) override;
 		bool Update() override;
 		bool Render() override;
+		bool IsRendering() const;
 		void BindBackBuffer();
 
 		static DX12Renderer* Get();
@@ -57,6 +58,7 @@ namespace Engine
 		ComPtr<ID3D12DebugDevice> _debugDevice;
 #endif
 
+		bool _isRendering;
 		bool _useWarpDevice;
 		bool _resize;
 

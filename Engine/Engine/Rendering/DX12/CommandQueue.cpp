@@ -3,6 +3,7 @@
 #include "CommandQueue.h"
 #include "../../Utils/Logging.h"
 #include "../../Factory/ResourceFactory.h"
+#include "DX12Renderer.h"
 
 //#define SINGLE_THREADED
 
@@ -17,7 +18,14 @@ namespace Engine
 
 	void CommandQueue::Enqueue(const std::function<void()>& task)
 	{
-		_tasks.push(task);
+		if (DX12Renderer::Get()->IsRendering())
+		{
+			task();
+		}
+		else
+		{
+			_tasks.push(task);
+		}
 	}
 
 	void CommandQueue::Release()

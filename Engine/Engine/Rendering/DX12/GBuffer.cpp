@@ -261,7 +261,14 @@ namespace Engine
 		_pScreenQuad->Transform.SetIs2D(true);
 		_pScreenQuad->Transform.SetScale(0.5f, 0.5f, 1.0f);
 		_pScreenQuad->Transform.SetPosition(-0.5f, 0.5f, 0.0f);
+		_pScreenQuad->GetMaterial()->SetTexture(_pTextures[1]);
+		_pScreenQuad->Update();
+		_pScreenQuad->Draw();
+
+		_pScreenQuad->Transform.SetScale(0.5f, 0.5f, 1.0f);
+		_pScreenQuad->Transform.SetPosition(0.5f, 0.5f, 0.0f);
 		_pScreenQuad->GetMaterial()->SetTexture(_pTextures[2]);
+		_pScreenQuad->Update();
 		_pScreenQuad->Draw();
 
 		//_pScreenQuad->Transform.SetPosition(-0.5f, -0.5f, 0.0f);

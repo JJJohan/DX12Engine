@@ -21,6 +21,7 @@ namespace Engine
 		, _rootSignature(nullptr)
 		, _rtvHeap(nullptr)
 		, _commandList(nullptr)
+		, _isRendering(false)
 		, _useWarpDevice(false)
 		, _resize(false)
 		, _frameIndex(0)
@@ -87,6 +88,11 @@ namespace Engine
 		return EXIT_SUCCESS;
 	}
 
+	bool DX12Renderer::IsRendering() const
+	{
+		return _isRendering;
+	}
+
 	bool DX12Renderer::Render()
 	{
 		//_previousTime = std::chrono::high_resolution_clock::now();
@@ -107,6 +113,7 @@ namespace Engine
 		}
 
 		// Execute any queued GPU tasks.
+		_isRendering = true;
 		std::vector<ID3D12CommandList*> commandLists = CommandQueue::Process(_device.Get());
 		if (!commandLists.empty())
 		{
@@ -117,6 +124,7 @@ namespace Engine
 		PopulateCommandList();
 		ID3D12CommandList* ppCommandLists[] = {_commandList.Get()};
 		_commandQueue->ExecuteCommandLists(_countof(ppCommandLists), ppCommandLists);
+		_isRendering = false;
 
 		// Present the frame.
 		LOGFAILEDCOMRETURN(_swapChain->Present(_vsync, 0), EXIT_FAILURE);
