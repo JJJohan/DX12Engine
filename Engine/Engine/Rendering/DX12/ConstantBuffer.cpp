@@ -29,7 +29,7 @@ namespace Engine
 			_copyBufferSize = size;
 		}
 		ZeroMemory(_pCopyBuffer, _copyBufferSize);
-		bool sameSize = (size == _heapSize);
+		bool sameSize = (((size + 255) & ~255) == _heapSize);
 
 		// Perform memory copy.
 		size_t offset = 0;
@@ -50,9 +50,16 @@ namespace Engine
 			}
 			offset += CBUFFER_SLOT_SIZE;
 		}
+		
+		size_t packed = size_t((offset + 255) & ~255);
+		if (_heapSize < packed)
+		{
+			// Heap needs to be recreated to enlarge the CBV.
+			HeapManager::ReleaseHeap(this);
+		}
 
 		// Allocate space and upload to the heap.
-		_heapSize = size_t(offset);
+		_heapSize = packed;
 		MarkDynamic();
 
 		HeapManager::Upload(this, _pCopyBuffer, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
@@ -62,7 +69,7 @@ namespace Engine
 		{
 			D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc = {};
 			cbvDesc.BufferLocation = _pResource->GetGPUVirtualAddress();
-			cbvDesc.SizeInBytes = (_heapSize + 255) & ~255;
+			cbvDesc.SizeInBytes = UINT(_heapSize);
 			_pDevice->CreateConstantBufferView(&cbvDesc, _pDescriptor->GetCPUDescriptorHandleForHeapStart());
 		}
 	}

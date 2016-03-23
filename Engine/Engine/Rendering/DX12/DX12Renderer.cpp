@@ -248,7 +248,7 @@ namespace Engine
 		_featureLevel = FeatureSupport::GetFeatureLevelString(_featureInfo.MaxFeatureLevelSupported);
 
 		SystemInfo::PrintSystemInfo();
-		Logging::Log("Creating Direct3D12 device using adapter '" + _deviceName + "'.");
+		Logging::Log("Creating Direct3D 12 device using adapter '" + _deviceName + "'.");
 
 		// Describe and create the command queue.
 		D3D12_COMMAND_QUEUE_DESC queueDesc = {};
@@ -305,7 +305,7 @@ namespace Engine
 			// define descriptor tables for a CBV for shaders
 			CD3DX12_DESCRIPTOR_RANGE DescRange[2];
 			DescRange[0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, ResourceFactory::CBufferLimit, 0);
-			DescRange[1].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, GBuffer::GBUFFER_NUM_TEXTURES, 0);
+			DescRange[1].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, ResourceFactory::TextureLimit, 0);
 
 			CD3DX12_ROOT_PARAMETER rootParameters[2];
 			rootParameters[0].InitAsDescriptorTable(1, &DescRange[0], D3D12_SHADER_VISIBILITY_VERTEX);

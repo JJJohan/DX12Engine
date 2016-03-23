@@ -32,7 +32,7 @@ namespace Engine
 
 	size_t IndexBufferInstance::GetSize() const
 	{
-		return Count() * sizeof(int);
+		return _indices.size() * sizeof(int);
 	}
 }
 

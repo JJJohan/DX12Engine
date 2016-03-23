@@ -124,11 +124,11 @@ namespace Engine
 		else
 		{
 			UINT8* dest;
-			heap->_pResource = heap->_pHeap;
 			CD3DX12_RANGE readRange(0, 0);
-			LOGFAILEDCOM(heap->_pResource->Map(0, &readRange, reinterpret_cast<void**>(&dest)));
+			LOGFAILEDCOM(heap->_pHeap->Map(0, &readRange, reinterpret_cast<void**>(&dest)));
 			memcpy(dest, data, rowPitch);
 			heap->_pHeap->Unmap(0, nullptr);
+			heap->_pResource = heap->_pHeap;
 		}
 	}
 
