@@ -132,7 +132,7 @@ namespace Engine
 	void Camera::ApplyTransform(ConstantBufferInstance* buffer, const Engine::Transform& transform) const
 	{
 		XMMATRIX mvp;
-		if (transform.GetIs2D())
+		if (!transform.GetIs2D())
 		{
 			mvp = XMMatrixTranspose(transform.GetMatrix() * _vp);
 		}
