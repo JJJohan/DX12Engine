@@ -60,7 +60,6 @@ namespace Engine
 			HeapResource* heapResource = *it;
 			heapResource->_heapSize = 0;
 			heapResource->_lastHeapSize = 0;
-			heapResource->_heapPending = false;
 			if (heapResource->_pHeap != nullptr)
 			{
 				heapResource->_pHeap->Release();
@@ -69,11 +68,6 @@ namespace Engine
 		}
 		_staticUploadHeaps.clear();
 		_mutex.unlock();
-
-		for (auto it = _dynamicUploadHeaps.begin(); it != _dynamicUploadHeaps.end(); ++it)
-		{
-			(*it)->_heapPending = false;
-		}
 	}
 
 	void HeapManager::ReleaseHeaps()
@@ -116,6 +110,8 @@ namespace Engine
 			subresourceData.pData = data;
 			subresourceData.RowPitch = LONG_PTR(rowPitch);
 			subresourceData.SlicePitch = LONG_PTR(slicePitch);
+
+			commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(heap->_pResource, destState, D3D12_RESOURCE_STATE_COPY_DEST));
 
 			UpdateSubresources(commandList, heap->_pResource, heap->_pHeap, 0, 0, 1, &subresourceData);
 

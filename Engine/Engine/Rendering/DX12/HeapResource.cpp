@@ -9,7 +9,6 @@ namespace Engine
 		, _pResource(nullptr)
 		, _heapSize(0)
 		, _dynamic(false)
-		, _heapPending(false)
 		, _customHeapDesc(false)
 		, _lastHeapSize(0)
 		, _pHeap(nullptr)
@@ -75,15 +74,12 @@ namespace Engine
 		_heapDesc.HeapFlags = flags;
 		_heapDesc.InitialResourceState = initialState;
 		_heapDesc.pOptimizedClearValue = clearValue;
+		_resourceState = initialState;
 	}
 
 	void HeapResource::HeapTask(const std::function<void()>& heapTask)
 	{
-		if (!_heapPending)
-		{
-			CommandQueue::Enqueue(heapTask);
-			_heapPending = true;
-		}
+		CommandQueue::Enqueue(heapTask);
 	}
 
 	void HeapResource::MarkDynamic()

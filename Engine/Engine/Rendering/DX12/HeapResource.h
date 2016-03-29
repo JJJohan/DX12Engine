@@ -12,7 +12,6 @@ namespace Engine
 	{
 	public:
 		ID3D12Resource* GetResource() const;
-		D3D12_RESOURCE_STATES GetResourceState() const;
 		
 		struct HeapDesc
 		{
@@ -31,21 +30,20 @@ namespace Engine
 		bool PrepareHeapResource();
 		bool PrepareHeapResource(const D3D12_RESOURCE_DESC& resourceDesc);
 		bool PrepareHeapResource(const D3D12_RESOURCE_DESC& resourceDesc, HeapDesc& heapDesc);
-		void HeapTask(const std::function<void()>& heapTask);
+		static void HeapTask(const std::function<void()>& heapTask);
 		void MarkDynamic();
 
 		ID3D12Device* _pDevice;
 		ID3D12Resource* _pResource;
 		unsigned long long _heapSize;
+		D3D12_RESOURCE_STATES _resourceState;
 
 	private:
 		bool _dynamic;
-		bool _heapPending;
 		bool _customHeapDesc;
 		unsigned long long _lastHeapSize;
 		ID3D12Resource* _pHeap;
 		HeapDesc _heapDesc;
-		D3D12_RESOURCE_STATES _resourceState;
 
 		friend class HeapManager;
 	};
