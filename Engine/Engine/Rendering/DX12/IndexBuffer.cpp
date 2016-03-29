@@ -41,6 +41,7 @@ namespace Engine
 		// Initialize the index buffer view.
 		if (!sameSize)
 		{
+			_indexBufferView = {};
 			_indexBufferView.BufferLocation = _pResource->GetGPUVirtualAddress();
 			_indexBufferView.Format = DXGI_FORMAT_R32_UINT;
 			_indexBufferView.SizeInBytes = UINT(_heapSize);

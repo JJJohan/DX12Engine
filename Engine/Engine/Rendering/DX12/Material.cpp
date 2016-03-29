@@ -115,21 +115,34 @@ namespace Engine
 			psoDesc.VS = {reinterpret_cast<UINT8*>(_pVertexShader->GetBufferPointer()), _pVertexShader->GetBufferSize()};
 			psoDesc.PS = {reinterpret_cast<UINT8*>(_pPixelShader->GetBufferPointer()), _pPixelShader->GetBufferSize()};
 			psoDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
+			psoDesc.DSVFormat = DXGI_FORMAT_D32_FLOAT;
 			psoDesc.BlendState = blendState;
-			psoDesc.DepthStencilState.DepthEnable = FALSE;
-			psoDesc.DepthStencilState.StencilEnable = FALSE;
-			psoDesc.SampleMask = UINT_MAX ;
+			psoDesc.SampleMask = UINT_MAX;
+			psoDesc.SampleDesc.Count = 1;
 			psoDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 			if (deferred)
 			{
-				psoDesc.NumRenderTargets = GBuffer::GBUFFER_NUM_TEXTURES;
-				psoDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
+				psoDesc.DepthStencilState.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
+				psoDesc.DepthStencilState.DepthEnable = TRUE;
+				psoDesc.DepthStencilState.StencilEnable = FALSE;
+				psoDesc.DepthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
+
+				psoDesc.NumRenderTargets = GBuffer::GBUFFER_NUM_TEXTURES;			
 				for (size_t i = 0; i < GBuffer::GBUFFER_NUM_TEXTURES; ++i)
 				{
 					psoDesc.RTVFormats[i] = DXGI_FORMAT_R8G8B8A8_UNORM;
 				}
 			}
-			psoDesc.SampleDesc.Count = 1;
+			else
+			{
+				psoDesc.DepthStencilState.DepthFunc = D3D12_COMPARISON_FUNC_ALWAYS;
+				psoDesc.DepthStencilState.DepthEnable = FALSE;
+				psoDesc.DepthStencilState.StencilEnable = FALSE;
+				psoDesc.DepthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
+				
+				psoDesc.NumRenderTargets = 1;
+				psoDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
+			}
 
 			LOGFAILEDCOM(_pDevice->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&_pPipelineState)));
 
