@@ -68,7 +68,7 @@ namespace Engine
 
 	void Text::Draw()
 	{
-		if (_text.empty())
+		if (_text.empty() || _pVertexBuffer == nullptr)
 		{
 			return;
 		}
