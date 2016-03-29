@@ -126,6 +126,7 @@ namespace Engine
 		}
 
 		// Describe and create a Texture2D description.
+		D3D12_RESOURCE_STATES initialState = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
 		if (!_customDesc)
 		{
 			_textureDesc = {};
@@ -138,12 +139,13 @@ namespace Engine
 			_textureDesc.SampleDesc.Count = 1;
 			_textureDesc.SampleDesc.Quality = 0;
 			_textureDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+			initialState = _resourceState;
 		}
 
 		// Allocate space and upload to the heap.
 		_heapSize = _width * _height * 4;
 		PrepareHeapResource(_textureDesc);
-		HeapManager::Upload(this, _fileBuffer.get(), _width * 4, int(_heapSize), D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+		HeapManager::Upload(this, _fileBuffer.get(), _width * 4, int(_heapSize), initialState);
 
 		// Create descriptor handle if custom one is not provided.
 		_heapHandle = CD3DX12_CPU_DESCRIPTOR_HANDLE(_pSrvHeap->GetCPUDescriptorHandleForHeapStart(), _index, D3DUtils::GetSRVDescriptorSize());
@@ -151,7 +153,7 @@ namespace Engine
 		// Describe and create a SRV for the texture.
 		D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
 		srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-		srvDesc.Format = _textureDesc.Format == DXGI_FORMAT_D24_UNORM_S8_UINT ? DXGI_FORMAT_B8G8R8A8_UNORM : _textureDesc.Format;;
+		srvDesc.Format = _textureDesc.Format == DXGI_FORMAT_R32_TYPELESS ? DXGI_FORMAT_R32_FLOAT : _textureDesc.Format;
 		srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
 		srvDesc.Texture2D.MipLevels = 1;
 		_pDevice->CreateShaderResourceView(_pResource, &srvDesc, _heapHandle);
