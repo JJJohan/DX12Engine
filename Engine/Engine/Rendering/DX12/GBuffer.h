@@ -14,7 +14,6 @@ namespace Engine
 		~GBuffer();
 
 		ID3D12DescriptorHeap* GetRTVHeap() const;
-		ID3D12DescriptorHeap* GetDSVHeap() const;
 
 		void Write() const;
 		void Present() const;
@@ -41,7 +40,6 @@ namespace Engine
 		bool _initialised;
 
 		ID3D12DescriptorHeap* _pRtvHeap;
-		ID3D12DescriptorHeap* _pDsvHeap;
 		ID3D12DescriptorHeap* _pSrvHeap;
 
 		ID3D12Device* _pDevice;
@@ -52,7 +50,7 @@ namespace Engine
 
 		Texture* _pTextures[GBUFFER_NUM_TEXTURES];
 		Texture* _pDepthTexture;
-		RenderObject* _pScreenQuad;
+		RenderObject* _pScreenQuads[GBUFFER_NUM_TEXTURES + 1];
 		Material* _pScreenMaterial;
 		
 		int _screenWidth;

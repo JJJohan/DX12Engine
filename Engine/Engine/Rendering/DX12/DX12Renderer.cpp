@@ -4,6 +4,7 @@
 #include "Material.h"
 #include "RenderObject.h"
 #include "GBuffer.h"
+#include "Texture.h"
 
 namespace Engine
 {
@@ -13,6 +14,7 @@ namespace Engine
 		: _featureInfo()
 		, _pCamera(nullptr)
 		, _pGBuffer(nullptr)
+		, _pDepthBuffer(nullptr)
 		, _scissorRect()
 		, _swapChain(nullptr)
 		, _device(nullptr)
@@ -20,6 +22,7 @@ namespace Engine
 		, _commandQueue(nullptr)
 		, _rootSignature(nullptr)
 		, _rtvHeap(nullptr)
+		, _dsvHeap(nullptr)
 		, _commandList(nullptr)
 		, _isRendering(false)
 		, _useWarpDevice(false)
@@ -41,6 +44,7 @@ namespace Engine
 
 		delete _pCamera;
 		delete _pGBuffer;
+		delete _pDepthBuffer;
 
 		HeapManager::ReleaseHeaps();
 		Material::ReleasePSOCache();
@@ -53,6 +57,7 @@ namespace Engine
 		_commandQueue.Reset();
 		_rootSignature.Reset();
 		_rtvHeap.Reset();
+		_dsvHeap.Reset();
 		_fence.Reset();
 
 #if _DEBUG
@@ -286,6 +291,13 @@ namespace Engine
 		LOGFAILEDCOMRETURN(
 			_device->CreateDescriptorHeap(&cbvSrvHeapDesc, IID_PPV_ARGS(&_cbvSrvHeap)),
 			EXIT_FAILURE);
+		
+		// Describe and create a depth stencil view (DSV) descriptor heap.
+		D3D12_DESCRIPTOR_HEAP_DESC dsvHeapDesc = {};
+		dsvHeapDesc.NumDescriptors = 1;
+		dsvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_DSV;
+		dsvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
+		LOGFAILEDCOM(_device->CreateDescriptorHeap(&dsvHeapDesc, IID_PPV_ARGS(&_dsvHeap)));
 
 		LOGFAILEDCOMRETURN(
 			_device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&_commandAllocator)),
@@ -345,6 +357,10 @@ namespace Engine
 		// Initialise factory pointers.
 		ResourceFactory::_init(static_cast<DX12Renderer*>(this), _cbvSrvHeap.Get());
 
+		// Create depth buffer.
+		CreateDepthBuffer();
+
+		// Create GBuffer.
 		_pGBuffer = new GBuffer(_device.Get(), _commandList.Get(), _cbvSrvHeap.Get(), _swapChain.Get());
 
 		// Call the resource creation method.
@@ -465,6 +481,45 @@ namespace Engine
 		return EXIT_SUCCESS;
 	}
 
+	void DX12Renderer::CreateDepthBuffer()
+	{
+		// Create a resource description for the depth texture.
+		D3D12_RESOURCE_DESC depthDesc = {};
+		depthDesc.MipLevels = 1;
+		depthDesc.Format = DXGI_FORMAT_R32_TYPELESS;
+		depthDesc.Alignment = 0;
+		depthDesc.Width = _screenWidth;
+		depthDesc.Height = _screenHeight;
+		depthDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
+		depthDesc.DepthOrArraySize = 1;
+		depthDesc.SampleDesc.Count = 1;
+		depthDesc.SampleDesc.Quality = 0;
+		depthDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
+		depthDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+
+		D3D12_CLEAR_VALUE* clearVal = new D3D12_CLEAR_VALUE();
+		clearVal->Format = DXGI_FORMAT_D32_FLOAT;
+		clearVal->DepthStencil.Depth = 1.0f;
+		clearVal->DepthStencil.Stencil = 0;
+
+		// Create a depth stencil view description.
+		D3D12_DEPTH_STENCIL_VIEW_DESC stencilDesc = {};
+		stencilDesc.Format = DXGI_FORMAT_D32_FLOAT;
+		stencilDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
+		stencilDesc.Texture2D.MipSlice = 0;
+
+		/*_device->CreateCommittedResource(&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
+			D3D12_HEAP_FLAG_NONE, &depthDesc, D3D12_RESOURCE_STATE_DEPTH_WRITE, &clearVal,
+			IID_PPV_ARGS(&_pDepthBuffer));*/
+
+		Texture* t = ResourceFactory::CreateTexture(_screenWidth, _screenHeight);
+		t->SetResourceDescription(depthDesc);
+		t->SetHeapDescription(D3D12_HEAP_TYPE_DEFAULT, D3D12_HEAP_FLAG_NONE, D3D12_RESOURCE_STATE_DEPTH_WRITE, clearVal);
+		t->Apply();
+
+		_device->CreateDepthStencilView(t->GetResource(), &stencilDesc, _dsvHeap->GetCPUDescriptorHandleForHeapStart());
+	}
+
 	void DX12Renderer::CreateRTV()
 	{
 		// Create descriptor heaps.
@@ -490,12 +545,15 @@ namespace Engine
 		_frameIndex = _swapChain->GetCurrentBackBufferIndex();
 	}
 
-	void DX12Renderer::BindBackBuffer()
+	void DX12Renderer::BindBackBuffer() const
 	{
 		CD3DX12_CPU_DESCRIPTOR_HANDLE rtvHandle(_rtvHeap->GetCPUDescriptorHandleForHeapStart());
 		rtvHandle.Offset(_frameIndex, D3DUtils::GetRTVDescriptorSize());
-		_commandList->OMSetRenderTargets(1, &rtvHandle, FALSE, nullptr);
+		_commandList->OMSetRenderTargets(1, &rtvHandle, FALSE, &_dsvHeap->GetCPUDescriptorHandleForHeapStart());
 		
+		// Clear the depth buffer.
+		_commandList->ClearDepthStencilView(_dsvHeap->GetCPUDescriptorHandleForHeapStart(), D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 1, &_scissorRect);
+
 		const float clearColor[] = { 0.0f, 0.0f, 0.2f, 1.0f };
 		_commandList->ClearRenderTargetView(rtvHandle, clearColor, 0, nullptr);
 	}
@@ -527,6 +585,11 @@ namespace Engine
 
 		// Recreate the RTV.
 		CreateRTV();
+	}
+
+	ID3D12DescriptorHeap* DX12Renderer::GetDepthBufferHeap() const
+	{
+		return _dsvHeap.Get();
 	}
 }
 

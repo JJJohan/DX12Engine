@@ -26,7 +26,8 @@ namespace Engine
 		bool Update() override;
 		bool Render() override;
 		bool IsRendering() const;
-		void BindBackBuffer();
+		void BindBackBuffer() const;
+		ID3D12DescriptorHeap* GetDepthBufferHeap() const;
 
 		static DX12Renderer* Get();
 
@@ -44,6 +45,7 @@ namespace Engine
 		// Pipeline objects
 		Camera* _pCamera;
 		GBuffer* _pGBuffer;
+		ID3D12Resource* _pDepthBuffer;
 		D3D12_RECT _scissorRect;
 		ComPtr<IDXGISwapChain3> _swapChain;
 		ComPtr<ID3D12Device> _device;
@@ -53,6 +55,7 @@ namespace Engine
 		ComPtr<ID3D12RootSignature> _rootSignature;
 		ComPtr<ID3D12DescriptorHeap> _rtvHeap;
 		ComPtr<ID3D12DescriptorHeap> _cbvSrvHeap;
+		ComPtr<ID3D12DescriptorHeap> _dsvHeap;
 		ComPtr<ID3D12GraphicsCommandList> _commandList;
 #if _DEBUG
 		ComPtr<ID3D12DebugDevice> _debugDevice;
@@ -75,6 +78,7 @@ namespace Engine
 		void PopulateCommandList() const;
 		bool WaitForPreviousFrame();
 		void ResizeRenderer();
+		void CreateDepthBuffer();
 
 		friend class ResourceFactory;
 	};
