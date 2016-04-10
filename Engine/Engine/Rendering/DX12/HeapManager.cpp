@@ -1,5 +1,6 @@
 #include "HeapManager.h"
 #include "HeapResource.h"
+#include "DX12Renderer.h"
 
 namespace Engine
 {
@@ -111,11 +112,15 @@ namespace Engine
 			subresourceData.RowPitch = LONG_PTR(rowPitch);
 			subresourceData.SlicePitch = LONG_PTR(slicePitch);
 
-			commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(heap->_pResource, destState, D3D12_RESOURCE_STATE_COPY_DEST));
+			if (heap->_resourceState != D3D12_RESOURCE_STATE_COPY_DEST)
+			{
+				commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(heap->_pResource, heap->_resourceState, D3D12_RESOURCE_STATE_COPY_DEST));
+			}
 
 			UpdateSubresources(commandList, heap->_pResource, heap->_pHeap, 0, 0, 1, &subresourceData);
 
 			commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(heap->_pResource, D3D12_RESOURCE_STATE_COPY_DEST, destState));
+			heap->_resourceState = destState;
 		}
 		else
 		{

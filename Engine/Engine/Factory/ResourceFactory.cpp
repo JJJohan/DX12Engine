@@ -79,6 +79,7 @@ namespace Engine
 		_pRenderer = renderer;
 		_pDevice = _pRenderer->_device.Get();
 		_pCbvSrvHeap = cbvSrvHeap;
+		_pCommandList = _pRenderer->_commandList.Get();
 
 		for (int i = 0; i < TextureLimit; ++i)
 		{

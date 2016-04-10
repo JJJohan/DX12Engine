@@ -305,7 +305,6 @@ namespace Engine
 
 		HeapManager::SetDevice(_device.Get());
 		_device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, _commandAllocator.Get(), nullptr, IID_PPV_ARGS(&_commandList));
-		_commandList->Close();
 
 		return EXIT_SUCCESS;
 	}
@@ -342,7 +341,7 @@ namespace Engine
 			rootSignatureDesc.Init(_countof(rootParameters), rootParameters, 1, &sampler, D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
 
 			ComPtr<ID3DBlob> signature;
-			ID3DBlob* error;
+			ID3DBlob* error = nullptr;
 			D3D12SerializeRootSignature(&rootSignatureDesc, D3D_ROOT_SIGNATURE_VERSION_1, &signature, &error);
 			if (!D3DUtils::Succeeded(error))
 			{
@@ -354,20 +353,30 @@ namespace Engine
 				EXIT_FAILURE);
 		}
 
+		//_commandAllocator->Reset();
+		//_commandList->Reset(_commandAllocator.Get(), nullptr);
+
 		// Initialise factory pointers.
-		ResourceFactory::_init(static_cast<DX12Renderer*>(this), _cbvSrvHeap.Get());
+		ResourceFactory::_init(this, _cbvSrvHeap.Get());
 
 		// Create depth buffer.
+		_isRendering = true;
 		CreateDepthBuffer();
+		_isRendering = false;
 
 		// Create GBuffer.
 		_pGBuffer = new GBuffer(_device.Get(), _commandList.Get(), _cbvSrvHeap.Get(), _swapChain.Get());
 
 		// Call the resource creation method.
 		CommandQueue::Enqueue(_createMethod);
+		//ID3D12CommandList* commandLists[] = { _commandList.Get() };
+		_commandList->Close();
+		//_commandQueue->ExecuteCommandLists(1, commandLists);
 		std::vector<ID3D12CommandList*> commandLists = CommandQueue::Process(_device.Get());
+		commandLists.push_back(_commandList.Get());
 		_commandQueue->ExecuteCommandLists(UINT(commandLists.size()), &commandLists[0]);
-		
+
+
 		// Create synchronization objects and wait until assets have been uploaded to the GPU.
 		Sync();
 
@@ -508,10 +517,6 @@ namespace Engine
 		stencilDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
 		stencilDesc.Texture2D.MipSlice = 0;
 
-		/*_device->CreateCommittedResource(&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
-			D3D12_HEAP_FLAG_NONE, &depthDesc, D3D12_RESOURCE_STATE_DEPTH_WRITE, &clearVal,
-			IID_PPV_ARGS(&_pDepthBuffer));*/
-
 		Texture* t = ResourceFactory::CreateTexture(_screenWidth, _screenHeight);
 		t->SetResourceDescription(depthDesc);
 		t->SetHeapDescription(D3D12_HEAP_TYPE_DEFAULT, D3D12_HEAP_FLAG_NONE, D3D12_RESOURCE_STATE_DEPTH_WRITE, clearVal);
@@ -549,7 +554,7 @@ namespace Engine
 	{
 		CD3DX12_CPU_DESCRIPTOR_HANDLE rtvHandle(_rtvHeap->GetCPUDescriptorHandleForHeapStart());
 		rtvHandle.Offset(_frameIndex, D3DUtils::GetRTVDescriptorSize());
-		_commandList->OMSetRenderTargets(1, &rtvHandle, FALSE, &_dsvHeap->GetCPUDescriptorHandleForHeapStart());
+		_commandList->OMSetRenderTargets(1, &rtvHandle, TRUE, &_dsvHeap->GetCPUDescriptorHandleForHeapStart());
 		
 		// Clear the depth buffer.
 		_commandList->ClearDepthStencilView(_dsvHeap->GetCPUDescriptorHandleForHeapStart(), D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 1, &_scissorRect);

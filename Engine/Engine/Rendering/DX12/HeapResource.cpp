@@ -61,6 +61,8 @@ namespace Engine
 				heapDesc.pOptimizedClearValue,
 				IID_PPV_ARGS(&_pResource)));
 
+			_resourceState = heapDesc.InitialResourceState;
+
 			newHeap = true;
 		}
 
@@ -74,7 +76,6 @@ namespace Engine
 		_heapDesc.HeapFlags = flags;
 		_heapDesc.InitialResourceState = initialState;
 		_heapDesc.pOptimizedClearValue = clearValue;
-		_resourceState = initialState;
 	}
 
 	void HeapResource::HeapTask(const std::function<void()>& heapTask)
