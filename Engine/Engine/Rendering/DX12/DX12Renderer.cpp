@@ -387,9 +387,7 @@ namespace Engine
 	{
 		ResourceFactory::AssignCommandList(_commandList.Get());
 		_commandList->Reset(_commandAllocator.Get(), nullptr);
-		_commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(_renderTargets[_frameIndex].Get(),
-			D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET));
-		
+
 		// Set necessary state.
 		_commandList->SetGraphicsRootSignature(_rootSignature.Get());
 
@@ -397,7 +395,7 @@ namespace Engine
 		ID3D12DescriptorHeap* ppHeaps[] = {_cbvSrvHeap.Get()};
 		_commandList->SetDescriptorHeaps(_countof(ppHeaps), ppHeaps);
 
-		CD3DX12_GPU_DESCRIPTOR_HANDLE rootHandle(ppHeaps[0]->GetGPUDescriptorHandleForHeapStart(), 0, D3DUtils::GetSRVDescriptorSize() * GBuffer::GBUFFER_NUM_TEXTURES);
+		CD3DX12_GPU_DESCRIPTOR_HANDLE rootHandle(ppHeaps[0]->GetGPUDescriptorHandleForHeapStart());
 		_commandList->SetGraphicsRootDescriptorTable(0, rootHandle);
 		rootHandle.Offset(ResourceFactory::CBufferLimit, D3DUtils::GetSRVDescriptorSize());
 		_commandList->SetGraphicsRootDescriptorTable(1, rootHandle);
@@ -405,12 +403,15 @@ namespace Engine
 		_commandList->RSSetScissorRects(1, &_scissorRect);
 		Material::ClearPSOHistory();
 
+		_commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(_renderTargets[_frameIndex].Get(),
+			D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET));
+
 		_pGBuffer->Write();
 		_pGBuffer->Clear();
 
 		// Execute the draw loop function.
 		_commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		_drawLoop();
+		//_drawLoop();
 
 		_pGBuffer->Present();
 		_pGBuffer->DrawTextures();

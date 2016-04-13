@@ -43,9 +43,8 @@ namespace Engine
 		}
 
 		_heapSize = size_t(offset);
-		PrepareHeapResource();
-
-		HeapManager::Upload(this, memory.get(), D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
+		PrepareHeapResource(D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
+		HeapManager::Upload(this, memory.get());
 
 		// Initialize the vertex buffer view.
 		if (!sameSize)

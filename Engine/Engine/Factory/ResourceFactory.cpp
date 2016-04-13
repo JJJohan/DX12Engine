@@ -12,9 +12,7 @@ namespace Engine
 	ID3D12DescriptorHeap* ResourceFactory::_pCbvSrvHeap = nullptr;
 	thread_local ID3D12CommandList* ResourceFactory::_pCommandList = nullptr;
 
-	int ResourceFactory::_cbufferIndex = 0;
 	int ResourceFactory::_textureIndex = 0;
-	std::vector<bool> ResourceFactory::_cbufferSlots = std::vector<bool>(CBufferLimit);
 	std::vector<bool> ResourceFactory::_textureSlots = std::vector<bool>(TextureLimit);
 
 	void ResourceFactory::AssignCommandList(ID3D12CommandList* commandList)
@@ -85,11 +83,6 @@ namespace Engine
 		{
 			_textureSlots.push_back(false);
 		}
-
-		for (int i = 0; i < CBufferLimit; ++i)
-		{
-			_cbufferSlots.push_back(false);
-		}
 	}
 
 	int ResourceFactory::GetTextureSlot()
@@ -109,25 +102,6 @@ namespace Engine
 	void ResourceFactory::FreeTextureSlot(int index)
 	{
 		_textureSlots[index - CBufferLimit] = false;
-	}
-
-	int ResourceFactory::GetCBufferSlot()
-	{
-		for (int i = 0; i < CBufferLimit; ++i)
-		{
-			if (_cbufferSlots[i] == false)
-			{
-				_cbufferSlots[i] = true;
-				return i;
-			}
-		}
-
-		return -1;
-	}
-
-	void ResourceFactory::FreeCBufferSlot(int index)
-	{
-		_cbufferSlots[index] = false;
 	}
 }
 

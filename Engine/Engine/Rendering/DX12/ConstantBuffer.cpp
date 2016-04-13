@@ -62,7 +62,7 @@ namespace Engine
 		_heapSize = packed;
 		MarkDynamic();
 
-		HeapManager::Upload(this, _pCopyBuffer, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
+		HeapManager::Upload(this, _pCopyBuffer);
 
 		// Create the resource view.
 		if (!sameSize)

@@ -157,7 +157,7 @@ namespace Engine
 		{
 			_pTextures[i] = ResourceFactory::CreateTexture(_screenWidth, _screenHeight);
 			_pTextures[i]->SetResourceDescription(textureDesc);
-			_pTextures[i]->SetHeapDescription(D3D12_HEAP_TYPE_DEFAULT, D3D12_HEAP_FLAG_NONE, D3D12_RESOURCE_STATE_RENDER_TARGET, texClearVal);
+			_pTextures[i]->SetHeapDescription(D3D12_HEAP_TYPE_DEFAULT, D3D12_HEAP_FLAG_NONE, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, texClearVal);
 			_pTextures[i]->Apply();
 		}
 

@@ -45,6 +45,7 @@ namespace Engine
 	void RenderObject::SetVertexBuffer(VertexBufferInstance* vertexBuffer)
 	{
 		_pVertexBuffer = vertexBuffer;
+		_pCbuffer->SetVertexBuffer(_pVertexBuffer);
 	}
 
 	VertexBufferInstance* RenderObject::GetVertexBuffer() const

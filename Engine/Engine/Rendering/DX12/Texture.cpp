@@ -126,7 +126,6 @@ namespace Engine
 		}
 
 		// Describe and create a Texture2D description.
-		D3D12_RESOURCE_STATES initialState = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
 		if (!_customDesc)
 		{
 			_textureDesc = {};
@@ -139,13 +138,12 @@ namespace Engine
 			_textureDesc.SampleDesc.Count = 1;
 			_textureDesc.SampleDesc.Quality = 0;
 			_textureDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
-			initialState = _resourceState;
 		}
 
 		// Allocate space and upload to the heap.
 		_heapSize = _width * _height * 4;
 		PrepareHeapResource(_textureDesc);
-		HeapManager::Upload(this, _fileBuffer.get(), _width * 4, int(_heapSize), initialState);
+		HeapManager::Upload(this, _fileBuffer.get(), _width * 4, int(_heapSize));
 
 		// Create descriptor handle if custom one is not provided.
 		_heapHandle = CD3DX12_CPU_DESCRIPTOR_HANDLE(_pSrvHeap->GetCPUDescriptorHandleForHeapStart(), _index, D3DUtils::GetSRVDescriptorSize());

@@ -29,6 +29,7 @@ namespace Engine
 			}
 			else
 			{
+				heapResource->_pResource = heapResource->_pHeap;
 				_dynamicUploadHeaps.push_back(heapResource);
 			}
 			_mutex.unlock();
@@ -85,12 +86,12 @@ namespace Engine
 		_staticUploadHeaps.clear();
 	}
 
-	void HeapManager::Upload(HeapResource* heap, void* data, enum D3D12_RESOURCE_STATES destState)
+	void HeapManager::Upload(HeapResource* heap, void* data)
 	{
-		Upload(heap, data, int(heap->_heapSize), int(heap->_heapSize), destState);
+		Upload(heap, data, int(heap->_heapSize), int(heap->_heapSize));
 	}
 
-	void HeapManager::Upload(HeapResource* heap, void* data, int rowPitch, int slicePitch, enum D3D12_RESOURCE_STATES destState)
+	void HeapManager::Upload(HeapResource* heap, void* data, int rowPitch, int slicePitch)
 	{
 		if (heap->_pHeap == nullptr)
 		{
@@ -111,16 +112,12 @@ namespace Engine
 			subresourceData.pData = data;
 			subresourceData.RowPitch = LONG_PTR(rowPitch);
 			subresourceData.SlicePitch = LONG_PTR(slicePitch);
-
-			if (heap->_resourceState != D3D12_RESOURCE_STATE_COPY_DEST)
-			{
-				commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(heap->_pResource, heap->_resourceState, D3D12_RESOURCE_STATE_COPY_DEST));
-			}
+			
+			commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(heap->_pResource, heap->_resourceState, D3D12_RESOURCE_STATE_COPY_DEST));
 
 			UpdateSubresources(commandList, heap->_pResource, heap->_pHeap, 0, 0, 1, &subresourceData);
 
-			commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(heap->_pResource, D3D12_RESOURCE_STATE_COPY_DEST, destState));
-			heap->_resourceState = destState;
+			commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(heap->_pResource, D3D12_RESOURCE_STATE_COPY_DEST, heap->_resourceState));
 		}
 		else
 		{
@@ -129,7 +126,6 @@ namespace Engine
 			LOGFAILEDCOM(heap->_pHeap->Map(0, &readRange, reinterpret_cast<void**>(&dest)));
 			memcpy(dest, data, rowPitch);
 			heap->_pHeap->Unmap(0, nullptr);
-			heap->_pResource = heap->_pHeap;
 		}
 	}
 

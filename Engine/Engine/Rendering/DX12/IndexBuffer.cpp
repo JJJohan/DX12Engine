@@ -34,9 +34,9 @@ namespace Engine
 		}
 
 		_heapSize = size_t(offset);
-		PrepareHeapResource();
+		PrepareHeapResource(D3D12_RESOURCE_STATE_INDEX_BUFFER);
 
-		HeapManager::Upload(this, memory.get(), D3D12_RESOURCE_STATE_INDEX_BUFFER);
+		HeapManager::Upload(this, memory.get());
 
 		// Initialize the index buffer view.
 		if (!sameSize)

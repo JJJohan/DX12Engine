@@ -19,12 +19,12 @@ namespace Engine
 		HeapManager::ReleaseHeap(this);
 	}
 
-	bool HeapResource::PrepareHeapResource()
+	bool HeapResource::PrepareHeapResource(D3D12_RESOURCE_STATES state)
 	{
 		return PrepareHeapResource(CD3DX12_RESOURCE_DESC::Buffer(_heapSize));
 	}
 
-	bool HeapResource::PrepareHeapResource(const D3D12_RESOURCE_DESC& resourceDesc)
+	bool HeapResource::PrepareHeapResource(const D3D12_RESOURCE_DESC& resourceDesc, D3D12_RESOURCE_STATES state)
 	{
 		HeapDesc heapDesc;
 		if (_customHeapDesc)
@@ -35,7 +35,7 @@ namespace Engine
 		{
 			heapDesc.HeapType = D3D12_HEAP_TYPE_DEFAULT;
 			heapDesc.HeapFlags = D3D12_HEAP_FLAG_NONE;
-			heapDesc.InitialResourceState = D3D12_RESOURCE_STATE_COPY_DEST;
+			heapDesc.InitialResourceState = state;
 			heapDesc.pOptimizedClearValue = nullptr;
 		}
 
