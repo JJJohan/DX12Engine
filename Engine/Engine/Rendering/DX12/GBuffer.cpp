@@ -10,13 +10,20 @@
 
 namespace Engine
 {
+	const GBuffer::BufferFormat GBuffer::Buffers[GBUFFER_NUM_BUFFERS] =
+	{
+		{ GBUFFER_BUFFER_TYPE_ALBEDO_ROUGHNESS, DXGI_FORMAT_R8G8B8A8_UNORM },
+		{ GBUFFER_BUFFER_TYPE_NORMAL_METALLIC, DXGI_FORMAT_R8G8B8A8_UNORM },
+		{ GBUFFER_BUFFER_TYPE_TEXCOORD, DXGI_FORMAT_R8G8_UNORM },
+		{ GBUFFER_BUFFER_TYPE_DEPTH, DXGI_FORMAT_R8_UNORM },
+	};
+
 	GBuffer::GBuffer(ID3D12Device* device, ID3D12GraphicsCommandList* commandList, ID3D12DescriptorHeap* srvHeap, IDXGISwapChain3* swapChain)
 		: _pRtvHeap(nullptr)
 		, _pSrvHeap(srvHeap)
 		, _pDevice(device)
 		, _pCommandList(commandList)
 		, _pSwapChain(swapChain)
-		, _pDepthTexture(nullptr)
 		, _pScreenMaterial(nullptr)
 		, _screenWidth(0)
 		, _screenHeight(0)
@@ -33,22 +40,18 @@ namespace Engine
 	GBuffer::~GBuffer()
 	{
 		// Release textures.
-		for (int i = 0; i < GBUFFER_NUM_TEXTURES; ++i)
+		for (int i = 0; i < GBUFFER_NUM_BUFFERS; ++i)
 		{
 			delete _pTextures[i];
 			_pTextures[i] = nullptr;
 		}
 
 		// Release quads.
-		for (int i = 0; i < GBUFFER_NUM_TEXTURES + 1; ++i)
+		for (int i = 0; i < GBUFFER_NUM_BUFFERS; ++i)
 		{
 			delete _pScreenQuads[i];
 			_pScreenQuads[i] = nullptr;
 		}
-
-		// Release depth texture.
-		delete _pDepthTexture;
-		_pDepthTexture = nullptr;
 
 		// Release screen resources.
 		delete _pScreenMaterial;
@@ -70,7 +73,7 @@ namespace Engine
 	{
 		// Describe and create a render target view (RTV) descriptor heap.
 		D3D12_DESCRIPTOR_HEAP_DESC rtvHeapDesc = {};
-		rtvHeapDesc.NumDescriptors = GBUFFER_NUM_TEXTURES;
+		rtvHeapDesc.NumDescriptors = GBUFFER_NUM_BUFFERS;
 		rtvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
 		rtvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
 		LOGFAILEDCOM(_pDevice->CreateDescriptorHeap(&rtvHeapDesc, IID_PPV_ARGS(&_pRtvHeap)));
@@ -95,14 +98,14 @@ namespace Engine
 		};
 
 		// Initialise screen quad
-		for (int i = 0; i < GBUFFER_NUM_TEXTURES + 1; ++i)
+		for (int i = 0; i < GBUFFER_NUM_BUFFERS; ++i)
 		{
 			Material* material = ResourceFactory::CreateMaterial();
 			material->LoadPixelShader(GetRelativePath("Shaders\\Quad.hlsl"), "PSMain", "ps_5_1");
 			material->LoadVertexShader(GetRelativePath("Shaders\\Quad.hlsl"), "VSMain", "vs_5_1");
 			material->Finalise(Material::Default_Input_Layout, false, false);
 
-			VertexBufferInstance* vertexBuffer = ResourceFactory::CreateVertexBufferInstance();
+			VertexBufferInstance* vertexBuffer = ResourceFactory::CreateVertexBufferInstance(VERTEX_POS_COL_UV);
 			vertexBuffer->SetVertices(vertices);
 
 			IndexBufferInstance* indexBuffer = ResourceFactory::CreateIndexBufferInstance();
@@ -124,37 +127,38 @@ namespace Engine
 		_pScreenQuads[0]->GetMaterial()->SetTexture(_pTextures[0]);
 		_pScreenQuads[1]->GetMaterial()->SetTexture(_pTextures[1]);
 		_pScreenQuads[2]->GetMaterial()->SetTexture(_pTextures[2]);
-		_pScreenQuads[3]->GetMaterial()->SetTexture(_pDepthTexture);
+		_pScreenQuads[3]->GetMaterial()->SetTexture(_pTextures[3]);
+
+		_pScreenQuads[0]->GetMaterial()->SetDepthMode(false, ALWAYS);
+		_pScreenQuads[1]->GetMaterial()->SetDepthMode(false, ALWAYS);
+		_pScreenQuads[2]->GetMaterial()->SetDepthMode(false, ALWAYS);
+		_pScreenQuads[3]->GetMaterial()->SetDepthMode(false, ALWAYS);
 	}
 
 	void GBuffer::CreateTextures()
 	{
-		// Create a resource description for the textures.
-		D3D12_RESOURCE_DESC textureDesc = {};
-		textureDesc.MipLevels = 1;
-		textureDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-		textureDesc.Width = _screenWidth;
-		textureDesc.Height = _screenHeight;
-		textureDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET;
-		textureDesc.DepthOrArraySize = 1;
-		textureDesc.SampleDesc.Count = 1;
-		textureDesc.SampleDesc.Quality = 0;
-		textureDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
-
-		D3D12_DEPTH_STENCIL_VALUE texStencilVal;
-		texStencilVal.Depth = 1;
-		texStencilVal.Stencil = 0;
-		D3D12_CLEAR_VALUE* texClearVal = new D3D12_CLEAR_VALUE();
-		texClearVal->Format = textureDesc.Format;
-		texClearVal->DepthStencil = texStencilVal;
-		texClearVal->Color[0] = 0.0f;
-		texClearVal->Color[1] = 0.0f;
-		texClearVal->Color[2] = 0.0f;
-		texClearVal->Color[3] = 1.0f;
-
 		// Create textures.
-		for (int i = 0; i < GBUFFER_NUM_TEXTURES; ++i)
+		for (int i = 0; i < GBUFFER_NUM_BUFFERS; ++i)
 		{
+			// Create a resource description for the textures.
+			D3D12_RESOURCE_DESC textureDesc = {};
+			textureDesc.Format = Buffers[i].Format;
+			textureDesc.MipLevels = 1;
+			textureDesc.Width = _screenWidth;
+			textureDesc.Height = _screenHeight;
+			textureDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET;
+			textureDesc.DepthOrArraySize = 1;
+			textureDesc.SampleDesc.Count = 1;
+			textureDesc.SampleDesc.Quality = 0;
+			textureDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+
+			D3D12_CLEAR_VALUE* texClearVal = new D3D12_CLEAR_VALUE();
+			texClearVal->Color[0] = 0.0f;
+			texClearVal->Color[1] = 0.0f;
+			texClearVal->Color[2] = 0.0f;
+			texClearVal->Color[3] = 1.0f;
+
+			texClearVal->Format = textureDesc.Format;
 			_pTextures[i] = ResourceFactory::CreateTexture(_screenWidth, _screenHeight);
 			_pTextures[i]->SetResourceDescription(textureDesc);
 			_pTextures[i]->SetHeapDescription(D3D12_HEAP_TYPE_DEFAULT, D3D12_HEAP_FLAG_NONE, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, texClearVal);
@@ -168,14 +172,14 @@ namespace Engine
 	{
 		// Render target view description.
 		D3D12_RENDER_TARGET_VIEW_DESC rtvDesc = {};
-		rtvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 		rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
 		rtvDesc.Texture2D.MipSlice = 0;
 		rtvDesc.Texture2D.PlaneSlice = 0;
 
 		// Create render textures.
-		for (int i = 0; i < GBUFFER_NUM_TEXTURES; ++i)
+		for (int i = 0; i < GBUFFER_NUM_BUFFERS; ++i)
 		{
+			rtvDesc.Format = Buffers[i].Format;
 			_pDevice->CreateRenderTargetView(_pTextures[i]->GetResource(), &rtvDesc, _rtvHandle);
 			_rtvHandle.Offset(1, D3DUtils::GetRTVDescriptorSize());
 		}
@@ -185,42 +189,40 @@ namespace Engine
 	{
 		return _pRtvHeap;
 	}
-
-	void GBuffer::Write() const
+	
+	void GBuffer::Clear(ID3D12DescriptorHeap* dsvHeap)
 	{
+		// Set the viewport.
+		_pCommandList->RSSetViewports(1, &Camera::Main()->GetViewPort());
+
 		// Indicate that the GBuffer textures will be used as render targets.
-		for (int i = 0; i < GBUFFER_NUM_TEXTURES; ++i)
+		for (int i = 0; i < GBUFFER_NUM_BUFFERS; ++i)
 		{
 			_pCommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(_pTextures[i]->GetResource(),
 				D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_RENDER_TARGET));
 		}
-		
+
 		// Bind the render target view array and depth stencil buffer to the output render pipeline.
 		CD3DX12_CPU_DESCRIPTOR_HANDLE rtvHandle = CD3DX12_CPU_DESCRIPTOR_HANDLE(
 			_pRtvHeap->GetCPUDescriptorHandleForHeapStart(),
 			0,
 			D3DUtils::GetRTVDescriptorSize());
-		_pCommandList->OMSetRenderTargets(GBUFFER_NUM_TEXTURES, &rtvHandle, TRUE, &DX12Renderer::Get()->GetDepthBufferHeap()->GetCPUDescriptorHandleForHeapStart());
 
-		// Set the viewport.
-		_pCommandList->RSSetViewports(1, &Camera::Main()->GetViewPort());
-	}
+		_pCommandList->OMSetRenderTargets(GBUFFER_NUM_BUFFERS, &rtvHandle, TRUE, &dsvHeap->GetCPUDescriptorHandleForHeapStart());
 
-	void GBuffer::Clear()
-	{
 		// Clear the render target buffers.
 		FLOAT clearColour[] = { 0.0f, 0.0f, 0.0f, 1.0f };
 		_rtvHandle = CD3DX12_CPU_DESCRIPTOR_HANDLE(_pRtvHeap->GetCPUDescriptorHandleForHeapStart());
-		for (int i = 0; i < GBUFFER_NUM_TEXTURES; ++i)
+		for (int i = 0; i < GBUFFER_NUM_BUFFERS; ++i)
 		{
-			_pCommandList->ClearRenderTargetView(_rtvHandle, clearColour, 1, &_screenRect);
+			_pCommandList->ClearRenderTargetView(_rtvHandle, clearColour, 0, nullptr);
 			_rtvHandle.Offset(1, D3DUtils::GetRTVDescriptorSize());
 		}
 	}
 
 	void GBuffer::DrawTextures()
 	{
-		for (int i = 0; i < GBUFFER_NUM_TEXTURES + 1; ++i)
+		for (int i = 0; i < GBUFFER_NUM_BUFFERS; ++i)
 		{
 			_pScreenQuads[i]->Update();
 			_pScreenQuads[i]->Draw();
@@ -230,7 +232,7 @@ namespace Engine
 	void GBuffer::Present() const
 	{
 		// Indicate that the GBuffer textures will now be used to present.
-		for (int i = 0; i < GBUFFER_NUM_TEXTURES; ++i)
+		for (int i = 0; i < GBUFFER_NUM_BUFFERS; ++i)
 		{
 			_pCommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(_pTextures[i]->GetResource(),
 				D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE));

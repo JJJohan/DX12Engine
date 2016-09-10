@@ -28,10 +28,13 @@ namespace Engine
 		bool IsRendering() const;
 		void BindBackBuffer() const;
 		ID3D12DescriptorHeap* GetDepthBufferHeap() const;
+		ID3D12Resource* GetDepthBuffer() const;
 
 		static DX12Renderer* Get();
 
 		void Sync();
+		
+		int DepthBufferIndex;
 
 	private:
 		void GetHardwareAdapter(IDXGIFactory2* pFactory, IDXGIAdapter3** ppAdapter);

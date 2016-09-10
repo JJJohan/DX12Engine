@@ -13,6 +13,7 @@ namespace Engine
 		void Bind(ID3D12GraphicsCommandList* commandList) const;
 		void SetResourceDescription(const D3D12_RESOURCE_DESC& desc);
 		void Apply();
+		void SetRootSlot(int value);
 
 	private:
 		Texture(int width, int height);
@@ -31,6 +32,7 @@ namespace Engine
 		// Image data
 		int _width;
 		int _height;
+		int _rootSlot;
 		size_t _size;
 
 		friend class ResourceFactory;

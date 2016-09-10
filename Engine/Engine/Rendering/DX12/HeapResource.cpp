@@ -8,11 +8,13 @@ namespace Engine
 		: _pDevice(nullptr)
 		, _pResource(nullptr)
 		, _heapSize(0)
+		, _resourceState()
 		, _dynamic(false)
 		, _customHeapDesc(false)
 		, _lastHeapSize(0)
 		, _pHeap(nullptr)
-	{ }
+	{
+	}
 
 	HeapResource::~HeapResource()
 	{

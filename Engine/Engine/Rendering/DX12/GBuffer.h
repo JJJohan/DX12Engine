@@ -15,21 +15,28 @@ namespace Engine
 
 		ID3D12DescriptorHeap* GetRTVHeap() const;
 
-		void Write() const;
 		void Present() const;
-		void Clear();
+		void Clear(ID3D12DescriptorHeap* dsvHeap);
 		void Resize();
 
 		void DrawTextures();
 
-		enum GBUFFER_TEXTURE_TYPE 
+		enum BufferType 
 		{
-			GBUFFER_TEXTURE_TYPE_POSITION,
-			GBUFFER_TEXTURE_TYPE_DIFFUSE,
-			//GBUFFER_TEXTURE_TYPE_NORMAL,
-			GBUFFER_TEXTURE_TYPE_TEXCOORD,
-			GBUFFER_NUM_TEXTURES
+			GBUFFER_BUFFER_TYPE_ALBEDO_ROUGHNESS,
+			GBUFFER_BUFFER_TYPE_NORMAL_METALLIC,
+			GBUFFER_BUFFER_TYPE_TEXCOORD,
+			GBUFFER_BUFFER_TYPE_DEPTH,
+			GBUFFER_NUM_BUFFERS
 		};
+
+		struct BufferFormat
+		{
+			BufferType Type;
+			DXGI_FORMAT Format;
+		};
+
+		const static BufferFormat Buffers[GBUFFER_NUM_BUFFERS];
 
 	private:
 		void FinishResourceInit();
@@ -48,9 +55,8 @@ namespace Engine
 
 		CD3DX12_CPU_DESCRIPTOR_HANDLE _rtvHandle;
 
-		Texture* _pTextures[GBUFFER_NUM_TEXTURES];
-		Texture* _pDepthTexture;
-		RenderObject* _pScreenQuads[GBUFFER_NUM_TEXTURES + 1];
+		Texture* _pTextures[GBUFFER_NUM_BUFFERS];
+		RenderObject* _pScreenQuads[GBUFFER_NUM_BUFFERS];
 		Material* _pScreenMaterial;
 		
 		int _screenWidth;

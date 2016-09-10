@@ -15,7 +15,7 @@ namespace Engine
 	{
 		// Vertex Buffer
 		std::vector<Vertex> vertices(24);
-		Vector3 tl, tr, bl, br;
+		Vector3 tl, tr, bl, br, normal;
 		for (int i = 0, idx = 0; i < 6; ++i, idx += 4)
 		{
 			switch (i)
@@ -26,6 +26,7 @@ namespace Engine
 				tr = Vector3(i == 0 ? 0.5f : -0.5f, 0.5f, i == 0 ? -0.5f : 0.5f);
 				bl = Vector3(i == 0 ? -0.5f : 0.5f, -0.5f, i == 0 ? -0.5f : 0.5f);
 				br = Vector3(i == 0 ? 0.5f : -0.5f, -0.5f, i == 0 ? -0.5f : 0.5f);
+				normal = Vector3(0, 0, i == 0 ? -1 : 1);
 				break;
 			case 1: // Left
 			case 3: // Right
@@ -33,6 +34,7 @@ namespace Engine
 				tr = Vector3(i == 1 ? -0.5f : 0.5f, 0.5f, i == 1 ? -0.5f : 0.5f);
 				bl = Vector3(i == 1 ? -0.5f : 0.5f, -0.5f, i == 1 ? 0.5f : -0.5f);
 				br = Vector3(i == 1 ? -0.5f : 0.5f, -0.5f, i == 1 ? -0.5f : 0.5f);
+				normal = Vector3(i == 0 ? -1 : 1, 0, 0);
 				break;
 			case 4: // Top
 			case 5: // Bottom
@@ -40,13 +42,14 @@ namespace Engine
 				tr = Vector3(i == 4 ? 0.5f : -0.5f, i == 5 ? -0.5f : 0.5f, 0.5f);
 				bl = Vector3(i == 4 ? -0.5f : 0.5f, i == 5 ? -0.5f : 0.5f, -0.5f);
 				br = Vector3(i == 4 ? 0.5f : -0.5f, i == 5 ? -0.5f : 0.5f, -0.5f);
+				normal = Vector3(0, i == 0 ? -1 : 1, 0);
 				break;
 			}
 
-			vertices[idx] = Vertex(tl, Colour::White, Vector2(0, 0));
-			vertices[idx + 1] = Vertex(tr, Colour::White, Vector2(1, 0));
-			vertices[idx + 2] = Vertex(bl, Colour::White, Vector2(0, 1));
-			vertices[idx + 3] = Vertex(br, Colour::White, Vector2(1, 1));
+			vertices[idx] = Vertex(tl, Colour::White, Vector2(0, 0), normal);
+			vertices[idx + 1] = Vertex(tr, Colour::White, Vector2(1, 0), normal);
+			vertices[idx + 2] = Vertex(bl, Colour::White, Vector2(0, 1), normal);
+			vertices[idx + 3] = Vertex(br, Colour::White, Vector2(1, 1), normal);
 		}
 		VertexBufferInstance* vertexBuffer = ResourceFactory::CreateVertexBufferInstance();
 		vertexBuffer->SetVertices(vertices);
@@ -116,7 +119,7 @@ namespace Engine
 					sinf(pi * vertical) * sinf(2 * pi * horizontal),
 					cosf(pi * vertical));
 
-				vertices[idx++] = Vertex(point, Colour::White, Vector2(vertical, horizontal));
+				vertices[idx++] = Vertex(point, Colour::White, Vector2(vertical, horizontal), point);
 			}
 		}
 
@@ -183,6 +186,7 @@ namespace Engine
 
 		std::vector<Vector3> positions(vertexCount);
 		std::vector<Vector2> uvs(vertexCount);
+		std::vector<Vector3> normals(vertexCount);
 		std::vector<int> indices((indicesPerCap + sides) * 6);
 
 		float curTheta = 0.0f;
@@ -198,36 +202,40 @@ namespace Engine
 		// Top cap
 		for (int i = 0; i < verticesPerCircle; ++i)
 		{
-			positions[posIndex++] = Vector3(halfCosThetas[i], 0.5f, halfSinThetas[i]);
+			positions[posIndex] = Vector3(halfCosThetas[i], 0.5f, halfSinThetas[i]);
 			uvs[uvIndex++] = Vector2(halfCosThetas[i] + 0.5f, halfSinThetas[i] + 0.5f);
+			normals[posIndex++] = Vector3(0.0f, 1.0f, 0.0f);
 		}
 		for (int i = 0; i < indicesPerCap; ++i)
 		{
-			indices[triIndex++] = 0;
-			indices[triIndex++] = i + 1;
 			indices[triIndex++] = i + 2;
+			indices[triIndex++] = i + 1;
+			indices[triIndex++] = 0;
 		}
 
 		// Bottom cap
 		for (int i = 0; i < verticesPerCircle; ++i)
 		{
-			positions[posIndex++] = Vector3(halfCosThetas[i], -0.5f, halfSinThetas[i]);
+			positions[posIndex] = Vector3(halfCosThetas[i], -0.5f, halfSinThetas[i]);
 			uvs[uvIndex++] = Vector2(halfCosThetas[i] + 0.5f, -halfSinThetas[i] + 0.5f);
+			normals[posIndex++] = Vector3(0.0f, -1.0f, 0.0f);
 		}
 		for (int i = 0; i < indicesPerCap; ++i)
 		{
-			indices[triIndex++] = verticesPerCircle + i + 2;
-			indices[triIndex++] = verticesPerCircle + i + 1;
 			indices[triIndex++] = verticesPerCircle;
+			indices[triIndex++] = verticesPerCircle + i + 1;
+			indices[triIndex++] = verticesPerCircle + i + 2;
 		}
 
 		// Top cap (for the sides)
 		float curU = 1.0f;
 		for (int i = 0; i < verticesPerCircle; ++i)
 		{
-			positions[posIndex++] = Vector3(halfCosThetas[i], 0.5f, halfSinThetas[i]);
+			positions[posIndex] = Vector3(halfCosThetas[i], 0.5f, halfSinThetas[i]);
 			uvs[uvIndex++] = Vector2(curU, 0.0f);
-
+			normals[posIndex] = positions[posIndex];
+			++posIndex;
+			
 			curU -= stepU;
 		}
 
@@ -235,8 +243,10 @@ namespace Engine
 		curU = 1.0f;
 		for (int i = 0; i < verticesPerCircle; ++i)
 		{
-			positions[posIndex++] = Vector3(halfCosThetas[i], -0.5f, halfSinThetas[i]);
+			positions[posIndex] = Vector3(halfCosThetas[i], -0.5f, halfSinThetas[i]);
 			uvs[uvIndex++] = Vector2(curU, 1.0f);
+			normals[posIndex] = positions[posIndex];
+			++posIndex;
 
 			curU -= stepU;
 		}
@@ -244,21 +254,21 @@ namespace Engine
 		for (int i = 0; i < sides; ++i)
 		{
 			// Top tri
-			indices[triIndex++] = firstSidePos + verticesPerCircle + i + 1; // bottom-right
-			indices[triIndex++] = firstSidePos + i + 1; // top-right
 			indices[triIndex++] = firstSidePos + i; // top-left
+			indices[triIndex++] = firstSidePos + i + 1; // top-right
+			indices[triIndex++] = firstSidePos + verticesPerCircle + i + 1; // bottom-right
 
 			// Bottom tri
-			indices[triIndex++] = firstSidePos + verticesPerCircle + i; // bottom-left
-			indices[triIndex++] = firstSidePos + verticesPerCircle + i + 1; // bottom-right
 			indices[triIndex++] = firstSidePos + i; // top-left
+			indices[triIndex++] = firstSidePos + verticesPerCircle + i + 1; // bottom-right
+			indices[triIndex++] = firstSidePos + verticesPerCircle + i; // bottom-left
 		}
 
 		// Combine vertex data
 		std::vector<Vertex> vertices(vertexCount);
 		for (int i = 0; i < vertexCount; ++i)
 		{
-			vertices[i] = Vertex(positions[i], Colour::White, uvs[i]);
+			vertices[i] = Vertex(positions[i], Colour::White, uvs[i], normals[i]);
 		}
 
 		// Vertex Buffer
@@ -292,10 +302,10 @@ namespace Engine
 		// Vertex Buffer
 		std::vector<Vertex> vertices
 		{
-			Vertex(Vector3(-0.5f, 0.5f, 0.0f), Colour::White, Vector2(0, 0)),
-			Vertex(Vector3(0.5f, 0.5f, 0.0f), Colour::White, Vector2(1, 0)),
-			Vertex(Vector3(-0.5f, -0.5f, 0.0f), Colour::White, Vector2(0, 1)),
-			Vertex(Vector3(0.5f, -0.5f, 0.0f), Colour::White, Vector2(1, 1))
+			Vertex(Vector3(-0.5f, 0.5f, 0.0f), Colour::White, Vector2(0, 0), Vector3(0.0f, 0.0f, -1.0f)),
+			Vertex(Vector3(0.5f, 0.5f, 0.0f), Colour::White, Vector2(1, 0), Vector3(0.0f, 0.0f, -1.0f)),
+			Vertex(Vector3(-0.5f, -0.5f, 0.0f), Colour::White, Vector2(0, 1), Vector3(0.0f, 0.0f, -1.0f)),
+			Vertex(Vector3(0.5f, -0.5f, 0.0f), Colour::White, Vector2(1, 1), Vector3(0.0f, 0.0f, -1.0f))
 		};
 		VertexBufferInstance* vertexBuffer = ResourceFactory::CreateVertexBufferInstance();
 		vertexBuffer->SetVertices(vertices);

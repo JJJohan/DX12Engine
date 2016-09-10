@@ -34,8 +34,15 @@ namespace Engine
 		_releaseRequested = true;
 		_releaseMutex.unlock();
 
-		_commandAllocator->Release();
-		_commandList->Release();
+		if (_commandAllocator != nullptr)
+		{
+			_commandAllocator->Release();
+		}
+		
+		if (_commandList != nullptr)
+		{
+			_commandList->Release();
+		}
 
 		for (auto it = _commandThreads.begin(); it != _commandThreads.end(); ++it)
 		{

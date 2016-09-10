@@ -85,6 +85,13 @@ namespace Engine
 		return message;
 	}
 
+	//Returns a COM error message.
+	String Logging::GetCOMError(const _com_error& error, const String& caller)
+	{
+
+		return String(caller + ": " + error.ErrorMessage());
+	}
+
 	void Logging::EnableFileLogging(bool enabled)
 	{
 		_logToFile = enabled;

@@ -99,7 +99,7 @@ namespace Engine
 			XMMATRIX world = XMMatrixTranspose(Transform.GetMatrix());
 			XMFLOAT4X4 worldT;
 			XMStoreFloat4x4(&worldT, world);
-			_pCbuffer->SetMatrix("world", worldT);
+			_pCbuffer->SetData("world", worldT);
 			_pVertexBuffer->SetBufferIndex(_pCbuffer->GetIndex());
 		}
 	}
@@ -124,12 +124,20 @@ namespace Engine
 
 		if (_pVertexBuffer == nullptr)
 		{
-			_pVertexBuffer = ResourceFactory::CreateVertexBufferInstance();
+			_pVertexBuffer = ResourceFactory::CreateVertexBufferInstance(VERTEX_POS_COL_UV);
 			_pIndexBuffer = ResourceFactory::CreateIndexBufferInstance();
 			_pMaterial = ResourceFactory::CreateMaterial();
 			_pMaterial->SetTexture(_pFont->_pTexture);
 			_pMaterial->LoadVertexShader(GetRelativePath("Shaders\\Font.hlsl"), "VSMain", "vs_5_1");
 			_pMaterial->LoadPixelShader(GetRelativePath("Shaders\\Font.hlsl"), "PSMain", "ps_5_1");
+			if (Transform.GetIs2D())
+			{
+				_pMaterial->SetDepthMode(false, ALWAYS);
+			}
+			else
+			{
+				_pMaterial->SetDepthMode(true, LESS_EQUAL);
+			}
 			_pMaterial->Finalise(_pVertexBuffer->GetInputLayout(), true);
 		}
 

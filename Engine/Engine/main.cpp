@@ -61,18 +61,6 @@ void Game::RemoveTriangles()
 
 void Game::Start()
 {
-	// Create an example triangle object.
-	std::vector<Vertex> triangleVertices =
-		{
-			{{-0.25f, 0.25f, 0.0f},{1.0f, 1.0f, 1.0f, 1.0f},{0.0f, 0.0f}},
-			{{0.25f, -0.25f, 0.0f},{1.0f, 1.0f, 1.0f, 1.0f},{1.0f, 64.0f}},
-			{{-0.25f, -0.25f, 0.0f},{1.0f, 1.0f, 1.0f, 1.0f},{0.0f, 64.0f}},
-
-			{{-0.25f, 0.25f, 0.0f},{1.0f, 1.0f, 1.0f, 1.0f},{0.0f, 0.0f}},
-			{{0.25f, 0.25f, 0.0f},{1.0f, 1.0f, 1.0f, 1.0f},{1.0f, 0.0f}},
-			{{0.25f, -0.25f, 0.0f},{1.0f, 1.0f, 1.0f, 1.0f},{1.0f, 64.0f}}
-		};
-
 	_pTexture = ResourceFactory::CreateTexture(0, 0);
 	_pTexture->Load(GetRelativePath("Textures\\test2.png"));
 
@@ -80,7 +68,7 @@ void Game::Start()
 	_pMaterial->SetTexture(_pTexture);
 	_pMaterial->LoadVertexShader(GetRelativePath("Shaders\\DiffuseTexture_Deferred.hlsl"), "VSMain", "vs_5_1");
 	_pMaterial->LoadPixelShader(GetRelativePath("Shaders\\DiffuseTexture_Deferred.hlsl"), "PSMain", "ps_5_1");
-	_pMaterial->Finalise(Material::Default_Input_Layout);
+	_pMaterial->Finalise(Material::PBR_Input_Layout);
 
 	_pTriangle = Primitives::CreateCylinder("triangle", 8);
 	_pTriangle->SetMaterial(_pMaterial);
@@ -90,10 +78,10 @@ void Game::Start()
 	// Create an example triangle object.
 	std::vector<Vertex> vertices2 =
 		{
-			Vertex(Vector3(-0.25f, 0.25f, 0.0f), Colour::White, Vector2(0.0f, 0.0f)), // bottom left
-			Vertex(Vector3(0.25f, -0.25f, 0.0f), Colour::White, Vector2(1.0f, 1.0f)), // top right
-			Vertex(Vector3(0.25f, 0.25f, 0.0f), Colour::White, Vector2(1.0f, 0.0f)), // bottom right
-			Vertex(Vector3(-0.25f, -0.25f, 0.0f), Colour::White, Vector2(0.0f, 1.0f)) // top left
+			Vertex(Vector3(-0.25f, 0.25f, 0.0f), Colour::White, Vector2(0.0f, 0.0f), Vector3(0.0f, 0.0f, -1.0f)), // bottom left
+			Vertex(Vector3(0.25f, -0.25f, 0.0f), Colour::White, Vector2(1.0f, 1.0f), Vector3(0.0f, 0.0f, -1.0f)), // top right
+			Vertex(Vector3(0.25f, 0.25f, 0.0f), Colour::White, Vector2(1.0f, 0.0f), Vector3(0.0f, 0.0f, -1.0f)), // bottom right
+			Vertex(Vector3(-0.25f, -0.25f, 0.0f), Colour::White, Vector2(0.0f, 1.0f), Vector3(0.0f, 0.0f, -1.0f)) // top left
 		};
 
 	std::vector<int> indices =

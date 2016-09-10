@@ -79,19 +79,29 @@ namespace Engine
 		if (!_bound)
 		{
 			// Bind the constant buffer.
-			commandList->SetGraphicsRootDescriptorTable(0, _pDescriptor->GetGPUDescriptorHandleForHeapStart());
+			CD3DX12_GPU_DESCRIPTOR_HANDLE cbvHandle(_pDescriptor->GetGPUDescriptorHandleForHeapStart(), 0, D3DUtils::GetSRVDescriptorSize());
+			commandList->SetGraphicsRootDescriptorTable(_rootSlot, cbvHandle);
+
 			_bound = true;
 		}
 	}
 
 	ConstantBufferInstance::ConstantBufferInstance(ID3D12DescriptorHeap* descriptorHeap)
-		: _index(-1)
-		, _slotUsage(0)
+		: _slotUsage(0)
 		, _pDescriptor(descriptorHeap)
-		, _pVertexBuffer(nullptr) { }
+		, _pVertexBuffer(nullptr)
+		, _rootSlot(0)
+	{
+		_index = ResourceFactory::GetCBufferSlot();
+	}
 
 	ConstantBufferInstance::~ConstantBufferInstance()
 	{
+		if (_index != -1)
+		{
+			ResourceFactory::FreeCBufferSlot(_index);
+		}
+
 		for (auto it = _cbuffer.begin(); it != _cbuffer.end(); ++it)
 		{
 			delete (*it).second.Data;
@@ -136,90 +146,6 @@ namespace Engine
 			ConstantBuffer* buffer = static_cast<ConstantBuffer*>(_pBuffer);
 			buffer->RequestBuild();
 		}
-	}
-
-	void ConstantBufferInstance::SetFloat(std::string name, float value)
-	{
-		if (_cbuffer.find(name) == _cbuffer.end())
-		{
-			if (_slotUsage + sizeof(float) > CBUFFER_SLOT_SIZE)
-			{
-				Logging::LogError("Variable '{0}' has exceeded slot size.", name);
-				return;
-			}
-
-			_slotUsage += sizeof(float);
-			_cbuffer[name] = {new float(value), sizeof(float)};
-		}
-		else
-		{
-			*static_cast<float*>(_cbuffer[name].Data) = value;
-		}
-
-		AssignBuffer();
-	}
-
-	void ConstantBufferInstance::SetInt(std::string name, int value)
-	{
-		if (_cbuffer.find(name) == _cbuffer.end())
-		{
-			if (_slotUsage + sizeof(int) > CBUFFER_SLOT_SIZE)
-			{
-				Logging::LogError("Variable '{0}' has exceeded slot size.", name);
-				return;
-			}
-
-			_slotUsage += sizeof(int);
-			_cbuffer[name] = {new int(value), sizeof(int)};
-		}
-		else
-		{
-			*static_cast<int*>(_cbuffer[name].Data) = value;
-		}
-
-		AssignBuffer();
-	}
-
-	void ConstantBufferInstance::SetVector(std::string name, const DirectX::XMFLOAT4& value)
-	{
-		if (_cbuffer.find(name) == _cbuffer.end())
-		{
-			if (_slotUsage + sizeof(DirectX::XMFLOAT4) > CBUFFER_SLOT_SIZE)
-			{
-				Logging::LogError("Variable '{0}' has exceeded slot size.", name);
-				return;
-			}
-
-			_slotUsage += sizeof(DirectX::XMFLOAT4);
-			_cbuffer[name] = {new DirectX::XMFLOAT4(value), sizeof(DirectX::XMFLOAT4)};
-		}
-		else
-		{
-			*static_cast<DirectX::XMFLOAT4*>(_cbuffer[name].Data) = value;
-		}
-
-		AssignBuffer();
-	}
-
-	void ConstantBufferInstance::SetMatrix(std::string name, const DirectX::XMFLOAT4X4& value)
-	{
-		if (_cbuffer.find(name) == _cbuffer.end())
-		{
-			if (_slotUsage + sizeof(DirectX::XMFLOAT4X4) > CBUFFER_SLOT_SIZE)
-			{
-				Logging::LogError("Variable '{0}' has exceeded slot size.", name);
-				return;
-			}
-
-			_slotUsage += sizeof(DirectX::XMFLOAT4X4);
-			_cbuffer[name] = {new DirectX::XMFLOAT4X4(value), sizeof(DirectX::XMFLOAT4X4)};
-		}
-		else
-		{
-			*static_cast<DirectX::XMFLOAT4X4*>(_cbuffer[name].Data) = value;
-		}
-
-		AssignBuffer();
 	}
 
 	std::vector<ConstantBufferInstance::DataItem> ConstantBufferInstance::GetData() const

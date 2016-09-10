@@ -12,6 +12,18 @@ namespace Engine
 		bool Alpha;
 	};
 
+	enum DepthTest
+	{
+		ALWAYS,
+		LESS_EQUAL,
+		GREATER_EQUAL,
+		EQUAL,
+		NOT_EQUAL,
+		LESS,
+		GREATER,
+		NEVER
+	};
+
 	class Texture;
 
 	class Material
@@ -32,8 +44,10 @@ namespace Engine
 
 		ENGINE_API void SetTexture(Texture* texture);
 		ENGINE_API Texture* GetTexture() const;
+		ENGINE_API void SetDepthMode(bool depthWrite, DepthTest depthTest);
 
 		static ENGINE_API std::vector<D3D12_INPUT_ELEMENT_DESC> Default_Input_Layout;
+		static ENGINE_API std::vector<D3D12_INPUT_ELEMENT_DESC> PBR_Input_Layout;
 
 	private:
 		Material();
@@ -47,6 +61,8 @@ namespace Engine
 		ID3DBlob* _pVertexShader;
 		ID3DBlob* _pPixelShader;
 		Texture* _pTexture;
+		D3D12_COMPARISON_FUNC _depthCheck;
+		D3D12_DEPTH_WRITE_MASK _depthWrite;
 
 		ID3D12Device* _pDevice;
 		ID3D12RootSignature* _pRootSignature;

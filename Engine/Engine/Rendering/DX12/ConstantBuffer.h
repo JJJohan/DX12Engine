@@ -45,27 +45,45 @@ namespace Engine
 	public:
 		ENGINE_API ~ConstantBufferInstance();
 
-		void SetFloat(std::string name, float value);
-		void SetInt(std::string name, int value);
-		void SetVector(std::string name, const DirectX::XMFLOAT4& value);
-		void SetMatrix(std::string name, const DirectX::XMFLOAT4X4& value);
 		std::vector<DataItem> GetData() const;
 		size_t Count() const override;
 		size_t GetSize() const override;
 		int GetIndex() const;
 		void SetIndex(int index);
 		void SetVertexBuffer(VertexBufferInstance* vertexBuffer);
+		void AssignBuffer();
+
+		template <class T>
+		void SetData(std::string name, T value)
+		{
+			if (_cbuffer.find(name) == _cbuffer.end())
+			{
+				if (_slotUsage + sizeof(T) > CBUFFER_SLOT_SIZE)
+				{
+					Logging::LogError("Variable '{0}' has exceeded slot size.", name);
+					return;
+				}
+
+				_slotUsage += sizeof(T);
+				_cbuffer[name] = { new T(value), sizeof(T) };
+			}
+			else
+			{
+				*static_cast<T*>(_cbuffer[name].Data) = value;
+			}
+
+			AssignBuffer();
+		}
 
 	private:
 		ConstantBufferInstance(ID3D12DescriptorHeap* descriptorHeap);
-
-		void AssignBuffer();
 
 		int _index;
 		size_t _slotUsage;
 		std::map<std::string, DataItem> _cbuffer;
 		ID3D12DescriptorHeap* _pDescriptor;
 		VertexBufferInstance* _pVertexBuffer;
+		int _rootSlot;
 
 		friend class ConstantBuffer;
 		friend class ResourceFactory;

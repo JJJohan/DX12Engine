@@ -10,12 +10,9 @@ namespace Engine
 		, _width(width)
 		, _height(height)
 		, _size(0)
+		, _rootSlot(1)
 	{
 		_index = ResourceFactory::GetTextureSlot();
-		if (_index == -1)
-		{
-			Logging::LogError("Ran out of SRV slots. Consider increasing the TextureLimit constant.");
-		}
 	}
 
 	Texture::~Texture()
@@ -24,6 +21,11 @@ namespace Engine
 		{
 			ResourceFactory::FreeTextureSlot(_index);
 		}
+	}
+
+	void Texture::SetRootSlot(int value)
+	{
+		_rootSlot = value;
 	}
 
 	bool Texture::Load(const std::string& filePath)
@@ -151,7 +153,7 @@ namespace Engine
 		// Describe and create a SRV for the texture.
 		D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
 		srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-		srvDesc.Format = _textureDesc.Format == DXGI_FORMAT_R32_TYPELESS ? DXGI_FORMAT_R32_FLOAT : _textureDesc.Format;
+		srvDesc.Format = _textureDesc.Format;
 		srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
 		srvDesc.Texture2D.MipLevels = 1;
 		_pDevice->CreateShaderResourceView(_pResource, &srvDesc, _heapHandle);
@@ -160,7 +162,7 @@ namespace Engine
 	void Texture::Bind(ID3D12GraphicsCommandList* commandList) const
 	{
 		CD3DX12_GPU_DESCRIPTOR_HANDLE srvHandle(_pSrvHeap->GetGPUDescriptorHandleForHeapStart(), _index, D3DUtils::GetSRVDescriptorSize());
-		commandList->SetGraphicsRootDescriptorTable(1, srvHandle);
+		commandList->SetGraphicsRootDescriptorTable(_rootSlot, srvHandle);
 	}
 }
 

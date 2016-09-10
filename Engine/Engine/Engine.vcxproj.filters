@@ -351,6 +351,9 @@
     <ClInclude Include="Rendering\DX12\D3DUtils.h">
       <Filter>Header Files\Rendering\DX12</Filter>
     </ClInclude>
+    <ClInclude Include="Constants.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\Build\Shaders\Diffuse.hlsl">
@@ -362,7 +365,7 @@
     <FxCompile Include="..\Build\Shaders\DiffuseTexture.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
-    <FxCompile Include="Shaders\DiffuseTexture_Deferred.hlsl">
+    <FxCompile Include="..\Build\Shaders\DiffuseTexture_Deferred.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
   </ItemGroup>
