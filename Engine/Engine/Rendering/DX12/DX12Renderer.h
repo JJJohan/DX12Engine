@@ -14,6 +14,7 @@ using namespace DirectX;
 namespace Engine
 {
 	class RenderObject;
+	class GBuffer;
 
 	class DX12Renderer : public IRenderer
 	{
@@ -24,10 +25,16 @@ namespace Engine
 		bool InitWindow(int width, int height, bool windowed, HWND windowHandle) override;
 		bool Update() override;
 		bool Render() override;
+		bool IsRendering() const;
+		void BindBackBuffer() const;
+		ID3D12DescriptorHeap* GetDepthBufferHeap() const;
+		ID3D12Resource* GetDepthBuffer() const;
 
 		static DX12Renderer* Get();
 
 		void Sync();
+		
+		int DepthBufferIndex;
 
 	private:
 		void GetHardwareAdapter(IDXGIFactory2* pFactory, IDXGIAdapter3** ppAdapter);
@@ -40,6 +47,8 @@ namespace Engine
 
 		// Pipeline objects
 		Camera* _pCamera;
+		GBuffer* _pGBuffer;
+		ID3D12Resource* _pDepthBuffer;
 		D3D12_RECT _scissorRect;
 		ComPtr<IDXGISwapChain3> _swapChain;
 		ComPtr<ID3D12Device> _device;
@@ -49,12 +58,13 @@ namespace Engine
 		ComPtr<ID3D12RootSignature> _rootSignature;
 		ComPtr<ID3D12DescriptorHeap> _rtvHeap;
 		ComPtr<ID3D12DescriptorHeap> _cbvSrvHeap;
+		ComPtr<ID3D12DescriptorHeap> _dsvHeap;
 		ComPtr<ID3D12GraphicsCommandList> _commandList;
 #if _DEBUG
 		ComPtr<ID3D12DebugDevice> _debugDevice;
 #endif
-		int _rtvDescriptorSize;
-		int _cbvSrvDescriptorSize;
+
+		bool _isRendering;
 		bool _useWarpDevice;
 		bool _resize;
 
@@ -71,6 +81,7 @@ namespace Engine
 		void PopulateCommandList() const;
 		bool WaitForPreviousFrame();
 		void ResizeRenderer();
+		void CreateDepthBuffer();
 
 		friend class ResourceFactory;
 	};

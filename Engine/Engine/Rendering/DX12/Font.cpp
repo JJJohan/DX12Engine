@@ -1,5 +1,6 @@
-#include "Font.h"
+// ReSharper disable once CppUnusedIncludeDirective
 #include "Texture.h"
+#include "Font.h"
 
 namespace Engine
 {

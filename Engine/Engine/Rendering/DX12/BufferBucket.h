@@ -26,12 +26,14 @@ namespace Engine
 		void RequestBuild();
 		bool CheckBufferSize(size_t* outSize);
 		void Unbind();
+		bool Bound() const;
 
 		virtual void Bind(ID3D12GraphicsCommandList* commandList) = 0;
 		virtual void Build() = 0;
 
 		std::set<BufferInstance*> _instances;
 		bool _bound;
+		int _rootSlot;
 
 	private:
 		static std::unordered_set<BufferBucket*> _buffers;
@@ -51,7 +53,7 @@ namespace Engine
 			BufferBucket* buffer = *it;
 			if (dynamic_cast<T*>(buffer))
 			{
-				if (buffer->_totalSize < 65536 - instanceSize)
+				if (buffer->_rootSlot == instance->_rootSlot & buffer->_totalSize < 65536 - instanceSize)
 				{
 					buffer->_instances.insert(instance);
 					buffer->_totalSize += instanceSize;
@@ -65,6 +67,7 @@ namespace Engine
 		buffer->_pDevice = instance->_pDevice;
 		buffer->_instances.insert(instance);
 		buffer->_totalSize += instanceSize;
+		buffer->_rootSlot = instance->_rootSlot;
 		buffer->RequestBuild();
 		_buffers.insert(buffer);
 		return buffer;

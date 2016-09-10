@@ -6,7 +6,8 @@ namespace Engine
 
 	BufferBucket::BufferBucket()
 		: _bound(false)
-		, _totalSize(0) { }
+		, _rootSlot(-1)
+	    , _totalSize(0)	{ }
 
 	BufferBucket::~BufferBucket()
 	{
@@ -70,6 +71,11 @@ namespace Engine
 	void BufferBucket::Unbind()
 	{
 		_bound = false;
+	}
+
+	bool BufferBucket::Bound() const
+	{
+		return _bound;
 	}
 }
 

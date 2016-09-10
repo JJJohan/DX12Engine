@@ -13,7 +13,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{C8817AB9-1A59-47B7-9B9A-5D853A31E276}</ProjectGuid>
     <RootNamespace>Engine</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.10586.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.14393.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
@@ -62,7 +62,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
       <ForcedIncludeFiles>stdafx.h</ForcedIncludeFiles>
@@ -89,7 +89,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
       <ForcedIncludeFiles>stdafx.h</ForcedIncludeFiles>
@@ -130,10 +130,13 @@
     <ClCompile Include="Rendering\DX12\Camera.cpp" />
     <ClCompile Include="Rendering\DX12\CommandQueue.cpp" />
     <ClCompile Include="Rendering\DX12\ConstantBuffer.cpp" />
+    <ClCompile Include="Rendering\DX12\D3DUtils.cpp" />
     <ClCompile Include="Rendering\DX12\DX12Renderer.cpp" />
     <ClCompile Include="Rendering\DX12\FeatureSupport.cpp" />
     <ClCompile Include="Rendering\DX12\Font.cpp" />
     <ClCompile Include="Rendering\DX12\FontManager.cpp" />
+    <ClCompile Include="Rendering\DX12\GBuffer.cpp" />
+    <ClCompile Include="Rendering\DX12\Light.cpp" />
     <ClCompile Include="Rendering\DX12\Primitives.cpp" />
     <ClCompile Include="Rendering\DX12\HeapManager.cpp" />
     <ClCompile Include="Rendering\DX12\HeapResource.cpp" />
@@ -160,6 +163,7 @@
     <ClCompile Include="Utils\Win32Utils.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Constants.h" />
     <ClInclude Include="Core\Core.h" />
     <ClInclude Include="Core\Time.h" />
     <ClInclude Include="Data\Colour.h" />
@@ -179,10 +183,13 @@
     <ClInclude Include="Rendering\DX12\Camera.h" />
     <ClInclude Include="Rendering\DX12\CommandQueue.h" />
     <ClInclude Include="Rendering\DX12\ConstantBuffer.h" />
+    <ClInclude Include="Rendering\DX12\D3DUtils.h" />
     <ClInclude Include="Rendering\DX12\DX12Renderer.h" />
     <ClInclude Include="Rendering\DX12\FeatureSupport.h" />
     <ClInclude Include="Rendering\DX12\Font.h" />
     <ClInclude Include="Rendering\DX12\FontManager.h" />
+    <ClInclude Include="Rendering\DX12\GBuffer.h" />
+    <ClInclude Include="Rendering\DX12\Light.h" />
     <ClInclude Include="Rendering\DX12\Primitives.h" />
     <ClInclude Include="Rendering\DX12\HeapManager.h" />
     <ClInclude Include="Rendering\DX12\HeapResource.h" />
@@ -213,6 +220,9 @@
     <FxCompile Include="..\Build\Shaders\DiffuseTexture.hlsl">
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">VSMain</EntryPointName>
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">VSMain</EntryPointName>
+    </FxCompile>
+    <FxCompile Include="..\Build\Shaders\DiffuseTexture_Deferred.hlsl">
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">VSMain</EntryPointName>
     </FxCompile>
     <FxCompile Include="..\Build\Shaders\Font.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">

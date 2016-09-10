@@ -4,6 +4,7 @@
 #include "ConstantBuffer.h"
 #include "Camera.h"
 #include "Material.h"
+#include "DX12Renderer.h"
 
 namespace Engine
 {
@@ -44,6 +45,7 @@ namespace Engine
 	void RenderObject::SetVertexBuffer(VertexBufferInstance* vertexBuffer)
 	{
 		_pVertexBuffer = vertexBuffer;
+		_pCbuffer->SetVertexBuffer(_pVertexBuffer);
 	}
 
 	VertexBufferInstance* RenderObject::GetVertexBuffer() const
@@ -73,11 +75,6 @@ namespace Engine
 
 	void RenderObject::Update()
 	{
-		if (_pVertexBuffer == nullptr)
-		{
-			return;
-		}
-
 		Camera::Main()->ApplyTransform(_pCbuffer, Transform);
 		_pVertexBuffer->SetBufferIndex(_pCbuffer->GetIndex());
 
@@ -91,11 +88,6 @@ namespace Engine
 
 	void RenderObject::Draw()
 	{
-		if (_pVertexBuffer == nullptr)
-		{
-			return;
-		}
-
 		ID3D12GraphicsCommandList* commandList = static_cast<ID3D12GraphicsCommandList*>(ResourceFactory::GetCommandList());
 		_pMaterial->Bind(commandList);
 		_pVertexBuffer->Bind(commandList);

@@ -6,7 +6,8 @@ namespace Engine
 	BufferInstance::BufferInstance()
 		: _pBuffer(nullptr)
 		, _pDevice(nullptr)
-		, _offset(0) { }
+		, _offset(0)
+	{ }
 
 	void BufferInstance::SetOffset(size_t offset)
 	{
@@ -23,7 +24,15 @@ namespace Engine
 
 	void BufferInstance::Bind(ID3D12GraphicsCommandList* commandList) const
 	{
-		_pBuffer->Bind(commandList);
+		if (_pBuffer != nullptr)
+		{
+			_pBuffer->Bind(commandList);
+		}
+	}
+
+	void BufferInstance::SetRootSlot(int value)
+	{
+		_rootSlot = value;
 	}
 
 	size_t BufferInstance::GetOffset() const
@@ -35,5 +44,14 @@ namespace Engine
 	{
 		_pBuffer->Unbind();
 	}
-}
 
+	bool BufferInstance::Bound() const
+	{
+		if (_pBuffer == nullptr)
+		{
+			return false;
+		}
+
+		return _pBuffer->Bound();
+	}
+}

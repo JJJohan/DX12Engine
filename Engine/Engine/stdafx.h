@@ -31,6 +31,7 @@
 #include <DirectXMath.h>
 #include <D3Dcompiler.h>
 #include "Rendering/DX12/d3dx12.h"
+#include "Rendering/DX12/D3DUtils.h"
 
 #include "Utils/Logging.h"
 #include "Utils/Helpers.h"

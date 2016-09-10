@@ -3,6 +3,7 @@
 #include "CommandQueue.h"
 #include "../../Utils/Logging.h"
 #include "../../Factory/ResourceFactory.h"
+#include "DX12Renderer.h"
 
 //#define SINGLE_THREADED
 
@@ -17,7 +18,14 @@ namespace Engine
 
 	void CommandQueue::Enqueue(const std::function<void()>& task)
 	{
-		_tasks.push(task);
+		if (DX12Renderer::Get()->IsRendering())
+		{
+			task();
+		}
+		else
+		{
+			_tasks.push(task);
+		}
 	}
 
 	void CommandQueue::Release()
@@ -26,8 +34,15 @@ namespace Engine
 		_releaseRequested = true;
 		_releaseMutex.unlock();
 
-		_commandAllocator->Release();
-		_commandList->Release();
+		if (_commandAllocator != nullptr)
+		{
+			_commandAllocator->Release();
+		}
+		
+		if (_commandList != nullptr)
+		{
+			_commandList->Release();
+		}
 
 		for (auto it = _commandThreads.begin(); it != _commandThreads.end(); ++it)
 		{
@@ -48,21 +63,27 @@ namespace Engine
 		{
 			// Wait until work is available.
 			std::unique_lock<std::mutex> waitLock(commandThread->WaitMutex);
+
 			if (!commandThread->Waiting)
 			{
 				std::lock_guard<std::mutex> lock(commandThread->LockMutex);
 				commandThread->Waiting = true;
 			}
+
 			commandThread->WaitCondition.wait(waitLock, [&]
-			                                  {
-				                                  return !commandThread->Available || _releaseRequested;
-			                                  });
+			{
+				return !commandThread->Available || _releaseRequested;
+			});
+
 			if (_releaseRequested)
 			{
 				return;
 			}
 
-			commandThread->Task();
+			if (commandThread->Task != nullptr)
+			{
+				commandThread->Task();
+			}
 
 			std::lock_guard<std::mutex> lock(commandThread->LockMutex);
 			++commandThread->TasksCompleted;
@@ -186,7 +207,10 @@ namespace Engine
 			ResourceFactory::AssignCommandList(_commandList);
 			std::function<void()> task = _tasks.front();
 			_tasks.pop();
-			task();
+			if (task != nullptr)
+			{
+				task();
+			}
 			_commandList->Close();
 			commandLists.push_back(_commandList);
 

@@ -4,29 +4,36 @@
 
 namespace Engine
 {
-	class Texture : HeapResource
+	class Texture : public HeapResource
 	{
 	public:
 		ENGINE_API ~Texture();
 
 		ENGINE_API bool Load(const std::string& filePath);
 		void Bind(ID3D12GraphicsCommandList* commandList) const;
+		void SetResourceDescription(const D3D12_RESOURCE_DESC& desc);
+		void Apply();
+		void SetRootSlot(int value);
 
 	private:
-		Texture();
+		Texture(int width, int height);
 
 		void Finalise();
+		void Fill();
 
 		std::unique_ptr<BYTE> _fileBuffer;
-		ID3D12DescriptorHeap* _pSrvHeap;
+		D3D12_RESOURCE_DESC _textureDesc;
+		bool _customDesc;
 		int _index;
+
+		ID3D12DescriptorHeap* _pSrvHeap;
+		CD3DX12_CPU_DESCRIPTOR_HANDLE _heapHandle;
 
 		// Image data
 		int _width;
 		int _height;
+		int _rootSlot;
 		size_t _size;
-
-		static UINT _descSize;
 
 		friend class ResourceFactory;
 	};

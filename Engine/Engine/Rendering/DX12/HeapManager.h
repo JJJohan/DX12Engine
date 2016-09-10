@@ -11,8 +11,8 @@ namespace Engine
 		static void UpdateHeaps();
 		static void ReleaseHeaps();
 		static void ReleaseHeap(HeapResource* heapResource);
-		static void Upload(HeapResource* heap, void* data, enum D3D12_RESOURCE_STATES destState);
-		static void Upload(HeapResource* heap, void* data, int rowPitch, int slicePitch, enum D3D12_RESOURCE_STATES destState);
+		static void Upload(HeapResource* heap, void* data);
+		static void Upload(HeapResource* heap, void* data, int rowPitch, int slicePitch);
 		static void SetDevice(ID3D12Device* device);
 
 	private:

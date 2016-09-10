@@ -1,5 +1,6 @@
 #include "Material.h"
 #include "Texture.h"
+#include "GBuffer.h"
 
 using namespace Microsoft::WRL;
 
@@ -14,6 +15,22 @@ namespace Engine
 {
 	ID3D12PipelineState* Material::_pLastPipelineState = nullptr;
 	std::vector<PSOCacheItem> Material::_psoCache;
+
+	std::vector<D3D12_INPUT_ELEMENT_DESC> Material::Default_Input_Layout =
+	{
+		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+		{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 28, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
+	};
+
+	std::vector<D3D12_INPUT_ELEMENT_DESC> Material::PBR_Input_Layout =
+	{
+		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+		{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 28, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+		{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 40, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+		{ "TEXCOORD", 1, DXGI_FORMAT_R32G32_FLOAT, 0, 52, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
+	};
 
 	ID3D12PipelineState* Material::GetPSO(const void* vertexByteCode, const void* pixelByteCode, bool alpha)
 	{
@@ -35,7 +52,10 @@ namespace Engine
 		for (auto it = _psoCache.begin(); it != _psoCache.end(); ++it)
 		{
 			PSOCacheItem& cacheItem = *it;
-			cacheItem.PipelineState->Release();
+			if (cacheItem.PipelineState != nullptr)
+			{
+				cacheItem.PipelineState->Release();
+			}
 		}
 		_psoCache.clear();
 	}
@@ -45,19 +65,25 @@ namespace Engine
 		, _pVertexShader(nullptr)
 		, _pPixelShader(nullptr)
 		, _pTexture(nullptr)
+		, _depthCheck(D3D12_COMPARISON_FUNC_GREATER_EQUAL)
+		, _depthWrite(D3D12_DEPTH_WRITE_MASK_ALL)
 		, _pDevice(nullptr)
-		, _pRootSignature(nullptr) { }
+		, _pRootSignature(nullptr)
+	{
+	}
 
 	void Material::LoadVertexShader(const std::string& shaderPath, const std::string& entryPoint, const std::string& shaderVersion)
 	{
-		ComPtr<ID3DBlob> errorMessage;
+		ID3DBlob* errorMessage = nullptr;
 		std::wstring widePath = std::wstring(shaderPath.begin(), shaderPath.end());
 		D3DCompileFromFile(widePath.c_str(), nullptr, nullptr, entryPoint.c_str(), shaderVersion.c_str(), compileFlags, 0, &_pVertexShader, &errorMessage);
-		if (errorMessage.Get() != nullptr)
+		
+		if (!D3DUtils::Succeeded(errorMessage))
 		{
-			Logging::LogError(static_cast<LPCTSTR>(errorMessage->GetBufferPointer()));
+			return;
 		}
-		else if (_pVertexShader == nullptr)
+
+		if (_pVertexShader == nullptr)
 		{
 			Logging::LogError("Failed to load vertex shader. No compilation error available.");
 		}
@@ -65,20 +91,22 @@ namespace Engine
 
 	void Material::LoadPixelShader(const std::string& shaderPath, const std::string& entryPoint, const std::string& shaderVersion)
 	{
-		ComPtr<ID3DBlob> errorMessage;
+		ID3DBlob* errorMessage = nullptr;
 		std::wstring widePath = std::wstring(shaderPath.begin(), shaderPath.end());
 		D3DCompileFromFile(widePath.c_str(), nullptr, nullptr, entryPoint.c_str(), shaderVersion.c_str(), compileFlags, 0, &_pPixelShader, &errorMessage);
-		if (errorMessage.Get() != nullptr)
+		
+		if (!D3DUtils::Succeeded(errorMessage))
 		{
-			Logging::LogError(static_cast<LPCTSTR>(errorMessage->GetBufferPointer()));
+			return;
 		}
-		else if (_pPixelShader == nullptr)
+
+		if (_pPixelShader == nullptr)
 		{
 			Logging::LogError("Failed to load pixel shader. No compilation error available.");
 		}
 	}
 
-	void Material::Finalise(std::vector<D3D12_INPUT_ELEMENT_DESC> inputLayout, bool alpha)
+	void Material::Finalise(std::vector<D3D12_INPUT_ELEMENT_DESC> inputLayout, bool alpha, bool deferred)
 	{
 		_pPipelineState = GetPSO(_pVertexShader->GetBufferPointer(), _pPixelShader->GetBufferPointer(), alpha);
 
@@ -104,14 +132,32 @@ namespace Engine
 			psoDesc.VS = {reinterpret_cast<UINT8*>(_pVertexShader->GetBufferPointer()), _pVertexShader->GetBufferSize()};
 			psoDesc.PS = {reinterpret_cast<UINT8*>(_pPixelShader->GetBufferPointer()), _pPixelShader->GetBufferSize()};
 			psoDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
+			psoDesc.DSVFormat = DXGI_FORMAT_D32_FLOAT;
 			psoDesc.BlendState = blendState;
-			psoDesc.DepthStencilState.DepthEnable = FALSE;
-			psoDesc.DepthStencilState.StencilEnable = FALSE;
-			psoDesc.SampleMask = UINT_MAX ;
-			psoDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
-			psoDesc.NumRenderTargets = 1;
-			psoDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
+			psoDesc.SampleMask = UINT_MAX;
 			psoDesc.SampleDesc.Count = 1;
+			psoDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+			if (deferred)
+			{
+				psoDesc.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
+				psoDesc.DepthStencilState.DepthFunc = _depthCheck;
+				psoDesc.DepthStencilState.DepthEnable = TRUE;
+				psoDesc.DepthStencilState.StencilEnable = FALSE;
+				psoDesc.DepthStencilState.DepthWriteMask = _depthWrite;
+
+				psoDesc.NumRenderTargets = GBuffer::GBUFFER_NUM_BUFFERS;
+				for (size_t i = 0; i < GBuffer::GBUFFER_NUM_BUFFERS; ++i)
+				{
+					psoDesc.RTVFormats[i] = GBuffer::Buffers[i].Format;
+				}
+			}
+			else
+			{
+				psoDesc.NumRenderTargets = 1;
+				psoDesc.DepthStencilState.DepthEnable = false;
+				psoDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
+			}
+
 
 			LOGFAILEDCOM(_pDevice->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&_pPipelineState)));
 
@@ -133,6 +179,47 @@ namespace Engine
 	Texture* Material::GetTexture() const
 	{
 		return _pTexture;
+	}
+
+	void Material::SetDepthMode(bool depthWrite, DepthTest depthTest)
+	{
+		if (depthWrite)
+		{
+			_depthWrite = D3D12_DEPTH_WRITE_MASK_ALL;
+		}
+		else
+		{
+			_depthWrite = D3D12_DEPTH_WRITE_MASK_ZERO;
+		}
+
+		// NOTE: The reversals are applied due to the inverse depth buffer creation.
+		switch (depthTest)
+		{
+		case ALWAYS:
+			_depthCheck = D3D12_COMPARISON_FUNC_ALWAYS;
+			break;
+		case LESS_EQUAL:
+			_depthCheck = D3D12_COMPARISON_FUNC_GREATER_EQUAL;
+			break;
+		case LESS:
+			_depthCheck = D3D12_COMPARISON_FUNC_GREATER;
+			break;
+		case GREATER_EQUAL:
+			_depthCheck = D3D12_COMPARISON_FUNC_LESS_EQUAL;
+			break;
+		case GREATER:
+			_depthCheck = D3D12_COMPARISON_FUNC_LESS;
+			break;
+		case EQUAL:
+			_depthCheck = D3D12_COMPARISON_FUNC_EQUAL;
+			break;
+		case NOT_EQUAL:
+			_depthCheck = D3D12_COMPARISON_FUNC_NOT_EQUAL;
+			break;
+		case NEVER:
+			_depthCheck = D3D12_COMPARISON_FUNC_NEVER;
+			break;
+		}
 	}
 
 	void Material::Bind(ID3D12GraphicsCommandList* commandList) const

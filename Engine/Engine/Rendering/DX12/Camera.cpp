@@ -1,19 +1,38 @@
 #include "Camera.h"
 #include "ConstantBuffer.h"
+#include "DX12Renderer.h"
 
 namespace Engine
 {
 	Camera* Camera::_pMainCamera = nullptr;
 
+	void Camera::SetActiveCamera(Camera* camera)
+	{
+		if (_pMainCamera == camera)
+		{
+			return;
+		}
+
+		if (_pMainCamera != nullptr)
+		{
+			_pMainCamera->_pSceneBuffer->Unbind();
+		}
+
+		_pMainCamera = camera;
+	}
+
 	Camera* Camera::CreateCamera(ID3D12Device* device, float width, float height, float fovInDegrees, float nearClip, float farClip)
 	{
 		Camera* camera = new Camera(device);
-		camera->_viewport.MinDepth = nearClip;
-		camera->_viewport.MaxDepth = farClip;
+		camera->_viewport.MinDepth = 0.0f;
+		camera->_viewport.MaxDepth = 1.0f;
 		camera->Resize(width, height);
 		camera->SetFOV(fovInDegrees);
+		camera->_nearClip = nearClip;
+		camera->_farClip = farClip;
 
-		_pMainCamera = camera;
+		camera->_pSceneBuffer->SetData("nearClip", nearClip);
+		camera->_pSceneBuffer->SetData("farClip", farClip);
 
 		return camera;
 	}
@@ -26,8 +45,14 @@ namespace Engine
 	Camera::Camera(ID3D12Device* device)
 		: _fov(90.0f)
 		, _pDevice(device)
+		, _nearClip(0.1f)
+		, _farClip(100.0f)
+		, _pSceneBuffer(nullptr)
 	{
 		Transform.SetPosition(0.0f, 0.0f, -1.0f);
+		_pSceneBuffer = ResourceFactory::CreateConstantBuffer();
+		_pSceneBuffer->SetRootSlot(2);
+		_pSceneBuffer->AssignBuffer();
 
 		Input::RegisterKey('W', KeyHeld, [&]
 		                   {
@@ -66,6 +91,16 @@ namespace Engine
 		Input::UnregisterKey("__cameraLeft");
 		Input::UnregisterKey("__cameraRight");
 		Input::UnregisterMouseMoveEvent("__cameraRotate");
+
+		delete _pSceneBuffer;
+	}
+
+	void Camera::Bind(ID3D12GraphicsCommandList* commandList) const
+	{
+		if (!_pSceneBuffer->Bound())
+		{
+			_pSceneBuffer->Bind(commandList);
+		}
 	}
 
 	bool Camera::Update()
@@ -83,7 +118,7 @@ namespace Engine
 			XMVECTOR up = XMVector3Rotate(Vector3::Up, rotation);
 
 			//update view matrix
-			_view = XMMatrixLookToLH(Transform.GetPosition(), forward, up);
+			_view = XMMatrixLookToLH(position, forward, up);
 			_vp = XMMatrixMultiply(_view, _projection);
 
 			Transform.Moved = false;
@@ -98,7 +133,7 @@ namespace Engine
 		_viewport.TopLeftY = 0.0f;
 		_viewport.Width = width;
 		_viewport.Height = height;
-		_projection = XMMatrixPerspectiveFovLH(_fov, _viewport.Width / _viewport.Height, _viewport.MinDepth, _viewport.MaxDepth);
+		SetFOV(-1.0f);
 		Transform.Moved = true;
 	}
 
@@ -124,18 +159,30 @@ namespace Engine
 
 	void Camera::SetFOV(float fov)
 	{
-		_fov = XMConvertToRadians(fov);
-		_projection = XMMatrixPerspectiveFovLH(_fov, _viewport.Width / _viewport.Height, _viewport.MinDepth, _viewport.MaxDepth);
+		if (fov > 0.0f)
+		{
+			_fov = XMConvertToRadians(fov);
+		}
+		
+		_projection = XMMatrixPerspectiveFovLH(_fov, _viewport.Width / _viewport.Height, _farClip, _nearClip);
 		Transform.Moved = true;
 	}
 
 	void Camera::ApplyTransform(ConstantBufferInstance* buffer, const Engine::Transform& transform) const
 	{
-		XMMATRIX mvp = XMMatrixTranspose(transform.GetMatrix() * _vp);
+		XMMATRIX mvp;
+		if (!transform.GetIs2D())
+		{
+			mvp = XMMatrixTranspose(transform.GetMatrix() * _vp);
+		}
+		else
+		{
+			mvp = XMMatrixTranspose(transform.GetMatrix());
+		}
+
 		XMFLOAT4X4 mvpT;
 		XMStoreFloat4x4(&mvpT, mvp);
-
-		buffer->SetMatrix("mvp", mvpT);
+		buffer->SetData("mvp", mvpT);
 	}
 
 	D3D12_VIEWPORT& Camera::GetViewPort()

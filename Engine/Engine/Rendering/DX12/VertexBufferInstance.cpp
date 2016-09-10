@@ -1,46 +1,21 @@
 #include "VertexBufferInstance.h"
 #include "VertexBuffer.h"
+#include "Material.h"
 
 namespace Engine
 {
-	VertexBufferInstance::VertexBufferInstance()
+	VertexBufferInstance::VertexBufferInstance(VertexType vertexType)
 		: _size(0)
 		, _bufferIndex(-1)
 	{
-		std::vector<D3D12_INPUT_ELEMENT_DESC> inputElementDescs;
-
-		VertexType vertexType = VERTEX_POS_COL_UV;
 		switch (vertexType)
 		{
-			case VERTEX_POS_COL:
-				inputElementDescs =
-					{
-						{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
-						{"COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0}
-					};
-
-				_inputLayout = inputElementDescs;
-				return;
-
 			case VERTEX_POS_COL_UV:
-				inputElementDescs =
-					{
-						{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
-						{"COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
-						{"TEXCOORD", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 28, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0}
-					};
-
-				_inputLayout = inputElementDescs;
+				_inputLayout = Material::Default_Input_Layout;
 				return;
 
-			case VERTEX_POS_UV:
-				inputElementDescs =
-					{
-						{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
-						{"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0}
-					};
-
-				_inputLayout = inputElementDescs;
+			case VERTEX_PBR:
+				_inputLayout = Material::PBR_Input_Layout;
 				return;
 
 			default:

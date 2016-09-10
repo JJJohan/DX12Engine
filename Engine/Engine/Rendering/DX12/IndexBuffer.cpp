@@ -34,13 +34,14 @@ namespace Engine
 		}
 
 		_heapSize = size_t(offset);
-		PrepareHeapResource();
+		PrepareHeapResource(D3D12_RESOURCE_STATE_INDEX_BUFFER);
 
-		HeapManager::Upload(this, memory.get(), D3D12_RESOURCE_STATE_INDEX_BUFFER);
+		HeapManager::Upload(this, memory.get());
 
 		// Initialize the index buffer view.
 		if (!sameSize)
 		{
+			_indexBufferView = {};
 			_indexBufferView.BufferLocation = _pResource->GetGPUVirtualAddress();
 			_indexBufferView.Format = DXGI_FORMAT_R32_UINT;
 			_indexBufferView.SizeInBytes = UINT(_heapSize);

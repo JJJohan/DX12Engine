@@ -4,19 +4,15 @@
 
 namespace Engine
 {
-	UINT Texture::_descSize = 0;
-
-	Texture::Texture()
-		: _pSrvHeap(nullptr)
-		, _width(0)
-		, _height(0)
+	Texture::Texture(int width, int height)
+		: _customDesc(false)
+		, _pSrvHeap(nullptr)
+		, _width(width)
+		, _height(height)
 		, _size(0)
+		, _rootSlot(1)
 	{
 		_index = ResourceFactory::GetTextureSlot();
-		if (_index == -1)
-		{
-			Logging::LogError("Ran out of SRV slots. Consider increasing the TextureLimit constant.");
-		}
 	}
 
 	Texture::~Texture()
@@ -25,6 +21,11 @@ namespace Engine
 		{
 			ResourceFactory::FreeTextureSlot(_index);
 		}
+	}
+
+	void Texture::SetRootSlot(int value)
+	{
+		_rootSlot = value;
 	}
 
 	bool Texture::Load(const std::string& filePath)
@@ -93,40 +94,75 @@ namespace Engine
 		return true;
 	}
 
+	void Texture::Fill()
+	{
+		_size = _width * _height * 4;
+		_fileBuffer = std::unique_ptr<BYTE>(new BYTE[_size]);
+		BYTE* buffer = _fileBuffer.get();
+		for (int i = 0; i < _size;)
+		{
+			buffer[i++] = 0;
+			buffer[i++] = 0;
+			buffer[i++] = 0;
+			buffer[i++] = 255;
+		}
+	}
+
+	void Texture::SetResourceDescription(const D3D12_RESOURCE_DESC& desc)
+	{
+		_textureDesc = desc;
+		_customDesc = true;
+	}
+
+	void Texture::Apply()
+	{
+		HeapTask(std::bind(&Texture::Finalise, this));
+	}
+
 	void Texture::Finalise()
 	{
-		// Describe and create a Texture2D.
-		D3D12_RESOURCE_DESC textureDesc = {};
-		textureDesc.MipLevels = 1;
-		textureDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
-		textureDesc.Width = _width;
-		textureDesc.Height = _height;
-		textureDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
-		textureDesc.DepthOrArraySize = 1;
-		textureDesc.SampleDesc.Count = 1;
-		textureDesc.SampleDesc.Quality = 0;
-		textureDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+		// Check we have loaded a texture, otherwise fill the texture with a black colour.
+		if (_fileBuffer == nullptr)
+		{
+			Fill();
+		}
+
+		// Describe and create a Texture2D description.
+		if (!_customDesc)
+		{
+			_textureDesc = {};
+			_textureDesc.MipLevels = 1;
+			_textureDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
+			_textureDesc.Width = _width;
+			_textureDesc.Height = _height;
+			_textureDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
+			_textureDesc.DepthOrArraySize = 1;
+			_textureDesc.SampleDesc.Count = 1;
+			_textureDesc.SampleDesc.Quality = 0;
+			_textureDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+		}
 
 		// Allocate space and upload to the heap.
 		_heapSize = _width * _height * 4;
-		PrepareHeapResource(textureDesc);
-		HeapManager::Upload(this, _fileBuffer.get(), _width * 4, int(_heapSize), D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+		PrepareHeapResource(_textureDesc);
+		HeapManager::Upload(this, _fileBuffer.get(), _width * 4, int(_heapSize));
+
+		// Create descriptor handle if custom one is not provided.
+		_heapHandle = CD3DX12_CPU_DESCRIPTOR_HANDLE(_pSrvHeap->GetCPUDescriptorHandleForHeapStart(), _index, D3DUtils::GetSRVDescriptorSize());
 
 		// Describe and create a SRV for the texture.
-		_descSize = _pDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-		CD3DX12_CPU_DESCRIPTOR_HANDLE srvHandle(_pSrvHeap->GetCPUDescriptorHandleForHeapStart(), _index, _descSize);
 		D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
-		srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING ;
-		srvDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
+		srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+		srvDesc.Format = _textureDesc.Format;
 		srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
 		srvDesc.Texture2D.MipLevels = 1;
-		_pDevice->CreateShaderResourceView(_pResource, &srvDesc, srvHandle);
+		_pDevice->CreateShaderResourceView(_pResource, &srvDesc, _heapHandle);
 	}
 
 	void Texture::Bind(ID3D12GraphicsCommandList* commandList) const
 	{
-		CD3DX12_GPU_DESCRIPTOR_HANDLE srvHandle(_pSrvHeap->GetGPUDescriptorHandleForHeapStart(), _index, _descSize);
-		commandList->SetGraphicsRootDescriptorTable(1, srvHandle);
+		CD3DX12_GPU_DESCRIPTOR_HANDLE srvHandle(_pSrvHeap->GetGPUDescriptorHandleForHeapStart(), _index, D3DUtils::GetSRVDescriptorSize());
+		commandList->SetGraphicsRootDescriptorTable(_rootSlot, srvHandle);
 	}
 }
 

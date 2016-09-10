@@ -4,6 +4,7 @@
 #include "../Rendering/DX12/Material.h"
 #include "../Rendering/DX12/Texture.h"
 #include "../Rendering/DX12/DX12Renderer.h"
+#include "../Rendering/DX12/GBuffer.h"
 
 namespace Engine
 {
@@ -12,10 +13,12 @@ namespace Engine
 	ID3D12DescriptorHeap* ResourceFactory::_pCbvSrvHeap = nullptr;
 	thread_local ID3D12CommandList* ResourceFactory::_pCommandList = nullptr;
 
-	int ResourceFactory::_cbufferIndex = 0;
-	int ResourceFactory::_textureIndex = 0;
-	std::vector<bool> ResourceFactory::_cbufferSlots = std::vector<bool>(CBufferLimit);
-	std::vector<bool> ResourceFactory::_textureSlots = std::vector<bool>(TextureLimit);
+	int ResourceFactory::_srvIndex = 0;
+	int ResourceFactory::_cbvIndex = 0;
+	int ResourceFactory::_srvCount = 0;
+	int ResourceFactory::_cbvCount = 0;
+	std::vector<bool> ResourceFactory::_srvSlots;
+	std::vector<bool> ResourceFactory::_cbvSlots;
 
 	void ResourceFactory::AssignCommandList(ID3D12CommandList* commandList)
 	{
@@ -36,9 +39,9 @@ namespace Engine
 		return instance;
 	}
 
-	VertexBufferInstance* ResourceFactory::CreateVertexBufferInstance()
+	VertexBufferInstance* ResourceFactory::CreateVertexBufferInstance(VertexType vertexType)
 	{
-		VertexBufferInstance* instance = new VertexBufferInstance();
+		VertexBufferInstance* instance = new VertexBufferInstance(vertexType);
 
 		instance->_pDevice = _pDevice;
 
@@ -64,9 +67,9 @@ namespace Engine
 		return material;
 	}
 
-	Texture* ResourceFactory::CreateTexture()
+	Texture* ResourceFactory::CreateTexture(int width, int height)
 	{
-		Texture* texture = new Texture();
+		Texture* texture = new Texture(width, height);
 
 		texture->_pDevice = _pDevice;
 		texture->_pSrvHeap = _pCbvSrvHeap;
@@ -74,59 +77,78 @@ namespace Engine
 		return texture;
 	}
 
+	void ResourceFactory::SetObjectLimit(int limit)
+	{
+		if (_srvCount != 0)
+		{
+			Logging::LogError("Object limit has already been set.");
+		}
+
+		_srvCount = GBuffer::GBUFFER_NUM_BUFFERS + limit;
+		_cbvCount = 1 + limit;
+
+		_srvSlots = std::vector<bool>(_srvCount);
+		_cbvSlots = std::vector<bool>(_cbvCount);
+
+		for (int i = 0; i < _srvCount; ++i)
+		{
+			_srvSlots.push_back(false);
+		}
+
+		for (int i = 0; i < _cbvCount; ++i)
+		{
+			_cbvSlots.push_back(false);
+		}
+	}
+
 	void ResourceFactory::_init(DX12Renderer* renderer, ID3D12DescriptorHeap* cbvSrvHeap)
 	{
 		_pRenderer = renderer;
 		_pDevice = _pRenderer->_device.Get();
 		_pCbvSrvHeap = cbvSrvHeap;
-
-		for (int i = 0; i < TextureLimit; ++i)
-		{
-			_textureSlots.push_back(false);
-		}
-
-		for (int i = 0; i < CBufferLimit; ++i)
-		{
-			_cbufferSlots.push_back(false);
-		}
+		_pCommandList = _pRenderer->_commandList.Get();
 	}
 
 	int ResourceFactory::GetTextureSlot()
 	{
-		for (int i = 0; i < TextureLimit; ++i)
+		for (int i = 0; i < _srvCount; ++i)
 		{
-			if (_textureSlots[i] == false)
+			if (_srvSlots[i] == false)
 			{
-				_textureSlots[i] = true;
-				return i + CBufferLimit;
+				_srvSlots[i] = true;
+				return i + _cbvCount;
 			}
 		}
+
+		Logging::LogError("Ran out of SRV slots. Consider raising the object limit.");
 
 		return -1;
 	}
 
 	void ResourceFactory::FreeTextureSlot(int index)
 	{
-		_textureSlots[index - CBufferLimit] = false;
+		_srvSlots[index - _cbvCount] = false;
 	}
 
 	int ResourceFactory::GetCBufferSlot()
 	{
-		for (int i = 0; i < CBufferLimit; ++i)
+		for (int i = 0; i < _cbvCount; ++i)
 		{
-			if (_cbufferSlots[i] == false)
+			if (_cbvSlots[i] == false)
 			{
-				_cbufferSlots[i] = true;
+				_cbvSlots[i] = true;
 				return i;
 			}
 		}
+
+		Logging::LogError("Ran out of CBV slots. Consider raising the object limit.");
 
 		return -1;
 	}
 
 	void ResourceFactory::FreeCBufferSlot(int index)
 	{
-		_cbufferSlots[index] = false;
+		_cbvSlots[index] = false;
 	}
 }
 

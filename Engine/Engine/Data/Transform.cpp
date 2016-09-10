@@ -4,6 +4,7 @@ namespace Engine
 {
 	Transform::Transform()
 		: Moved(false)
+		, _is2d(false)
 		, _setPosOverride(false)
 		, _setRotOverride(false)
 		, _setScaleOverride(false)
@@ -87,6 +88,16 @@ namespace Engine
 		}
 
 		UpdateMatrix();
+	}
+
+	void Transform::SetIs2D(bool enabled)
+	{
+		_is2d = enabled;
+	}
+
+	bool Transform::GetIs2D() const
+	{
+		return _is2d;
 	}
 
 	Vector3 Transform::GetPosition() const

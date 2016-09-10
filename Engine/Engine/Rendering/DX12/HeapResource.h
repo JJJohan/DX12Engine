@@ -12,25 +12,38 @@ namespace Engine
 	{
 	public:
 		ID3D12Resource* GetResource() const;
+		
+		struct HeapDesc
+		{
+			D3D12_HEAP_TYPE HeapType;
+			D3D12_HEAP_FLAGS HeapFlags;
+			D3D12_RESOURCE_STATES InitialResourceState;
+			D3D12_CLEAR_VALUE* pOptimizedClearValue;
+		};
+
+		void SetHeapDescription(D3D12_HEAP_TYPE heapType, D3D12_HEAP_FLAGS flags, D3D12_RESOURCE_STATES initialState, D3D12_CLEAR_VALUE* clearValue);
 
 	protected:
 		HeapResource();
 		virtual ~HeapResource();
 
-		bool PrepareHeapResource();
-		bool PrepareHeapResource(const D3D12_RESOURCE_DESC& resourceDesc);
-		void HeapTask(const std::function<void()>& heapTask);
+		bool PrepareHeapResource(D3D12_RESOURCE_STATES state = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+		bool PrepareHeapResource(const D3D12_RESOURCE_DESC& resourceDesc, D3D12_RESOURCE_STATES state = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+		bool PrepareHeapResource(const D3D12_RESOURCE_DESC& resourceDesc, HeapDesc& heapDesc);
+		static void HeapTask(const std::function<void()>& heapTask);
 		void MarkDynamic();
 
 		ID3D12Device* _pDevice;
 		ID3D12Resource* _pResource;
 		unsigned long long _heapSize;
+		D3D12_RESOURCE_STATES _resourceState;
 
 	private:
 		bool _dynamic;
-		bool _heapPending;
+		bool _customHeapDesc;
 		unsigned long long _lastHeapSize;
 		ID3D12Resource* _pHeap;
+		HeapDesc _heapDesc;
 
 		friend class HeapManager;
 	};

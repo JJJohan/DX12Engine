@@ -18,6 +18,7 @@ namespace Engine
 		ENGINE_API void SetRotation(const Quaternion& rotation);
 		ENGINE_API void SetScale(float x, float y, float z);
 		ENGINE_API void SetScale(const Vector3& scale);
+		ENGINE_API void SetIs2D(bool enabled);
 
 		ENGINE_API void Move(const Vector3& translation, Space relativeTo = World);
 		ENGINE_API void Rotate(const Vector3& eulerAngles);
@@ -28,6 +29,7 @@ namespace Engine
 		ENGINE_API Vector3 GetPosition() const;
 		ENGINE_API Quaternion GetRotation() const;
 		ENGINE_API Vector3 GetScale() const;
+		ENGINE_API bool GetIs2D() const;
 		ENGINE_API const DirectX::XMMATRIX& GetMatrix() const;
 		ENGINE_API Vector3 GetEulerAngles() const;
 
@@ -48,6 +50,7 @@ namespace Engine
 		Quaternion _rotation;
 		Vector3 _eulerAngles;
 		Vector3 _scale;
+		bool _is2d;
 
 		std::function<Vector3(float, float, float)> _setPosOverrideFunc;
 		std::function<Quaternion(float, float, float, float)> _setRotOverrideFunc;
